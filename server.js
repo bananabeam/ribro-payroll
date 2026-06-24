@@ -1,41 +1,43 @@
 const express = require('express');
 const cors = require('cors');
-const fs = require('fs');
 const path = require('path');
 
 const app = express();
-const PORT = 3000;
-const DB_FILE = path.join(__dirname, 'db.json');
+const PORT = process.env.PORT || 3000;
+
+// ⚠️ PASTE YOUR SUPABASE CREDENTIALS HERE
+const SUPABASE_URL = 'https://wiuczrpqdohgkzscqxzz.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndpdWN6cnBxa2RvaGdrenNjcXh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNzA4NjIsImV4cCI6MjA5Nzg0Njg2Mn0.heIrphrCU26N8LUbNf0bldAr7MDqB3UwWgifJl4zZCs';
 
 app.use(cors());
 app.use(express.json());
 app.use(express.static(__dirname));
 
-if (!fs.existsSync(DB_FILE)) {
-    fs.writeFileSync(DB_FILE, JSON.stringify({ entries: [] }, null, 2));
-}
-
-const readDB = () => JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
-const writeDB = (data) => fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
-
-// API: Get payroll entries (Filtered by user role)
-app.get('/api/payroll', (req, res) => {
-    const db = readDB();
+// API: Get payroll entries from Supabase
+app.get('/api/payroll', async (req, res) => {
     const { username, role } = req.query;
+    let targetUrl = `${SUPABASE_URL}/rest/v1/payroll?select=*`;
+    
+    if (role !== 'admin') {
+        targetUrl += `&createdBy=ilike.${encodeURIComponent(username)}`;
+    }
 
-    if (role === 'admin') {
-        // Admins see everything
-        res.json(db.entries);
-    } else {
-        // Members only see assignments matching their specific username
-        const filtered = db.entries.filter(entry => entry.createdBy.toLowerCase() === username.toLowerCase());
-        res.json(filtered);
+    try {
+        const response = await fetch(targetUrl, {
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${SUPABASE_KEY}`
+            }
+        });
+        const data = await response.json();
+        res.json(data);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
 });
 
-// API: Add a new payroll entry
-app.post('/api/payroll', (req, res) => {
-    const db = readDB();
+// API: Add a new payroll entry to Supabase
+app.post('/api/payroll', async (req, res) => {
     const newEntry = {
         id: Date.now().toString(),
         name: req.body.name,
@@ -44,23 +46,44 @@ app.post('/api/payroll', (req, res) => {
         games: parseInt(req.body.games) || 0,
         rate: parseFloat(req.body.rate) || 0,
         total: (parseInt(req.body.games) || 0) * (parseFloat(req.body.rate) || 0),
-        createdBy: req.body.createdBy // Tracks who encoded the data
+        createdBy: req.body.createdBy
     };
-    
-    db.entries.push(newEntry);
-    writeDB(db);
-    res.status(201).json(newEntry);
+
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/payroll`, {
+            method: 'POST',
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=representation'
+            },
+            body: JSON.stringify(newEntry)
+        });
+        const data = await response.json();
+        res.status(201).json(data[0]);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
-// API: Delete an entry
-app.delete('/api/payroll/:id', (req, res) => {
-    const db = readDB();
+// API: Delete an entry from Supabase
+app.delete('/api/payroll/:id', async (req, res) => {
     const idToDelete = req.params.id;
-    db.entries = db.entries.filter(entry => entry.id !== idToDelete);
-    writeDB(db);
-    res.json({ message: "Entry deleted successfully" });
+    try {
+        await fetch(`${SUPABASE_URL}/rest/v1/payroll?id=eq.${idToDelete}`, {
+            method: 'DELETE',
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${SUPABASE_KEY}`
+            }
+        });
+        res.json({ message: "Entry deleted successfully" });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 app.listen(PORT, () => {
-    console.log(`Server running smoothly at http://localhost:${PORT}`);
+    console.log(`Server running smoothly on port ${PORT}`);
 });
