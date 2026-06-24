@@ -4,15 +4,12 @@ const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const HOST = '0.0.0.0'; // Forces the app to listen globally for public mobile web requests
 
-// ⚠️ YOUR DEPLOYED SUPABASE CREDENTIALS PRESERVED
-const SUPABASE_URL = 'https://wiuczrpqdohgkzscqxzz.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndpdWN6cnBxa2RvaGdrenNjcXh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNzA4NjIsImV4cCI6MjA5Nzg0Njg2Mn0.heIrphrCU26N8LUbNf0bldAr7MDqB3UwWgifJl4zZCs';
-
-// Configured wide-open CORS protocols to authorize Android/mobile browsers
+// Configured wide-open CORS protocols to authorize Android/mobile browsers and preflight checks
 app.use(cors({
     origin: '*',
-    methods: ['GET', 'POST', 'DELETE'],
+    methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
@@ -95,6 +92,10 @@ app.delete('/api/payroll/:id', async (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`Server running smoothly on port ${PORT}`);
+// ⚠️ YOUR DEPLOYED SUPABASE CREDENTIALS PRESERVED
+const SUPABASE_URL = 'https://wiuczrpqdohgkzscqxzz.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndpdWN6cnBxa2RvaGdrenNjcXh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNzA4NjIsImV4cCI6MjA5Nzg0Njg2Mn0.heIrphrCU26N8LUbNf0bldAr7MDqB3UwWgifJl4zZCs';
+
+app.listen(PORT, HOST, () => {
+    console.log(`Server running smoothly on http://${HOST}:${PORT}`);
 });
