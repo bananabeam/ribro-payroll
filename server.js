@@ -5,11 +5,17 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ⚠️ PASTE YOUR SUPABASE CREDENTIALS HERE
+// ⚠️ YOUR DEPLOYED SUPABASE CREDENTIALS PRESERVED
 const SUPABASE_URL = 'https://wiuczrpqdohgkzscqxzz.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndpdWN6cnBxa2RvaGdrenNjcXh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNzA4NjIsImV4cCI6MjA5Nzg0Njg2Mn0.heIrphrCU26N8LUbNf0bldAr7MDqB3UwWgifJl4zZCs';
 
-app.use(cors());
+// Configured wide-open CORS protocols to authorize Android/mobile browsers
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 app.use(express.static(__dirname));
 
