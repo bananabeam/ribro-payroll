@@ -19,6 +19,11 @@ app.use(cors({
 app.use(express.json());
 app.use(express.static(__dirname));
 
+// 🚀 CRITICAL MOBILE FIX: Force the server to explicitly handle and route index.html
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 // API: Get payroll entries from Supabase
 app.get('/api/payroll', async (req, res) => {
     const { username, role } = req.query;
