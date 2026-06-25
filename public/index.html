@@ -12,7 +12,7 @@
     <div id="loginScreen" class="flex items-center justify-center min-h-screen p-4">
         <div class="bg-gray-800 p-8 rounded-xl border border-gray-700 shadow-xl max-w-md w-full space-y-6">
             <div class="flex flex-col items-center text-center">
-                <img src="RIBroInc NEW LOGO.jpg" alt="RIBRO Inc. Logo" class="w-32 h-32 object-contain mb-4 drop-shadow-[0_4px_10px_rgba(249,115,22,0.3)]">
+                <img src="RIBROnc NEW LOGO.jpg" alt="RIBRO Inc. Logo" class="w-32 h-32 object-contain mb-4 drop-shadow-[0_4px_10px_rgba(249,115,22,0.3)]">
                 <h1 class="text-3xl font-black text-orange-500 uppercase tracking-wider">RIBRO Inc.</h1>
                 <p class="text-sm font-semibold text-gray-300 mt-1 uppercase text-center">Roxas Isabela Basketball Referees Organization Inc.</p>
                 <p class="text-xs text-gray-500 mt-1 bg-gray-900/50 py-1 px-2 rounded inline-block border border-gray-700/60">SEC Reg. No. 2025048197717-63</p>
@@ -35,7 +35,7 @@
     <div id="appDashboard" class="hidden min-h-screen flex flex-col">
         <header class="bg-gray-950 border-b border-gray-800 px-6 py-4 flex flex-wrap items-center justify-between gap-4">
             <div class="flex items-center gap-3">
-                <img src="RIBroInc NEW LOGO.jpg" alt="Logo" class="w-10 h-10 object-contain">
+                <img src="RIBROnc NEW LOGO.jpg" alt="Logo" class="w-10 h-10 object-contain">
                 <div>
                     <div class="flex items-center gap-2">
                         <span class="text-lg font-black text-orange-500 tracking-wider">RIBRO INC.</span>
@@ -176,7 +176,6 @@
         let userRole = 'member';
         let payrollCachedRecords = [];
 
-        // Simple real-time dynamic total math field helper listener
         const refNameInput = document.getElementById('refereeName');
         const gamesInput = document.getElementById('gamesCount');
         const rateInput = document.getElementById('gameRate');
@@ -212,7 +211,6 @@
                 currentUser = data.username;
                 userRole = data.role;
 
-                // Toggle visibility views configurations
                 document.getElementById('loginScreen').classList.add('hidden');
                 document.getElementById('appDashboard').classList.remove('hidden');
                 document.getElementById('userDisplay').textContent = currentUser;
@@ -220,8 +218,9 @@
                 if (userRole === 'admin') {
                     document.getElementById('adminBadge').classList.remove('hidden');
                     document.getElementById('adminOnlyForms').classList.remove('hidden');
+                    refNameInput.value = '';
+                    refNameInput.readOnly = false;
                     refNameInput.placeholder = "Enter referee name";
-                    // Fetch users list to populate dropdown
                     loadMembersDropdown();
                 } else {
                     document.getElementById('adminBadge').classList.add('hidden');
@@ -237,7 +236,6 @@
             }
         }
 
-        // Fetch user listing and inject into reset selection element
         async function loadMembersDropdown() {
             try {
                 const response = await fetch('/api/users');
@@ -259,7 +257,6 @@
             }
         }
 
-        // Submits user patch payload request to update user passwords
         async function handlePasswordReset() {
             const username = document.getElementById('resetUserSelect').value;
             const newPassword = document.getElementById('resetNewPassword').value;
@@ -289,11 +286,10 @@
                     alert(`Error: ${data.error}`);
                 }
             } catch (err) {
-                alert("Failed to submit patch update tracking request payload to the server instance context.");
+                alert("Failed to submit patch update tracking request payload to the server.");
             }
         }
 
-        // Fetch payroll entries from engine rest stack
         async function fetchPayrollDataRecords() {
             try {
                 const response = await fetch(`/api/payroll?username=${encodeURIComponent(currentUser)}&role=${userRole}`);
@@ -304,7 +300,6 @@
             }
         }
 
-        // Render arrays layout engine records dynamically matching selected filter criteria
         function renderPayrollTableData() {
             const container = document.getElementById('payrollTableRowsContainer');
             const totalSummaryText = document.getElementById('grandSystemAccumulationPayout');
@@ -312,7 +307,6 @@
 
             container.innerHTML = '';
 
-            // Apply ordering array logic parameters
             let logs = [...payrollCachedRecords];
             if (sortVal === 'date-desc') logs.sort((a,b) => new Date(b.date) - new Date(a.date));
             if (sortVal === 'date-asc') logs.sort((a,b) => new Date(a.date) - new Date(b.date));
@@ -349,7 +343,7 @@
             totalSummaryText.textContent = `₱${sumAccumulator.toFixed(2)}`;
         }
 
-        // Submits new log entry
+        // FIXED FUNCTION: Saving payload dropped the 'createdBy' variable completely
         async function handleSaveAssignment(e) {
             e.preventDefault();
             const payload = {
@@ -357,8 +351,7 @@
                 league: document.getElementById('leagueTitle').value,
                 date: document.getElementById('matchDate').value,
                 games: document.getElementById('gamesCount').value,
-                rate: document.getElementById('gameRate').value,
-                createdBy: currentUser
+                rate: document.getElementById('gameRate').value
             };
 
             try {
@@ -382,7 +375,6 @@
             }
         }
 
-        // Clear row logs mapping row primary tracking identity references
         async function handleDeleteAssignment(id) {
             if (!confirm("Are you absolutely sure you want to permanently delete this assignment entry log row?")) return;
 
@@ -398,7 +390,6 @@
             }
         }
 
-        // Administrative module registry processing handles accounts generation sets
         async function handleCreateAccount(e) {
             e.preventDefault();
             const username = document.getElementById('newUsername').value;
@@ -412,10 +403,9 @@
                 });
 
                 if (response.ok) {
-                    alert(`Success: Referee account "${username}" has been fully registered inside your directory database!`);
+                    alert(`Success: Referee account "${username}" has been fully registered!`);
                     document.getElementById('newUsername').value = '';
                     document.getElementById('newPassword').value = '';
-                    // Reload dropdown list to include the newly registered referee user account
                     loadMembersDropdown();
                 } else {
                     alert("Failed to create user account. Username may be taken.");
@@ -425,7 +415,6 @@
             }
         }
 
-        // Clear down authorization session files variables mapping context drop handles
         function handleLogout() {
             currentUser = null;
             userRole = 'member';
@@ -436,7 +425,6 @@
             document.getElementById('loginScreen').classList.remove('hidden');
         }
 
-        // Compiles data grid files array mapping matrix blocks outputs to Excel sheets formats directly
         function exportToExcelWorkbook() {
             if (payrollCachedRecords.length === 0) {
                 alert("There are no records currently available data fields to transfer to spreadsheet.");
@@ -450,15 +438,13 @@
                 "Match Officiated Date": item.date,
                 "Games Counts": item.games,
                 "Per Game Rate Fee (PHP)": item.rate,
-                "Total Payout Compensation (PHP)": item.total,
-                "Logged By User": item.createdBy || 'System'
+                "Total Payout Compensation (PHP)": item.total
             }));
 
             const ws = XLSX.utils.json_to_sheet(cleanRows);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "RIBRO Payroll Logs");
             
-            // Format dynamic file naming outputs strings parameters configurations
             const datestamp = new Date().toISOString().slice(0,10);
             XLSX.writeFile(wb, `RIBRO_Inc_Payroll_Report_${datestamp}.xlsx`);
         }
