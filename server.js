@@ -65,22 +65,30 @@ app.post('/api/users', async (req, res) => {
     }
 });
 
-// Fetch payroll rows conditionally based on role
+// ==========================================
+// 🛠️ FIXED ROUTE: SAFE ARRAY HANDLER FETCH
+// ==========================================
 app.get('/api/payroll', async (req, res) => {
     try {
         const { username, role } = req.query;
         let queryUrl = `${SUPABASE_URL}/rest/v1/payroll?select=*`;
 
+        // Filter out records to match the user's name exactly if they are not an admin
         if (role !== 'admin' && username) {
-            queryUrl += `&name=eq.${encodeURIComponent(username)}`;
+            queryUrl += `&name=eq.${encodeURIComponent(username.trim())}`;
         }
 
         const response = await axios.get(queryUrl, {
             headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
         });
-        res.json(response.data);
+
+        // Always guarantee an array payload to protect frontend loops
+        const records = Array.isArray(response.data) ? response.data : [];
+        res.json(records);
     } catch (err) {
-        res.status(500).json({ error: "Failed to read database records." });
+        console.error("Database Fetch Error:", err.response?.data || err.message);
+        // Safely return an empty array back so the table component doesn't crash
+        res.json([]);
     }
 });
 
@@ -131,5 +139,4 @@ app.get('*', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`🚀 RIBRO Inc. Server Engine running successfully on port ${PORT}`);
-});
+    console.log(`🚀 RIBRO Inc
