@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const axios = require('axios');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -33,8 +34,7 @@ app.get('/api/payroll', async (req, res) => {
             targetUrl += `&createdBy=ilike.${encodeURIComponent(username)}`;
         }
 
-        const response = await fetch(targetUrl, {
-            method: 'GET',
+        const response = await axios.get(targetUrl, {
             headers: {
                 'apikey': SUPABASE_KEY.trim(),
                 'Authorization': `Bearer ${SUPABASE_KEY.trim()}`,
@@ -42,11 +42,9 @@ app.get('/api/payroll', async (req, res) => {
             }
         });
         
-        const data = await response.json();
-        // Force array compliance so the frontend loop (.forEach) never crashes
-        res.json(Array.isArray(data) ? data : []);
+        res.json(Array.isArray(response.data) ? response.data : []);
     } catch (err) {
-        console.error("Server fetch error:", err);
+        console.error("Supabase GET Exception Details:", err.response?.data || err.message);
         res.json([]);
     }
 });
@@ -65,21 +63,18 @@ app.post('/api/payroll', async (req, res) => {
             createdBy: req.body.createdBy || ''
         };
 
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/payroll`, {
-            method: 'POST',
+        const response = await axios.post(`${SUPABASE_URL}/rest/v1/payroll`, newEntry, {
             headers: {
                 'apikey': SUPABASE_KEY.trim(),
                 'Authorization': `Bearer ${SUPABASE_KEY.trim()}`,
                 'Content-Type': 'application/json',
                 'Prefer': 'return=representation'
-            },
-            body: JSON.stringify(newEntry)
+            }
         });
         
-        const data = await response.json();
-        res.status(201).json(Array.isArray(data) ? data[0] : data);
+        res.status(201).json(Array.isArray(response.data) ? response.data[0] : response.data);
     } catch (err) {
-        console.error("Server insert error:", err);
+        console.error("Supabase POST Exception Details:", err.response?.data || err.message);
         res.status(500).json({ error: err.message });
     }
 });
@@ -88,8 +83,7 @@ app.post('/api/payroll', async (req, res) => {
 app.delete('/api/payroll/:id', async (req, res) => {
     try {
         const idToDelete = req.params.id;
-        await fetch(`${SUPABASE_URL}/rest/v1/payroll?id=eq.${idToDelete}`, {
-            method: 'DELETE',
+        await axios.delete(`${SUPABASE_URL}/rest/v1/payroll?id=eq.${idToDelete}`, {
             headers: {
                 'apikey': SUPABASE_KEY.trim(),
                 'Authorization': `Bearer ${SUPABASE_KEY.trim()}`
@@ -97,6 +91,7 @@ app.delete('/api/payroll/:id', async (req, res) => {
         });
         res.json({ message: "Entry deleted successfully" });
     } catch (err) {
+        console.error("Supabase DELETE Exception Details:", err.response?.data || err.message);
         res.status(500).json({ error: err.message });
     }
 });
