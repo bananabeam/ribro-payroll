@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RIBRO Inc. | Referee Payroll Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body class="bg-gray-900 text-gray-100 min-h-screen font-sans">
 
@@ -106,6 +107,22 @@
             </section>
 
             <section class="lg:col-span-2 space-y-6">
+                <div id="adminControlsBar" class="hidden flex flex-col sm:flex-row gap-4 items-center justify-between bg-gray-800 p-4 rounded-xl border border-gray-700 shadow-md">
+                    <div class="flex items-center gap-2 w-full sm:w-auto">
+                        <label class="text-xs font-bold uppercase tracking-wider text-gray-400 whitespace-nowrap">Sort By:</label>
+                        <select id="adminSortSelect" onchange="sortAndRenderTable()" class="w-full sm:w-auto bg-gray-900 border border-gray-600 rounded px-3 py-1.5 text-sm text-white focus:outline-none focus:border-orange-500 font-semibold cursor-pointer">
+                            <option value="date-desc">Date (Newest First)</option>
+                            <option value="date-asc">Date (Oldest First)</option>
+                            <option value="name-asc">Referee Name (A-Z)</option>
+                            <option value="name-desc">Referee Name (Z-A)</option>
+                            <option value="league-asc">League (A-Z)</option>
+                        </select>
+                    </div>
+                    <button onclick="downloadExcelReport()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 px-4 rounded text-xs uppercase tracking-wider transition shadow-md flex items-center justify-center gap-2">
+                        💾 Download Excel File
+                    </button>
+                </div>
+
                 <div class="bg-gradient-to-r from-gray-800 to-gray-800 border-l-4 border-orange-500 p-6 rounded-xl shadow-md flex justify-between items-center">
                     <div>
                         <h3 id="totalCardTitle" class="text-sm font-semibold uppercase tracking-wider text-gray-400">Total Payout</h3>
@@ -144,6 +161,8 @@
         
         let currentUser = null;
         let currentUserRole = null;
+        // 🚀 ADDED: Cache variable to keep data in memory for sorting & excel functions
+        let fetchedPayrollEntries = [];
 
         const loginScreen = document.getElementById('loginScreen');
         const appDashboard = document.getElementById('appDashboard');
@@ -152,6 +171,7 @@
         const dashboardBadge = document.getElementById('dashboardBadge');
         const actionsHeader = document.getElementById('actionsHeader');
         const totalCardTitle = document.getElementById('totalCardTitle');
+        const adminControlsBar = document.getElementById('adminControlsBar');
 
         const form = document.getElementById('payrollForm');
         const refNameInput = document.getElementById('refName');
@@ -184,6 +204,7 @@
                 refNameInput.value = "";
                 actionsHeader.classList.remove('hidden');
                 totalCardTitle.textContent = "Grand Total System Payout";
+                adminControlsBar.classList.remove('hidden'); // Show Sorting and Excel features
             } else {
                 dashboardBadge.textContent = "Member Mode";
                 dashboardBadge.className = "text-[11px] font-bold px-2 py-0.5 rounded bg-blue-900/50 text-blue-400 border border-blue-800";
@@ -191,6 +212,7 @@
                 refNameInput.readOnly = true;
                 actionsHeader.classList.add('hidden');
                 totalCardTitle.textContent = "Your Earnings Total";
+                adminControlsBar.classList.add('hidden'); // Hide Sorting and Excel features
             }
 
             userDisplay.textContent = `User: ${currentUser}`;
@@ -203,6 +225,7 @@
         function handleLogout() {
             currentUser = null;
             currentUserRole = null;
+            fetchedPayrollEntries = [];
             usernameInput.value = "";
             appDashboard.classList.add('hidden');
             loginScreen.classList.remove('hidden');
@@ -220,10 +243,31 @@
             try {
                 const response = await fetch(`${API_URL}?username=${encodeURIComponent(currentUser)}&role=${currentUserRole}`);
                 const data = await response.json();
-                renderTable(data);
+                
+                // Save entries into memory cache
+                fetchedPayrollEntries = Array.isArray(data) ? data : [];
+                
+                // Sort and display the items
+                sortAndRenderTable();
             } catch (err) {
                 console.error("Error fetching data:", err);
             }
+        }
+
+        // 🚀 ADDED: Sorting function processor
+        function sortAndRenderTable() {
+            const sortVal = document.getElementById('adminSortSelect').value;
+            
+            fetchedPayrollEntries.sort((a, b) => {
+                if (sortVal === 'date-desc') return new Date(b.date) - new Date(a.date);
+                if (sortVal === 'date-asc') return new Date(a.date) - new Date(b.date);
+                if (sortVal === 'name-asc') return String(a.name).localeCompare(b.name);
+                if (sortVal === 'name-desc') return String(b.name).localeCompare(a.name);
+                if (sortVal === 'league-asc') return String(a.league).localeCompare(b.league);
+                return 0;
+            });
+            
+            renderTable(fetchedPayrollEntries);
         }
 
         // Render Table rows
@@ -268,6 +312,47 @@
             });
 
             grandTotalDisplay.textContent = `\u20B1${grandTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        }
+
+        // 🚀 ADDED: Excel File Exporter Function
+        function downloadExcelReport() {
+            if (!fetchedPayrollEntries || fetchedPayrollEntries.length === 0) {
+                alert("There are no payroll records available to download.");
+                return;
+            }
+
+            // Map data array to professional layout columns
+            const excelRows = fetchedPayrollEntries.map((row, index) => ({
+                "Row No.": index + 1,
+                "Referee Name": row.name.toUpperCase(),
+                "League": row.league,
+                "Assignment Date": row.date,
+                "Games Officiated": parseInt(row.games) || 0,
+                "Rate Per Game (PHP)": parseFloat(row.rate) || 0,
+                "Total Payout (PHP)": parseFloat(row.total) || 0,
+                "Logged By": row.createdBy
+            }));
+
+            // Generate structural workbook and worksheets
+            const worksheet = XLSX.utils.json_to_sheet(excelRows);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Payroll Summary");
+
+            // Format column scaling widths automatically
+            worksheet["!cols"] = [
+                { wch: 10 }, // Row No.
+                { wch: 22 }, // Referee Name
+                { wch: 25 }, // League
+                { wch: 18 }, // Assignment Date
+                { wch: 18 }, // Games Officiated
+                { wch: 20 }, // Rate Per Game
+                { wch: 20 }, // Total Payout
+                { wch: 15 }  // Logged By
+            ];
+
+            // Save file down to local computer storage
+            const dateStamp = new Date().toISOString().split('T')[0];
+            XLSX.writeFile(workbook, `RIBRO_Inc_Payroll_Report_${dateStamp}.xlsx`);
         }
 
         form.addEventListener('submit', async (e) => {
