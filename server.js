@@ -71,6 +71,54 @@ app.post('/api/users', async (req, res) => {
     }
 });
 
+// NEW API: Admin fetches all registered members for the navigation dropdown
+app.get('/api/users', async (req, res) => {
+    try {
+        const response = await axios.get(`${SUPABASE_URL}/rest/v1/users?select=username,role`, {
+            headers: { 
+                'apikey': SUPABASE_KEY, 
+                'Authorization': `Bearer ${SUPABASE_KEY}` 
+            }
+        });
+        res.json(response.data);
+    } catch (err) {
+        console.error("Fetch Users Error:", err.message);
+        res.status(500).json({ error: "Failed to retrieve members list." });
+    }
+});
+
+// NEW API: Admin resets a member's password via selective patch filtering
+app.patch('/api/users/reset-password', async (req, res) => {
+    try {
+        const { username, newPassword } = req.body;
+        if (!username || !newPassword) {
+            return res.status(400).json({ error: "Username and new password are required." });
+        }
+
+        const response = await axios.patch(
+            `${SUPABASE_URL}/rest/v1/users?username=eq.${encodeURIComponent(username.trim())}`,
+            { password: newPassword.trim() },
+            {
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=representation'
+                }
+            }
+        );
+
+        if (response.data.length === 0) {
+            return res.status(404).json({ error: "User not found." });
+        }
+
+        res.json({ message: `Password for ${username} has been successfully reset.` });
+    } catch (err) {
+        console.error("Password Reset Error:", err.message);
+        res.status(500).json({ error: "Failed to reset password." });
+    }
+});
+
 // Fetch payroll rows conditionally based on role
 app.get('/api/payroll', async (req, res) => {
     try {
