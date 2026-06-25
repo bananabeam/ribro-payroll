@@ -14,7 +14,7 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 app.use(cors({
     origin: '*',
     methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'apikey']
+    allowedHeaders: ['Content-Type', 'Authorization', 'apikey', 'Prefer']
 }));
 
 app.use(express.json());
@@ -39,13 +39,22 @@ app.get('/api/payroll', async (req, res) => {
             headers: {
                 'apikey': SUPABASE_KEY.trim(),
                 'Authorization': `Bearer ${SUPABASE_KEY.trim()}`,
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
             }
         });
+        
         const data = await response.json();
+        
+        // If Supabase returned an error object instead of an array, send an empty list back to safety protect the frontend loop
+        if (!Array.isArray(data)) {
+            console.error("Supabase error response:", data);
+            return res.json([]);
+        }
+        
         res.json(data);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json([]);
     }
 });
 
@@ -74,7 +83,7 @@ app.post('/api/payroll', async (req, res) => {
             body: JSON.stringify(newEntry)
         });
         const data = await response.json();
-        res.status(201).json(data[0] || data);
+        res.status(201).json(Array.isArray(data) ? data[0] : data);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
