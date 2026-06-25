@@ -12,431 +12,455 @@
     <div id="loginScreen" class="flex items-center justify-center min-h-screen p-4">
         <div class="bg-gray-800 p-8 rounded-xl border border-gray-700 shadow-xl max-w-md w-full space-y-6">
             <div class="flex flex-col items-center text-center">
-                <img src="RIBroInc NEW LOGO.jpg" alt="RIBRO Inc. Logo" class="w-32 h-32 object-contain mb-4 drop-shadow-[0_4px_10px_rgba(249,115,22,0.3)]">
+                <img src="RIBROnc NEW LOGO.jpg" alt="RIBRO Inc. Logo" class="w-32 h-32 object-contain mb-4 drop-shadow-[0_4px_10px_rgba(249,115,22,0.3)]">
                 <h1 class="text-3xl font-black text-orange-500 uppercase tracking-wider">RIBRO Inc.</h1>
-                <p class="text-sm font-semibold text-gray-300 mt-1 uppercase tracking-wide">Roxas Isabela Basketball Referees Organization Inc.</p>
+                <p class="text-sm font-semibold text-gray-300 mt-1 uppercase text-center">Roxas Isabela Basketball Referees Organization Inc.</p>
                 <p class="text-xs text-gray-500 mt-1 bg-gray-900/50 py-1 px-2 rounded inline-block border border-gray-700/60">SEC Reg. No. 2025048197717-63</p>
             </div>
-            
+
             <form id="loginForm" class="space-y-4" onsubmit="handleLogin(event)">
                 <div>
                     <label class="block text-left text-xs font-bold uppercase text-gray-400 mb-1">Username</label>
-                    <input type="text" id="usernameInput" required placeholder="Enter username" class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white focus:outline-none focus:border-orange-500 font-semibold">
+                    <input type="text" id="usernameInput" required placeholder="Enter username" class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-orange-500">
                 </div>
                 <div>
                     <label class="block text-left text-xs font-bold uppercase text-gray-400 mb-1">Password</label>
-                    <input type="password" id="passwordInput" required placeholder="Enter password" class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white focus:outline-none focus:border-orange-500 font-semibold">
+                    <input type="password" id="passwordInput" required placeholder="•••••" class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-orange-500">
                 </div>
-                
-                <button type="submit" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-2.5 px-4 rounded transition duration-200 text-sm tracking-wide uppercase shadow-lg">
-                    Log In
-                </button>
+                <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 rounded transition duration-200 uppercase tracking-wide">Log In</button>
             </form>
         </div>
     </div>
 
-    <div id="appDashboard" class="hidden">
-        <header class="bg-black border-b border-orange-600 p-5 shadow-lg">
-            <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div class="flex items-center gap-4">
-                    <img src="RIBroInc NEW LOGO.jpg" alt="RIBRO Inc. Logo" class="w-12 h-12 object-contain hidden sm:block">
-                    <div>
-                        <h1 class="text-xl font-black tracking-wider text-orange-500 uppercase flex flex-wrap items-center gap-x-3 gap-y-1">
-                            RIBRO Inc.
-                            <span class="text-xs font-medium text-gray-400 normal-case tracking-normal">Roxas Isabela Basketball Referees Organization Inc.</span>
-                        </h1>
-                        <p class="text-[11px] text-gray-500 tracking-wide mt-0.5">SEC Reg. No. 2025048197717-63</p>
-                    </div>
-                </div>
-                <div class="flex items-center justify-between w-full md:w-auto gap-4 border-t border-gray-800 md:border-t-0 pt-3 md:pt-0">
+    <div id="appDashboard" class="hidden min-h-screen flex flex-col">
+        <header class="bg-gray-950 border-b border-gray-800 px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <img src="RIBROnc NEW LOGO.jpg" alt="Logo" class="w-10 h-10 object-contain">
+                <div>
                     <div class="flex items-center gap-2">
-                        <span id="userDisplay" class="text-sm font-semibold text-gray-300"></span>
-                        <span id="dashboardBadge" class="text-[11px] font-bold px-2 py-0.5 rounded">Member Mode</span>
+                        <span class="text-lg font-black text-orange-500 tracking-wider">RIBRO INC.</span>
+                        <span class="text-[10px] text-gray-400 font-medium hidden sm:inline">Roxas Isabela Basketball Referees Organization Inc.</span>
                     </div>
-                    <button onclick="handleLogout()" class="text-xs bg-gray-800 hover:bg-red-900 border border-gray-700 text-gray-400 hover:text-white px-3 py-1 rounded transition">
-                        Logout
-                    </button>
+                    <p class="text-[9px] text-gray-500 font-mono">SEC Reg. No. 2025048197717-63</p>
                 </div>
+            </div>
+            <div class="flex items-center gap-3 ml-auto">
+                <span class="text-sm text-gray-400">User: <strong id="userDisplay" class="text-white"></strong></span>
+                <span id="adminBadge" class="hidden bg-red-900/60 border border-red-700 text-red-300 text-[10px] font-bold px-2 py-0.5 rounded">Admin Control View</span>
+                <button onclick="handleLogout()" class="bg-gray-800 hover:bg-gray-700 text-gray-300 px-3 py-1 text-xs rounded border border-gray-700 transition">Logout</button>
             </div>
         </header>
 
-        <main class="max-w-7xl mx-auto p-4 md:p-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <main class="flex-1 p-6 grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl w-full mx-auto">
             
-            <div class="space-y-6">
-                <section class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-md h-fit">
-                    <h2 class="text-xl font-bold mb-4 text-orange-400 border-b border-gray-700 pb-2">Add Assignment Log</h2>
-                    
-                    <form id="payrollForm" class="space-y-4">
+            <div id="controlPanelSide" class="space-y-6">
+                
+                <div id="addAssignmentSection" class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-xl">
+                    <h2 class="text-xl font-bold text-orange-500 mb-4">Add Assignment Log</h2>
+                    <form id="payrollForm" onsubmit="handleSaveAssignment(event)" class="space-y-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-400 mb-1">Referee Name</label>
-                            <input type="text" id="refName" required class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white focus:outline-none focus:border-orange-500 disabled:opacity-50" readonly>
+                            <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Referee Name</label>
+                            <input type="text" id="refereeName" required class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white">
                         </div>
-
                         <div>
-                            <label class="block text-sm font-medium text-gray-400 mb-1">League Title</label>
-                            <input type="text" id="league" placeholder="e.g., Inter-Barangay, SK Cup, SK League" required class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white focus:outline-none focus:border-orange-500">
+                            <label class="block text-xs font-bold uppercase text-gray-400 mb-1">League Title</label>
+                            <input type="text" id="leagueTitle" required placeholder="e.g., Inter-Barangay, SK Cup, SK League" class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white placeholder-gray-500">
                         </div>
-
                         <div>
-                            <label class="block text-sm font-medium text-gray-400 mb-1">Date</label>
-                            <input type="date" id="gameDate" required class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white focus:outline-none focus:border-orange-500">
+                            <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Date</label>
+                            <input type="date" id="matchDate" required class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white">
                         </div>
-
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-400 mb-1">Games Officiated</label>
-                                <input type="number" id="gamesCount" min="1" value="1" required class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white focus:outline-none focus:border-orange-500">
+                                <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Games Officiated</label>
+                                <input type="number" id="gamesCount" min="1" value="1" required class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-400 mb-1">Rate per Game (₱)</label>
-                                <input type="number" id="gameRate" min="0" step="0.01" placeholder="500.00" required class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white focus:outline-none focus:border-orange-500">
+                                <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Rate per Game (₱)</label>
+                                <input type="number" id="gameRate" step="0.01" value="500.00" required class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white">
                             </div>
                         </div>
-
-                        <div class="bg-gray-900 p-3 rounded border border-dashed border-gray-700 flex justify-between items-center">
-                            <span class="text-sm text-gray-400 font-medium">Assignment Total:</span>
-                            <span id="liveTotal" class="text-xl font-bold text-green-400">₱0.00</span>
+                        <div class="pt-2 flex items-center justify-between border-t border-gray-700/60">
+                            <span class="text-xs font-bold text-gray-400 uppercase">Assignment Total:</span>
+                            <span id="liveCalculationTotal" class="text-xl font-black text-green-400">₱0.00</span>
                         </div>
-
-                        <button type="submit" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-2.5 px-4 rounded transition duration-200 uppercase tracking-wide">
-                            Save Assignment
-                        </button>
+                        <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 rounded transition duration-200 uppercase tracking-wide">Save Assignment</button>
                     </form>
-                </section>
+                </div>
 
-                <section id="adminAccountCreationBox" class="hidden bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-md">
-                    <h2 class="text-xl font-bold mb-4 text-emerald-400 border-b border-gray-700 pb-2">Create Referee Account</h2>
-                    <form id="userCreationForm" class="space-y-4" onsubmit="handleCreateUser(event)">
-                        <div>
-                            <label class="block text-xs font-bold uppercase text-gray-400 mb-1">New Username</label>
-                            <input type="text" id="newUsername" required placeholder="Referee unique name" class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-emerald-500">
+                <div id="adminOnlyForms" class="hidden space-y-6">
+                    <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-xl">
+                        <h2 class="text-xl font-bold text-teal-400 mb-4">Create Referee Account</h2>
+                        <form id="createAccountForm" onsubmit="handleCreateAccount(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-gray-400 mb-1">New Username</label>
+                                <input type="text" id="newUsername" required placeholder="Referee unique name" class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white placeholder-gray-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Assign Password</label>
+                                <input type="text" id="newPassword" required placeholder="Assign entry password" class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white placeholder-gray-500">
+                            </div>
+                            <button type="submit" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 rounded transition duration-200 uppercase tracking-wide">Register Member Account</button>
+                        </form>
+                    </div>
+
+                    <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-xl">
+                        <h2 class="text-xl font-bold text-orange-500 mb-4">Manage Members & Passwords</h2>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Select Member</label>
+                                <select id="resetUserSelect" class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white focus:outline-none focus:border-orange-500">
+                                    <option value="">-- Loading Members... --</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-gray-400 mb-1">New Password</label>
+                                <input type="text" id="resetNewPassword" placeholder="Enter temporary/new password" class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-orange-500">
+                            </div>
+                            <button onclick="handlePasswordReset()" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 rounded transition duration-200 uppercase tracking-wide">Reset Password</button>
                         </div>
-                        <div>
-                            <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Assign Password</label>
-                            <input type="text" id="newPassword" required placeholder="Assign entry password" class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-emerald-500">
-                        </div>
-                        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 px-4 rounded text-sm uppercase tracking-wider transition shadow-md">
-                            Register Member Account
-                        </button>
-                    </form>
-                </section>
+                    </div>
+                </div>
+
             </div>
 
-            <section class="lg:col-span-2 space-y-6">
-                <div id="adminControlsBar" class="hidden flex flex-col sm:flex-row gap-4 items-center justify-between bg-gray-800 p-4 rounded-xl border border-gray-700 shadow-md">
-                    <div class="flex items-center gap-2 w-full sm:w-auto">
-                        <label class="text-xs font-bold uppercase tracking-wider text-gray-400 whitespace-nowrap">Sort By:</label>
-                        <select id="adminSortSelect" onchange="sortAndRenderTable()" class="w-full sm:w-auto bg-gray-900 border border-gray-600 rounded px-3 py-1.5 text-sm text-white focus:outline-none focus:border-orange-500 font-semibold cursor-pointer">
+            <div class="lg:col-span-2 space-y-4 flex flex-col">
+                <div class="flex flex-wrap items-center justify-between gap-3 bg-gray-950 p-3 rounded-xl border border-gray-800">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-gray-400 uppercase font-bold">Sort By:</span>
+                        <select id="sortConfigSelection" onchange="renderPayrollTableData()" class="bg-gray-900 border border-gray-700 rounded text-xs px-2 py-1 text-white">
                             <option value="date-desc">Date (Newest First)</option>
                             <option value="date-asc">Date (Oldest First)</option>
                             <option value="name-asc">Referee Name (A-Z)</option>
-                            <option value="name-desc">Referee Name (Z-A)</option>
-                            <option value="league-asc">League (A-Z)</option>
+                            <option value="total-desc">Highest Payout Amount</option>
                         </select>
                     </div>
-                    <button onclick="downloadExcelReport()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 px-4 rounded text-xs uppercase tracking-wider transition shadow-md flex items-center justify-center gap-2">
-                        💾 Download Excel File
+                    <button onclick="exportToExcelWorkbook()" class="bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 rounded flex items-center gap-1.5 transition ml-auto">
+                        📊 Download Excel File
                     </button>
                 </div>
 
-                <div class="bg-gradient-to-r from-gray-800 to-gray-800 border-l-4 border-orange-500 p-6 rounded-xl shadow-md flex justify-between items-center">
+                <div class="bg-gradient-to-r from-orange-600/20 to-amber-600/10 border border-orange-500/30 rounded-xl p-5 flex items-center justify-between shadow-md">
                     <div>
-                        <h3 id="totalCardTitle" class="text-sm font-semibold uppercase tracking-wider text-gray-400">Total Payout</h3>
-                        <p class="text-xs text-gray-500">Accumulated total for loaded entries</p>
+                        <h4 class="text-xs uppercase font-bold tracking-wider text-orange-400">Grand Total System Payout</h4>
+                        <p class="text-[10px] text-gray-400 mt-0.5">Accumulated total for loaded entries</p>
                     </div>
-                    <div id="grandTotal" class="text-3xl font-black text-orange-500">₱0.00</div>
+                    <span id="grandSystemAccumulationPayout" class="text-3xl font-black text-orange-500 font-mono">₱0.00</span>
                 </div>
 
-                <div class="bg-gray-800 rounded-xl border border-gray-700 shadow-md overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
+                <div class="bg-gray-800 rounded-xl border border-gray-700 shadow-xl overflow-hidden flex-1 flex flex-col min-h-[400px]">
+                    <div class="overflow-x-auto w-full flex-1">
+                        <table class="w-full text-left text-xs border-collapse">
                             <thead>
-                                <tr class="bg-black text-gray-400 text-xs uppercase tracking-wider border-b border-gray-700">
-                                    <th class="p-4">Referee</th>
-                                    <th class="p-4">League</th>
-                                    <th class="p-4">Date</th>
-                                    <th class="p-4 text-center">Games</th>
-                                    <th class="p-4 text-right">Rate</th>
-                                    <th class="p-4 text-right">Total</th>
-                                    <th id="actionsHeader" class="p-4 text-center">Actions</th>
+                                <tr class="bg-gray-950 text-gray-400 uppercase font-bold border-b border-gray-700">
+                                    <th class="p-3">Referee</th>
+                                    <th class="p-3">League</th>
+                                    <th class="p-3">Date</th>
+                                    <th class="p-3 text-center">Games</th>
+                                    <th class="p-3 text-right">Rate</th>
+                                    <th class="p-3 text-right">Total</th>
+                                    <th class="p-3 text-center">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody id="payrollTableBody" class="divide-y divide-gray-700 text-sm"></tbody>
+                            <tbody id="payrollTableRowsContainer" class="divide-y divide-y-gray-700/50">
+                                </tbody>
                         </table>
                     </div>
-                    <div id="emptyState" class="p-8 text-center text-gray-500 hidden">
-                        No records found.
-                    </div>
                 </div>
-            </section>
+            </div>
         </main>
     </div>
 
     <script>
-        // Adjust paths targeting Render web instance server coordinates
-        const BASE_API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-            ? 'http://localhost:3000' 
-            : 'https://ribro-payroll.onrender.com';
-
         let currentUser = null;
-        let currentUserRole = null;
-        let fetchedPayrollEntries = [];
+        let userRole = 'member';
+        let payrollCachedRecords = [];
 
-        const loginScreen = document.getElementById('loginScreen');
-        const appDashboard = document.getElementById('appDashboard');
-        const usernameInput = document.getElementById('usernameInput');
-        const passwordInput = document.getElementById('passwordInput');
-        const userDisplay = document.getElementById('userDisplay');
-        const dashboardBadge = document.getElementById('dashboardBadge');
-        const actionsHeader = document.getElementById('actionsHeader');
-        const totalCardTitle = document.getElementById('totalCardTitle');
-        const adminControlsBar = document.getElementById('adminControlsBar');
-        const adminAccountCreationBox = document.getElementById('adminAccountCreationBox');
-
-        const form = document.getElementById('payrollForm');
-        const refNameInput = document.getElementById('refName');
+        // Simple real-time dynamic total math field helper listener
+        const refNameInput = document.getElementById('refereeName');
         const gamesInput = document.getElementById('gamesCount');
         const rateInput = document.getElementById('gameRate');
-        const liveTotalDisplay = document.getElementById('liveTotal');
-        const grandTotalDisplay = document.getElementById('grandTotal');
-        const tableBody = document.getElementById('payrollTableBody');
-        const emptyState = document.getElementById('emptyState');
+        const liveTotalText = document.getElementById('liveCalculationTotal');
 
+        function updateLiveTotalMathOutput() {
+            const g = parseInt(gamesInput.value) || 0;
+            const r = parseFloat(rateInput.value) || 0;
+            liveTotalText.textContent = `₱${(g * r).toFixed(2)}`;
+        }
+        gamesInput.addEventListener('input', updateLiveTotalMathOutput);
+        rateInput.addEventListener('input', updateLiveTotalMathOutput);
+
+        // Security Authentication Router Session Login Logic
         async function handleLogin(e) {
             e.preventDefault();
-            const username = usernameInput.value.trim();
-            const password = passwordInput.value.trim();
+            const username = document.getElementById('usernameInput').value;
+            const password = document.getElementById('passwordInput').value;
 
             try {
-                const response = await fetch(`${BASE_API_URL}/api/login`, {
+                const response = await fetch('/api/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, password })
                 });
+                const data = await response.json();
 
                 if (!response.ok) {
-                    const errData = await response.json();
-                    alert(errData.error || "Login Verification Denied.");
+                    alert(data.error || "Authentication system failure.");
                     return;
                 }
 
-                const userData = await response.json();
-                currentUser = userData.username;
-                currentUserRole = userData.role;
+                currentUser = data.username;
+                userRole = data.role;
 
-                // Adjust UI features according to access roles configuration rules
-                if(currentUserRole === 'admin') {
-                    dashboardBadge.textContent = "Admin Control View";
-                    dashboardBadge.className = "text-[11px] font-bold px-2 py-0.5 rounded bg-red-900/50 text-red-400 border border-red-800";
-                    refNameInput.readOnly = false;
-                    refNameInput.value = "";
-                    actionsHeader.classList.remove('hidden');
-                    totalCardTitle.textContent = "Grand Total System Payout";
-                    adminControlsBar.classList.remove('hidden');
-                    adminAccountCreationBox.classList.remove('hidden'); // Enable registration box panel
+                // Toggle visibility views configurations
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('appDashboard').classList.remove('hidden');
+                document.getElementById('userDisplay').textContent = currentUser;
+
+                if (userRole === 'admin') {
+                    document.getElementById('adminBadge').classList.remove('hidden');
+                    document.getElementById('adminOnlyForms').classList.remove('hidden');
+                    refNameInput.placeholder = "Enter referee name";
+                    // Fetch users list to populate dropdown
+                    loadMembersDropdown();
                 } else {
-                    dashboardBadge.textContent = "Member Mode";
-                    dashboardBadge.className = "text-[11px] font-bold px-2 py-0.5 rounded bg-blue-900/50 text-blue-400 border border-blue-800";
+                    document.getElementById('adminBadge').classList.add('hidden');
+                    document.getElementById('adminOnlyForms').classList.add('hidden');
                     refNameInput.value = currentUser;
                     refNameInput.readOnly = true;
-                    actionsHeader.classList.add('hidden');
-                    totalCardTitle.textContent = "Your Earnings Total";
-                    adminControlsBar.classList.add('hidden');
-                    adminAccountCreationBox.classList.add('hidden');
                 }
 
-                userDisplay.textContent = `User: ${currentUser}`;
-                loginScreen.classList.add('hidden');
-                appDashboard.classList.remove('hidden');
-                
-                fetchPayroll();
+                updateLiveTotalMathOutput();
+                fetchPayrollDataRecords();
             } catch (err) {
-                alert("Could not connect to the authentication server.");
+                alert("Cannot establish communications with backend api engine.");
             }
         }
 
-        async function handleCreateUser(e) {
-            e.preventDefault();
-            const username = document.getElementById('newUsername').value.trim();
-            const password = document.getElementById('newPassword').value.trim();
+        // Fetch user listing and inject into reset selection element
+        async function loadMembersDropdown() {
+            try {
+                const response = await fetch('/api/users');
+                const users = await response.json();
+                
+                const selectElement = document.getElementById('resetUserSelect');
+                selectElement.innerHTML = '<option value="">-- Select a Member --</option>';
+                
+                users.forEach(user => {
+                    if(user.username !== 'admin') {
+                        const option = document.createElement('option');
+                        option.value = user.username;
+                        option.textContent = `${user.username} (${user.role})`;
+                        selectElement.appendChild(option);
+                    }
+                });
+            } catch (err) {
+                console.error("Error populating member selection dropdown options:", err);
+            }
+        }
+
+        // Submits user patch payload request to update user passwords
+        async function handlePasswordReset() {
+            const username = document.getElementById('resetUserSelect').value;
+            const newPassword = document.getElementById('resetNewPassword').value;
+
+            if (!username || !newPassword) {
+                alert("Please select a target user account row and provide a new entry password.");
+                return;
+            }
+
+            if (!confirm(`Are you certain you wish to overwrite the active access login password row for ${username}?`)) {
+                return;
+            }
 
             try {
-                const response = await fetch(`${BASE_API_URL}/api/users`, {
+                const response = await fetch('/api/users/reset-password', {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, newPassword })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert(data.message);
+                    document.getElementById('resetNewPassword').value = '';
+                } else {
+                    alert(`Error: ${data.error}`);
+                }
+            } catch (err) {
+                alert("Failed to submit patch update tracking request payload to the server instance context.");
+            }
+        }
+
+        // Fetch payroll entries from engine rest stack
+        async function fetchPayrollDataRecords() {
+            try {
+                const response = await fetch(`/api/payroll?username=${encodeURIComponent(currentUser)}&role=${userRole}`);
+                payrollCachedRecords = await response.json();
+                renderPayrollTableData();
+            } catch (err) {
+                console.error("Logs download connection failure mapping engine stack streams.");
+            }
+        }
+
+        // Render arrays layout engine records dynamically matching selected filter criteria
+        function renderPayrollTableData() {
+            const container = document.getElementById('payrollTableRowsContainer');
+            const totalSummaryText = document.getElementById('grandSystemAccumulationPayout');
+            const sortVal = document.getElementById('sortConfigSelection').value;
+
+            container.innerHTML = '';
+
+            // Apply ordering array logic parameters
+            let logs = [...payrollCachedRecords];
+            if (sortVal === 'date-desc') logs.sort((a,b) => new Date(b.date) - new Date(a.date));
+            if (sortVal === 'date-asc') logs.sort((a,b) => new Date(a.date) - new Date(b.date));
+            if (sortVal === 'name-asc') logs.sort((a,b) => a.name.localeCompare(b.name));
+            if (sortVal === 'total-desc') logs.sort((a,b) => b.total - a.total);
+
+            let sumAccumulator = 0;
+
+            if (logs.length === 0) {
+                container.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-500 tracking-wide">No assignment logs found inside your user file data.</td></tr>`;
+                totalSummaryText.textContent = "₱0.00";
+                return;
+            }
+
+            logs.forEach(row => {
+                sumAccumulator += (row.total || 0);
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-gray-700/30 transition border-b border-gray-700/40 text-gray-300 font-medium";
+                
+                tr.innerHTML = `
+                    <td class="p-3 font-semibold text-white">${row.name}</td>
+                    <td class="p-3 text-gray-400">${row.league}</td>
+                    <td class="p-3 font-mono text-gray-400">${row.date}</td>
+                    <td class="p-3 text-center font-bold">${row.games}</td>
+                    <td class="p-3 text-right font-mono text-gray-400">₱${parseFloat(row.rate).toFixed(2)}</td>
+                    <td class="p-3 text-right font-black text-green-400 font-mono">₱${parseFloat(row.total).toFixed(2)}</td>
+                    <td class="p-3 text-center">
+                        <button onclick="handleDeleteAssignment('${row.id}')" class="bg-red-950/80 border border-red-800 text-red-400 hover:bg-red-900 hover:text-white px-2 py-1 rounded text-[10px] uppercase font-bold transition">Delete</button>
+                    </td>
+                `;
+                container.appendChild(tr);
+            });
+
+            totalSummaryText.textContent = `₱${sumAccumulator.toFixed(2)}`;
+        }
+
+        // Submits new log entry
+        async function handleSaveAssignment(e) {
+            e.preventDefault();
+            const payload = {
+                name: document.getElementById('refereeName').value,
+                league: document.getElementById('leagueTitle').value,
+                date: document.getElementById('matchDate').value,
+                games: document.getElementById('gamesCount').value,
+                rate: document.getElementById('gameRate').value,
+                createdBy: currentUser
+            };
+
+            try {
+                const response = await fetch('/api/payroll', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    document.getElementById('leagueTitle').value = '';
+                    document.getElementById('matchDate').value = '';
+                    document.getElementById('gamesCount').value = '1';
+                    updateLiveTotalMathOutput();
+                    fetchPayrollDataRecords();
+                } else {
+                    alert("Failed to submit assignment entry values.");
+                }
+            } catch (err) {
+                alert("Error sending payroll logs parameters across data channels.");
+            }
+        }
+
+        // Clear row logs mapping row primary tracking identity references
+        async function handleDeleteAssignment(id) {
+            if (!confirm("Are you absolutely sure you want to permanently delete this assignment entry log row?")) return;
+
+            try {
+                const response = await fetch(`/api/payroll/${id}`, { method: 'DELETE' });
+                if (response.ok) {
+                    fetchPayrollDataRecords();
+                } else {
+                    alert("Deletion command rejected by backend cloud engine verification.");
+                }
+            } catch (err) {
+                alert("Communication error targeting row delete commands pipelines.");
+            }
+        }
+
+        // Administrative module registry processing handles accounts generation sets
+        async function handleCreateAccount(e) {
+            e.preventDefault();
+            const username = document.getElementById('newUsername').value;
+            const password = document.getElementById('newPassword').value;
+
+            try {
+                const response = await fetch('/api/users', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, password, role: 'member' })
                 });
 
                 if (response.ok) {
-                    alert(`Account for Referee "${username}" successfully registered!`);
-                    document.getElementById('newUsername').value = "";
-                    document.getElementById('newPassword').value = "";
+                    alert(`Success: Referee account "${username}" has been fully registered inside your directory database!`);
+                    document.getElementById('newUsername').value = '';
+                    document.getElementById('newPassword').value = '';
+                    // Reload dropdown list to include the newly registered referee user account
+                    loadMembersDropdown();
                 } else {
-                    const errData = await response.json();
-                    alert(errData.error || "Failed to register profile.");
+                    alert("Failed to create user account. Username may be taken.");
                 }
             } catch (err) {
-                alert("Error connecting to registration pipeline.");
+                alert("Network failure processing user creation requests.");
             }
         }
 
+        // Clear down authorization session files variables mapping context drop handles
         function handleLogout() {
             currentUser = null;
-            currentUserRole = null;
-            fetchedPayrollEntries = [];
-            usernameInput.value = "";
-            passwordInput.value = "";
-            appDashboard.classList.add('hidden');
-            loginScreen.classList.remove('hidden');
+            userRole = 'member';
+            payrollCachedRecords = [];
+            document.getElementById('usernameInput').value = '';
+            document.getElementById('passwordInput').value = '';
+            document.getElementById('appDashboard').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
         }
 
-        function updateLiveTotal() {
-            const games = parseInt(gamesInput.value) || 0;
-            const rate = parseFloat(rateInput.value) || 0;
-            liveTotalDisplay.textContent = `\u20B1${(games * rate).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-        }
-        gamesInput.addEventListener('input', updateLiveTotal);
-        rateInput.addEventListener('input', updateLiveTotal);
-
-        async function fetchPayroll() {
-            try {
-                const response = await fetch(`${BASE_API_URL}/api/payroll?username=${encodeURIComponent(currentUser)}&role=${currentUserRole}`);
-                const data = await response.json();
-                fetchedPayrollEntries = Array.isArray(data) ? data : [];
-                sortAndRenderTable();
-            } catch (err) {
-                console.error("Error fetching payroll rows:", err);
-            }
-        }
-
-        function sortAndRenderTable() {
-            const sortVal = document.getElementById('adminSortSelect').value;
-            
-            fetchedPayrollEntries.sort((a, b) => {
-                if (sortVal === 'date-desc') return new Date(b.date) - new Date(a.date);
-                if (sortVal === 'date-asc') return new Date(a.date) - new Date(b.date);
-                if (sortVal === 'name-asc') return String(a.name).localeCompare(b.name);
-                if (sortVal === 'name-desc') return String(b.name).localeCompare(a.name);
-                if (sortVal === 'league-asc') return String(a.league).localeCompare(b.league);
-                return 0;
-            });
-            
-            renderTable(fetchedPayrollEntries);
-        }
-
-        function renderTable(entries) {
-            tableBody.innerHTML = '';
-            let grandTotal = 0;
-
-            if(entries.length === 0) {
-                emptyState.classList.remove('hidden');
-            } else {
-                emptyState.classList.add('hidden');
-            }
-
-            entries.forEach(entry => {
-                grandTotal += entry.total;
-                
-                const row = document.createElement('tr');
-                row.className = "hover:bg-gray-700/50 transition";
-                
-                let actionsCell = '';
-                if(currentUserRole === 'admin') {
-                    actionsCell = `
-                        <td class="p-4 text-center">
-                            <button onclick="deleteEntry('${entry.id}')" class="bg-red-900/40 text-red-400 border border-red-800 hover:bg-red-600 hover:text-white px-2 py-1 rounded text-xs transition">
-                                Delete
-                            </button>
-                        </td>`;
-                } else {
-                    actionsCell = `<td class="hidden"></td>`;
-                }
-
-                row.innerHTML = `
-                    <td class="p-4 font-semibold text-white">${entry.name}</td>
-                    <td class="p-4 text-gray-300">${entry.league}</td>
-                    <td class="p-4 text-gray-400">${entry.date}</td>
-                    <td class="p-4 text-center text-gray-200">${entry.games}</td>
-                    <td class="p-4 text-right text-gray-300">\u20B1${entry.rate.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-                    <td class="p-4 text-right font-bold text-green-400">\u20B1${entry.total.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-                    ${actionsCell}
-                `;
-                tableBody.appendChild(row);
-            });
-
-            grandTotalDisplay.textContent = `\u20B1${grandTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-        }
-
-        function downloadExcelReport() {
-            if (!fetchedPayrollEntries || fetchedPayrollEntries.length === 0) {
-                alert("There are no payroll records available to download.");
+        // Compiles data grid files array mapping matrix blocks outputs to Excel sheets formats directly
+        function exportToExcelWorkbook() {
+            if (payrollCachedRecords.length === 0) {
+                alert("There are no records currently available data fields to transfer to spreadsheet.");
                 return;
             }
 
-            const excelRows = fetchedPayrollEntries.map((row, index) => ({
-                "Row No.": index + 1,
-                "Referee Name": row.name.toUpperCase(),
-                "League": row.league,
-                "Assignment Date": row.date,
-                "Games Officiated": parseInt(row.games) || 0,
-                "Rate Per Game (PHP)": parseFloat(row.rate) || 0,
-                "Total Payout (PHP)": parseFloat(row.total) || 0,
-                "Logged By": row.createdBy
+            const cleanRows = payrollCachedRecords.map((item, index) => ({
+                "Log ID": index + 1,
+                "Referee Name": item.name,
+                "League / Tournament": item.league,
+                "Match Officiated Date": item.date,
+                "Games Counts": item.games,
+                "Per Game Rate Fee (PHP)": item.rate,
+                "Total Payout Compensation (PHP)": item.total,
+                "Logged By User": item.createdBy || 'System'
             }));
 
-            const worksheet = XLSX.utils.json_to_sheet(excelRows);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Payroll Summary");
-
-            worksheet["!cols"] = [
-                { wch: 10 }, { wch: 22 }, { wch: 25 }, { wch: 18 }, { wch: 18 }, { wch: 20 }, { wch: 20 }, { wch: 15 }
-            ];
-
-            const dateStamp = new Date().toISOString().split('T')[0];
-            XLSX.writeFile(workbook, `RIBRO_Inc_Payroll_Report_${dateStamp}.xlsx`);
-        }
-
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const payload = {
-                name: refNameInput.value,
-                league: document.getElementById('league').value,
-                date: document.getElementById('gameDate').value,
-                games: gamesInput.value,
-                rate: rateInput.value,
-                createdBy: currentUserRole === 'admin' ? refNameInput.value : currentUser
-            };
-
-            try {
-                const response = await fetch(`${BASE_API_URL}/api/payroll`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                
-                if(response.ok) {
-                    document.getElementById('league').value = "";
-                    document.getElementById('gameDate').value = "";
-                    gamesInput.value = "1";
-                    rateInput.value = "";
-                    if (currentUserRole === 'admin') refNameInput.value = "";
-                    updateLiveTotal();
-                    fetchPayroll();
-                }
-            } catch (err) {
-                console.error("Error saving entry:", err);
-            }
-        });
-
-        async function deleteEntry(id) {
-            if(!confirm("Are you sure you want to permanently delete this record?")) return;
-            try {
-                const response = await fetch(`${BASE_API_URL}/api/payroll/${id}`, { method: 'DELETE' });
-                if(response.ok) fetchPayroll();
-            } catch (err) {
-                console.error("Error deleting entry:", err);
-            }
+            const ws = XLSX.utils.json_to_sheet(cleanRows);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "RIBRO Payroll Logs");
+            
+            // Format dynamic file naming outputs strings parameters configurations
+            const datestamp = new Date().toISOString().slice(0,10);
+            XLSX.writeFile(wb, `RIBRO_Inc_Payroll_Report_${datestamp}.xlsx`);
         }
     </script>
 </body>
