@@ -6,7 +6,6 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Force clean strings by removing quotes, brackets, spaces, or formatting anomalies
 const cleanEnvVar = (val) => {
     if (!val) return '';
     return val.replace(/['"\[\]\s]/g, '').trim();
@@ -15,14 +14,8 @@ const cleanEnvVar = (val) => {
 let SUPABASE_URL = cleanEnvVar(process.env.SUPABASE_URL);
 const SUPABASE_KEY = cleanEnvVar(process.env.SUPABASE_KEY);
 
-// Auto-patch missing https:// protocols if necessary
 if (SUPABASE_URL && !SUPABASE_URL.startsWith('http://') && !SUPABASE_URL.startsWith('https://')) {
     SUPABASE_URL = `https://${SUPABASE_URL}`;
-}
-
-// Fallback graceful values instead of crashing the server
-if (!SUPABASE_URL || !SUPABASE_KEY) {
-    console.warn("⚠️ WARNING: Supabase keys are not ready yet. Check your Render Dashboard Environment tab!");
 }
 
 app.use(cors());
@@ -34,7 +27,6 @@ app.post('/api/login', async (req, res) => {
     try {
         const { username, password } = req.body;
         if (!username || !password) return res.status(400).json({ error: "Username and password required." });
-        if (!SUPABASE_URL || !SUPABASE_KEY) return res.status(500).json({ error: "Backend database configurations are missing." });
 
         const response = await axios.get(`${SUPABASE_URL}/rest/v1/users?username=eq.${encodeURIComponent(username.trim())}`, {
             headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
@@ -46,7 +38,6 @@ app.post('/api/login', async (req, res) => {
         }
         res.json({ username: user.username, role: user.role });
     } catch (err) {
-        console.error("Login Error:", err.message);
         res.status(500).json({ error: "Authentication system failure." });
     }
 });
@@ -71,30 +62,22 @@ app.post('/api/users', async (req, res) => {
     }
 });
 
-// NEW API: Admin fetches all registered members for the navigation dropdown
+// API: Admin fetches all registered members
 app.get('/api/users', async (req, res) => {
     try {
         const response = await axios.get(`${SUPABASE_URL}/rest/v1/users?select=username,role`, {
-            headers: { 
-                'apikey': SUPABASE_KEY, 
-                'Authorization': `Bearer ${SUPABASE_KEY}` 
-            }
+            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
         });
         res.json(response.data);
     } catch (err) {
-        console.error("Fetch Users Error:", err.message);
         res.status(500).json({ error: "Failed to retrieve members list." });
     }
 });
 
-// NEW API: Admin resets a member's password via selective patch filtering
+// API: Admin resets a member's password
 app.patch('/api/users/reset-password', async (req, res) => {
     try {
         const { username, newPassword } = req.body;
-        if (!username || !newPassword) {
-            return res.status(400).json({ error: "Username and new password are required." });
-        }
-
         const response = await axios.patch(
             `${SUPABASE_URL}/rest/v1/users?username=eq.${encodeURIComponent(username.trim())}`,
             { password: newPassword.trim() },
@@ -107,14 +90,9 @@ app.patch('/api/users/reset-password', async (req, res) => {
                 }
             }
         );
-
-        if (response.data.length === 0) {
-            return res.status(404).json({ error: "User not found." });
-        }
-
+        if (response.data.length === 0) return res.status(404).json({ error: "User not found." });
         res.json({ message: `Password for ${username} has been successfully reset.` });
     } catch (err) {
-        console.error("Password Reset Error:", err.message);
         res.status(500).json({ error: "Failed to reset password." });
     }
 });
@@ -132,27 +110,23 @@ app.get('/api/payroll', async (req, res) => {
         const response = await axios.get(queryUrl, {
             headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
         });
-
-        const records = Array.isArray(response.data) ? response.data : [];
-        res.json(records);
+        res.json(Array.isArray(response.data) ? response.data : []);
     } catch (err) {
-        console.error("Fetch Payroll Error:", err.message);
         res.json([]);
     }
 });
 
-// Post a new payroll log item
+// FIXED API: Post a new payroll log item (Dropped non-existent column)
 app.post('/api/payroll', async (req, res) => {
     try {
-        const { name, league, date, games, rate, createdBy } = req.body;
+        const { name, league, date, games, rate } = req.body;
         const newEntry = {
             name: name.trim(), 
-            league, 
+            league: league.trim(), 
             date,
             games: parseInt(games) || 0,
             rate: parseFloat(rate) || 0,
-            total: (parseInt(games) || 0) * (parseFloat(rate) || 0),
-            createdBy: createdBy || name
+            total: (parseInt(games) || 0) * (parseFloat(rate) || 0)
         };
 
         const response = await axios.post(`${SUPABASE_URL}/rest/v1/payroll`, newEntry, {
@@ -165,6 +139,7 @@ app.post('/api/payroll', async (req, res) => {
         });
         res.status(201).json(response.data);
     } catch (err) {
+        console.error("Supabase Save Error:", err.response ? err.response.data : err.message);
         res.status(500).json({ error: "Failed to save data." });
     }
 });
@@ -173,11 +148,7 @@ app.post('/api/payroll', async (req, res) => {
 app.delete('/api/payroll/:id', async (req, res) => {
     try {
         const response = await axios.delete(`${SUPABASE_URL}/rest/v1/payroll?id=eq.${req.params.id}`, {
-            headers: {
-                'apikey': SUPABASE_KEY,
-                'Authorization': `Bearer ${SUPABASE_KEY}`,
-                'Prefer': 'return=representation'
-            }
+            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
         });
         res.json(response.data);
     } catch (err) {
@@ -190,5 +161,5 @@ app.get('*', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`🚀 RIBRO Inc. Server Engine running successfully on port ${PORT}`);
+    console.log(`🚀 Server Engine running on port ${PORT}`);
 });
