@@ -7,8 +7,8 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const HOST = '0.0.0.0';
 
-// Secure credentials
-const SUPABASE_URL = 'https://wiuczrpqdohgkzscqxzz.supabase.co';
+// 🚀 FIXED THE TYPO HERE (Changed "dohg" to "kdhg")
+const SUPABASE_URL = 'https://wiuczrpqkdhgkzscqxzz.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndpdWN6cnBxa2RvaGdrenNjcXh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNzA4NjIsImV4cCI6MjA5Nzg0Njg2Mn0.heIrphrCU26N8LUbNf0bldAr7MDqB3UwWgifJl4zZCs';
 
 app.use(cors({
@@ -44,7 +44,7 @@ app.get('/api/payroll', async (req, res) => {
         
         res.json(Array.isArray(response.data) ? response.data : []);
     } catch (err) {
-        console.error("Supabase GET Exception Details:", err.response?.data || err.message);
+        console.error("Supabase GET Exception:", err.response?.data || err.message);
         res.json([]);
     }
 });
@@ -74,7 +74,7 @@ app.post('/api/payroll', async (req, res) => {
         
         res.status(201).json(Array.isArray(response.data) ? response.data[0] : response.data);
     } catch (err) {
-        console.error("Supabase POST Exception Details:", err.response?.data || err.message);
+        console.error("Supabase POST Exception:", err.response?.data || err.message);
         res.status(500).json({ error: err.message });
     }
 });
@@ -91,7 +91,7 @@ app.delete('/api/payroll/:id', async (req, res) => {
         });
         res.json({ message: "Entry deleted successfully" });
     } catch (err) {
-        console.error("Supabase DELETE Exception Details:", err.response?.data || err.message);
+        console.error("Supabase DELETE Exception:", err.response?.data || err.message);
         res.status(500).json({ error: err.message });
     }
 });
