@@ -12,7 +12,7 @@
     <div id="loginScreen" class="flex items-center justify-center min-h-screen p-4">
         <div class="bg-gray-800 p-8 rounded-xl border border-gray-700 shadow-xl max-w-md w-full space-y-6">
             <div class="flex flex-col items-center text-center">
-                <img src="RIBroInc NEW LOGO.jpg" alt="RIBRO Inc. Logo" class="w-32 h-32 object-contain mb-4 drop-shadow-[0_4px_10px_rgba(249,115,22,0.3)]">
+                <img src="RIBROnc NEW LOGO.jpg" alt="RIBRO Inc. Logo" class="w-32 h-32 object-contain mb-4 drop-shadow-[0_4px_10px_rgba(249,115,22,0.3)]">
                 <h1 class="text-3xl font-black text-orange-500 uppercase tracking-wider">RIBRO Inc.</h1>
                 <p class="text-sm font-semibold text-gray-300 mt-1 uppercase text-center">Roxas Isabela Basketball Referees Organization Inc.</p>
                 <p class="text-xs text-gray-500 mt-1 bg-gray-900/50 py-1 px-2 rounded inline-block border border-gray-700/60">SEC Reg. No. 2025048197717-63</p>
@@ -35,7 +35,7 @@
     <div id="appDashboard" class="hidden min-h-screen flex flex-col">
         <header class="bg-gray-950 border-b border-gray-800 px-6 py-4 flex flex-wrap items-center justify-between gap-4">
             <div class="flex items-center gap-3">
-                <img src="RIBroInc NEW LOGO.jpg" alt="Logo" class="w-10 h-10 object-contain">
+                <img src="RIBROnc NEW LOGO.jpg" alt="Logo" class="w-10 h-10 object-contain">
                 <div>
                     <div class="flex items-center gap-2">
                         <span class="text-lg font-black text-orange-500 tracking-wider">RIBRO INC.</span>
@@ -51,7 +51,31 @@
             </div>
         </header>
 
-        <main class="flex-1 p-6 grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl w-full mx-auto">
+        <section class="p-6 max-w-7xl w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-gradient-to-br from-orange-600/20 to-amber-600/5 border border-orange-500/20 rounded-xl p-5 shadow-md flex justify-between items-center">
+                <div>
+                    <h4 class="text-xs uppercase font-bold tracking-wider text-orange-400">Total System Payout</h4>
+                    <p class="text-[10px] text-gray-400 mt-0.5">Sum of all filtered records</p>
+                </div>
+                <span id="grandSystemAccumulationPayout" class="text-2xl font-black text-orange-500 font-mono">₱0.00</span>
+            </div>
+            <div class="bg-gray-800 border border-gray-700 rounded-xl p-5 shadow-md flex justify-between items-center">
+                <div>
+                    <h4 class="text-xs uppercase font-bold tracking-wider text-blue-400">Total Games Officiated</h4>
+                    <p class="text-[10px] text-gray-400 mt-0.5">Accumulated count of games</p>
+                </div>
+                <span id="analyticsTotalGames" class="text-2xl font-black text-blue-400 font-mono">0</span>
+            </div>
+            <div class="bg-gray-800 border border-gray-700 rounded-xl p-5 shadow-md flex justify-between items-center">
+                <div>
+                    <h4 class="text-xs uppercase font-bold tracking-wider text-emerald-400">Avg. Payout Per Log</h4>
+                    <p class="text-[10px] text-gray-400 mt-0.5">Average earning per assignment entry</p>
+                </div>
+                <span id="analyticsAvgEarning" class="text-2xl font-black text-emerald-400 font-mono">₱0.00</span>
+            </div>
+        </section>
+
+        <main class="flex-1 px-6 pb-6 grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl w-full mx-auto">
             
             <div id="controlPanelSide" class="space-y-6">
                 
@@ -125,27 +149,32 @@
             </div>
 
             <div class="lg:col-span-2 space-y-4 flex flex-col">
-                <div class="flex flex-wrap items-center justify-between gap-3 bg-gray-950 p-3 rounded-xl border border-gray-800">
-                    <div class="flex items-center gap-2">
-                        <span class="text-xs text-gray-400 uppercase font-bold">Sort By:</span>
-                        <select id="sortConfigSelection" onchange="renderPayrollTableData()" class="bg-gray-900 border border-gray-700 rounded text-xs px-2 py-1 text-white">
+                
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-gray-950 p-4 rounded-xl border border-gray-800">
+                    <div>
+                        <label class="block text-[10px] text-gray-400 uppercase font-bold mb-1">Filter Month/Year</label>
+                        <input type="month" id="filterMonthSelect" onchange="renderPayrollTableData()" class="w-full bg-gray-900 border border-gray-700 rounded text-xs px-2 py-1.5 text-white">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-gray-400 uppercase font-bold mb-1">Search Referee / League</label>
+                        <input type="text" id="filterSearchQuery" oninput="renderPayrollTableData()" placeholder="Type to filter query..." class="w-full bg-gray-900 border border-gray-700 rounded text-xs px-2 py-1.5 text-white placeholder-gray-500">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-gray-400 uppercase font-bold mb-1">Sort Configuration</label>
+                        <select id="sortConfigSelection" onchange="renderPayrollTableData()" class="w-full bg-gray-900 border border-gray-700 rounded text-xs px-2 py-1.5 text-white">
                             <option value="date-desc">Date (Newest First)</option>
                             <option value="date-asc">Date (Oldest First)</option>
                             <option value="name-asc">Referee Name (A-Z)</option>
                             <option value="total-desc">Highest Payout Amount</option>
                         </select>
                     </div>
-                    <button onclick="exportToExcelWorkbook()" class="bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 rounded flex items-center gap-1.5 transition ml-auto">
-                        📊 Download Excel File
-                    </button>
                 </div>
 
-                <div class="bg-gradient-to-r from-orange-600/20 to-amber-600/10 border border-orange-500/30 rounded-xl p-5 flex items-center justify-between shadow-md">
-                    <div>
-                        <h4 class="text-xs uppercase font-bold tracking-wider text-orange-400">Grand Total System Payout</h4>
-                        <p class="text-[10px] text-gray-400 mt-0.5">Accumulated total for loaded entries</p>
-                    </div>
-                    <span id="grandSystemAccumulationPayout" class="text-3xl font-black text-orange-500 font-mono">₱0.00</span>
+                <div class="flex items-center justify-between">
+                    <span class="text-xs text-gray-400 font-semibold" id="recordsCounterDisplay">Showing 0 matching data entries</span>
+                    <button onclick="exportToExcelWorkbook()" class="bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 rounded flex items-center gap-1.5 transition">
+                        📊 Download Excel File
+                    </button>
                 </div>
 
                 <div class="bg-gray-800 rounded-xl border border-gray-700 shadow-xl overflow-hidden flex-1 flex flex-col min-h-[400px]">
@@ -303,26 +332,54 @@
         function renderPayrollTableData() {
             const container = document.getElementById('payrollTableRowsContainer');
             const totalSummaryText = document.getElementById('grandSystemAccumulationPayout');
+            const totalGamesText = document.getElementById('analyticsTotalGames');
+            const avgEarningText = document.getElementById('analyticsAvgEarning');
+            const counterText = document.getElementById('recordsCounterDisplay');
+            
             const sortVal = document.getElementById('sortConfigSelection').value;
+            const monthFilter = document.getElementById('filterMonthSelect').value; // Expected Format: YYYY-MM
+            const searchQuery = document.getElementById('filterSearchQuery').value.toLowerCase().trim();
 
             container.innerHTML = '';
 
-            let logs = [...payrollCachedRecords];
+            // Apply Runtime Filtering Rules
+            let logs = [...payrollCachedRecords].filter(row => {
+                // 1. Month Filter matching
+                if (monthFilter) {
+                    if (!row.date || !row.date.startsWith(monthFilter)) return false;
+                }
+                // 2. Text Search Query checking
+                if (searchQuery) {
+                    const matchName = row.name ? row.name.toLowerCase().includes(searchQuery) : false;
+                    const matchLeague = row.league ? row.league.toLowerCase().includes(searchQuery) : false;
+                    if (!matchName && !matchLeague) return false;
+                }
+                return true;
+            });
+
+            // Apply Runtime Sorting Engine rules
             if (sortVal === 'date-desc') logs.sort((a,b) => new Date(b.date) - new Date(a.date));
             if (sortVal === 'date-asc') logs.sort((a,b) => new Date(a.date) - new Date(b.date));
             if (sortVal === 'name-asc') logs.sort((a,b) => a.name.localeCompare(b.name));
             if (sortVal === 'total-desc') logs.sort((a,b) => b.total - a.total);
 
             let sumAccumulator = 0;
+            let gamesAccumulator = 0;
+
+            counterText.textContent = `Showing ${logs.length} matching data entries`;
 
             if (logs.length === 0) {
-                container.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-500 tracking-wide">No assignment logs found inside your user file data.</td></tr>`;
+                container.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-500 tracking-wide">No assignment logs matched your search or monthly filter.</td></tr>`;
                 totalSummaryText.textContent = "₱0.00";
+                totalGamesText.textContent = "0";
+                avgEarningText.textContent = "₱0.00";
                 return;
             }
 
             logs.forEach(row => {
                 sumAccumulator += (row.total || 0);
+                gamesAccumulator += (parseInt(row.games) || 0);
+
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-gray-700/30 transition border-b border-gray-700/40 text-gray-300 font-medium";
                 
@@ -340,10 +397,12 @@
                 container.appendChild(tr);
             });
 
+            // Update Global Dashboard Metrics Elements dynamically
             totalSummaryText.textContent = `₱${sumAccumulator.toFixed(2)}`;
+            totalGamesText.textContent = gamesAccumulator.toLocaleString();
+            avgEarningText.textContent = `₱${(sumAccumulator / logs.length).toFixed(2)}`;
         }
 
-        // FIXED FUNCTION: Saving payload dropped the 'createdBy' variable completely
         async function handleSaveAssignment(e) {
             e.preventDefault();
             const payload = {
