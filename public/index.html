@@ -12,7 +12,7 @@
     <div id="loginScreen" class="flex items-center justify-center min-h-screen p-4">
         <div class="bg-gray-800 p-8 rounded-xl border border-gray-700 shadow-xl max-w-md w-full space-y-6">
             <div class="flex flex-col items-center text-center">
-                <img src="RIBroInc NEW LOGO.jpg" alt="RIBRO Inc. Logo" class="w-32 h-32 object-contain mb-4 drop-shadow-[0_4px_10px_rgba(249,115,22,0.3)]">
+                <img src="RIBROnc NEW LOGO.jpg" alt="RIBRO Inc. Logo" class="w-32 h-32 object-contain mb-4 drop-shadow-[0_4px_10px_rgba(249,115,22,0.3)]">
                 <h1 class="text-3xl font-black text-orange-500 uppercase tracking-wider">RIBRO Inc.</h1>
                 <p class="text-sm font-semibold text-gray-300 mt-1 uppercase text-center">Roxas Isabela Basketball Referees Organization Inc.</p>
                 <p class="text-xs text-gray-500 mt-1 bg-gray-900/50 py-1 px-2 rounded inline-block border border-gray-700/60">SEC Reg. No. 2025048197717-63</p>
@@ -35,7 +35,7 @@
     <div id="appDashboard" class="hidden min-h-screen flex flex-col">
         <header class="bg-gray-950 border-b border-gray-800 px-6 py-4 flex flex-wrap items-center justify-between gap-4">
             <div class="flex items-center gap-3">
-                <img src="RIBroInc NEW LOGO.jpg" alt="Logo" class="w-10 h-10 object-contain">
+                <img src="RIBROnc NEW LOGO.jpg" alt="Logo" class="w-10 h-10 object-contain">
                 <div>
                     <div class="flex items-center gap-2">
                         <span class="text-lg font-black text-orange-500 tracking-wider">RIBRO INC.</span>
@@ -233,7 +233,12 @@
                 </div>
 
                 <div class="space-y-2 pt-2">
-                    <h3 class="text-sm font-black uppercase text-emerald-400 tracking-wider">💰 Withdrawal Processing Requests & History</h3>
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-sm font-black uppercase text-emerald-400 tracking-wider">💰 Withdrawal Processing Requests & History</h3>
+                        <button onclick="exportWithdrawalsToExcel()" class="bg-teal-700 hover:bg-teal-600 text-white text-[11px] font-bold px-2.5 py-1 rounded flex items-center gap-1 transition">
+                            📊 Export Withdrawal Excel
+                        </button>
+                    </div>
                     <div class="bg-gray-800 rounded-xl border border-gray-700 shadow-xl overflow-hidden min-h-[200px]">
                         <table class="w-full text-left text-xs border-collapse">
                             <thead>
@@ -246,7 +251,7 @@
                                 </tr>
                             </thead>
                             <tbody id="withdrawalsTableRowsContainer" class="divide-y divide-gray-700/50">
-                                </tbody>
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -260,7 +265,7 @@
         let userRole = 'member';
         let payrollCachedRecords = [];
         let withdrawalsCachedRecords = [];
-        let globalCurrentWalletBalance = 0; // Tracks running balance validation checks
+        let globalCurrentWalletBalance = 0;
 
         const refNameInput = document.getElementById('refereeName');
         const gamesInput = document.getElementById('gamesCount');
@@ -349,13 +354,11 @@
             }
         }
 
-        // UNIFIED FINANCIAL LOGIC LOOP MATRIX
         function calculateAndRenderUnifiedFinancials() {
             const totalSummaryText = document.getElementById('grandSystemAccumulationPayout');
             const totalWithdrawalsText = document.getElementById('analyticsTotalWithdrawals');
             const walletBalanceText = document.getElementById('analyticsWalletBalance');
 
-            // 1. Calculate Gross Approved Game Earnings
             let grossEarnings = 0;
             payrollCachedRecords.forEach(row => {
                 if (row.status === 'approved') {
@@ -363,7 +366,6 @@
                 }
             });
 
-            // 2. Calculate Approved Extracted Withdrawals
             let grossWithdrawals = 0;
             withdrawalsCachedRecords.forEach(w => {
                 if (w.status === 'approved') {
@@ -371,15 +373,12 @@
                 }
             });
 
-            // 3. Compute Net Wallet Balance (Remaining Cash)
             globalCurrentWalletBalance = grossEarnings - grossWithdrawals;
 
-            // Render Metrics Cards Panels
             totalSummaryText.textContent = `₱${grossEarnings.toFixed(2)}`;
             totalWithdrawalsText.textContent = `₱${grossWithdrawals.toFixed(2)}`;
             walletBalanceText.textContent = `₱${globalCurrentWalletBalance.toFixed(2)}`;
 
-            // Render Table Layout UI rows mapping lists
             renderPayrollTableData();
             renderWithdrawalsTableData();
         }
@@ -445,7 +444,6 @@
             });
         }
 
-        // RENDER NEW WITHDRAWALS HISTORY LEDGER LAYOUT PANEL
         function renderWithdrawalsTableData() {
             const container = document.getElementById('withdrawalsTableRowsContainer');
             container.innerHTML = '';
@@ -454,7 +452,7 @@
             items.sort((a,b) => new Date(b.date) - new Date(a.date));
 
             if (items.length === 0) {
-                container.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-500 font-medium">No processed withdrawal extractions logs history found.</td></tr>`;
+                container.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-500 font-medium">No processed withdrawal extraction history logs found.</td></tr>`;
                 return;
             }
 
@@ -489,15 +487,13 @@
             });
         }
 
-        // SUBMIT NEW WITHDRAWAL REQUEST ACTION PIPELINES
         async function handleRequestWithdrawal(e) {
             e.preventDefault();
             const amt = parseFloat(document.getElementById('withdrawAmount').value) || 0;
             const date = document.getElementById('withdrawDate').value;
 
-            // Safeguard block: Cannot withdraw more than available net wallet balance checks
             if (userRole !== 'admin' && amt > globalCurrentWalletBalance) {
-                alert(`Insufficient Funds! Your running wallet balance limit calculation holds ₱${globalCurrentWalletBalance.toFixed(2)}. You cannot request an extraction exceeding this amount.`);
+                alert(`Insufficient Funds! Your running wallet balance calculation holds ₱${globalCurrentWalletBalance.toFixed(2)}. You cannot request an extraction exceeding this amount.`);
                 return;
             }
 
@@ -520,7 +516,6 @@
             }
         }
 
-        // ADMIN WITHDRAWALS ACTION DISPATCH ENGINE
         async function processWithdrawalStatusToggles(id, decision) {
             if (!confirm(`Are you certain you wish to mark this extraction request as: ${decision.toUpperCase()}?`)) return;
 
@@ -641,7 +636,7 @@
                     alert("Server rejected deletion command request processing.");
                 }
             } catch (err) {
-                alert("Communication error targeting user delete pipelines execution paths.");
+                alert("Communication error targeting user delete pipelines paths.");
             }
         }
 
@@ -790,7 +785,7 @@
 
             const approvedRecords = payrollCachedRecords.filter(item => item.status === 'approved');
             if (approvedRecords.length === 0) {
-                alert("No approved entries found to export.");
+                alert("No approved game entries found to export.");
                 return;
             }
 
@@ -810,6 +805,36 @@
             
             const datestamp = new Date().toISOString().slice(0,10);
             XLSX.writeFile(wb, `RIBRO_Inc_Approved_Payroll_Report_${datestamp}.xlsx`);
+        }
+
+        // NEW JAVASCRIPT EXPORT FUNCTION: GENERATES EXCEL SHEET FOR APPROVED WITHDRAWALS
+        function exportWithdrawalsToExcel() {
+            if (withdrawalsCachedRecords.length === 0) {
+                alert("There are no withdrawal records currently available to export.");
+                return;
+            }
+
+            // Isolate only approved withdrawals matching organization audit specifications
+            const approvedWithdrawals = withdrawalsCachedRecords.filter(item => item.status === 'approved');
+            if (approvedWithdrawals.length === 0) {
+                alert("No approved withdrawal entries found to generate report.");
+                return;
+            }
+
+            const cleanRows = approvedWithdrawals.map((item, index) => ({
+                "Transaction ID": index + 1,
+                "Referee Name": item.name,
+                "Release Date": item.date,
+                "Withdrawn Amount (PHP)": item.amount,
+                "Status": "Approved / Released"
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(cleanRows);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "RIBRO Released Withdrawals");
+            
+            const datestamp = new Date().toISOString().slice(0,10);
+            XLSX.writeFile(wb, `RIBRO_Inc_Withdrawal_Report_${datestamp}.xlsx`);
         }
     </script>
 </body>
