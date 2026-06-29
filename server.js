@@ -37,7 +37,6 @@ app.post('/api/login', async (req, res) => {
             return res.status(401).json({ error: "Invalid username or password." });
         }
         
-        // Block login if account is locked
         if (user.status === 'locked') {
             return res.status(403).json({ error: "This account has been locked by the administrator." });
         }
@@ -56,7 +55,7 @@ app.post('/api/users', async (req, res) => {
             username: username.trim(), 
             password: password.trim(), 
             role: role || 'member',
-            status: 'active' // Default status explicitly tracked
+            status: 'active'
         };
 
         const response = await axios.post(`${SUPABASE_URL}/rest/v1/users`, newUser, {
@@ -76,15 +75,11 @@ app.post('/api/users', async (req, res) => {
 // API: Admin fetches all columns for management view safely
 app.get('/api/users', async (req, res) => {
     try {
-        // Select id, username, role, status dynamically
         const response = await axios.get(`${SUPABASE_URL}/rest/v1/users?select=id,username,role,status`, {
             headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
         });
         
-        // Ensure data is always treated as an array payload back to front-end browser
         const userData = Array.isArray(response.data) ? response.data : [];
-        
-        // Fallback sanitize check: if a user row is missing a 'status' field completely, set it to active
         const safeUsers = userData.map(u => ({
             ...u,
             status: u.status || 'active',
@@ -93,8 +88,7 @@ app.get('/api/users', async (req, res) => {
 
         res.json(safeUsers);
     } catch (err) {
-        console.error("DEBUG ERR: Failed to retrieve members list from Supabase:", err.response?.data || err.message);
-        // Always return an empty array format so frontend components don't crash with 500 errors!
+        console.error("DEBUG ERR:", err.message);
         res.json([]);
     }
 });
@@ -123,7 +117,7 @@ app.put('/api/users/:id', async (req, res) => {
 // API: Admin toggles status lock on an account
 app.patch('/api/users/:id/toggle-lock', async (req, res) => {
     try {
-        const { status } = req.body; // Expects 'active' or 'locked'
+        const { status } = req.body;
         const response = await axios.patch(`${SUPABASE_URL}/rest/v1/users?id=eq.${req.params.id}`, 
             { status },
             {
@@ -176,7 +170,7 @@ app.patch('/api/users/reset-password', async (req, res) => {
     }
 });
 
-// Fetch payroll rows conditionally based on role
+// Fetch payroll rows conditionally based on role (Includes status field)
 app.get('/api/payroll', async (req, res) => {
     try {
         const { username, role } = req.query;
@@ -189,23 +183,34 @@ app.get('/api/payroll', async (req, res) => {
         const response = await axios.get(queryUrl, {
             headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
         });
-        res.json(Array.isArray(response.data) ? response.data : []);
+        
+        const data = Array.isArray(response.data) ? response.data : [];
+        // Fallback sanitization for status tracking field
+        const cleanData = data.map(item => ({
+            ...item,
+            status: item.status || 'approved'
+        }));
+        
+        res.json(cleanData);
     } catch (err) {
         res.json([]);
     }
 });
 
-// Post a new payroll log item
+// Post a new payroll log item (Defaults entries to 'pending')
 app.post('/api/payroll', async (req, res) => {
     try {
-        const { name, league, date, games, rate } = req.body;
+        const { name, league, date, games, rate, role } = req.body;
+        
         const newEntry = {
             name: name.trim(), 
             league: league.trim(), 
             date,
             games: parseInt(games) || 0,
             rate: parseFloat(rate) || 0,
-            total: (parseInt(games) || 0) * (parseFloat(rate) || 0)
+            total: (parseInt(games) || 0) * (parseFloat(rate) || 0),
+            // Admins bypass pending logs, regular members enter as pending
+            status: (role === 'admin') ? 'approved' : 'pending'
         };
 
         const response = await axios.post(`${SUPABASE_URL}/rest/v1/payroll`, newEntry, {
@@ -219,6 +224,27 @@ app.post('/api/payroll', async (req, res) => {
         res.status(201).json(response.data);
     } catch (err) {
         res.status(500).json({ error: "Failed to save data." });
+    }
+});
+
+// NEW API ROUTE: Admin approves a specific payroll entry
+app.patch('/api/payroll/:id/approve', async (req, res) => {
+    try {
+        const { status } = req.body; // 'approved' or 'rejected'
+        const response = await axios.patch(`${SUPABASE_URL}/rest/v1/payroll?id=eq.${req.params.id}`, 
+            { status },
+            {
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=representation'
+                }
+            }
+        );
+        res.json(response.data);
+    } catch (err) {
+        res.status(500).json({ error: "Failed to update entry status." });
     }
 });
 
