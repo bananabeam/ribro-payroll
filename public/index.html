@@ -150,12 +150,12 @@
                             <h2 class="text-xl font-bold text-indigo-400">Members Directory</h2>
                             <span id="directoryCountBadge" class="bg-indigo-950 text-indigo-300 text-xs px-2 py-0.5 rounded border border-indigo-800 font-mono">0 Total</span>
                         </div>
-                        <div class="overflow-hidden border border-gray-700 rounded-lg max-h-[260px] overflow-y-auto">
+                        <div class="overflow-hidden border border-gray-700 rounded-lg max-h-[380px] overflow-y-auto">
                             <table class="w-full text-left text-xs border-collapse">
                                 <thead>
                                     <tr class="bg-gray-950 text-gray-400 font-bold uppercase border-b border-gray-700">
-                                        <th class="p-2.5">Username</th>
-                                        <th class="p-2.5 text-center">System Role</th>
+                                        <th class="p-2.5">Member details</th>
+                                        <th class="p-2.5 text-center">Actions Management</th>
                                     </tr>
                                 </thead>
                                 <tbody id="memberDirectoryContainer" class="divide-y divide-gray-700/50">
@@ -284,7 +284,6 @@
             }
         }
 
-        // UPDATED JAVASCRIPT: Pulls full data arrays to populate dropdown selections AND directory grid values
         async function loadMembersDropdownAndDirectory() {
             try {
                 const response = await fetch('/api/users');
@@ -294,13 +293,11 @@
                 const directoryBody = document.getElementById('memberDirectoryContainer');
                 const countBadge = document.getElementById('directoryCountBadge');
 
-                // Reset fields
                 selectElement.innerHTML = '<option value="">-- Select a Member --</option>';
                 directoryBody.innerHTML = '';
                 countBadge.textContent = `${users.length} Total`;
 
                 users.forEach(user => {
-                    // Populate Reset Dropdown (skip 'admin' user profile if chosen)
                     if(user.username !== 'admin') {
                         const option = document.createElement('option');
                         option.value = user.username;
@@ -308,24 +305,89 @@
                         selectElement.appendChild(option);
                     }
 
-                    // Append directory data rows natively
+                    const isLocked = user.status === 'locked';
                     const tr = document.createElement('tr');
                     tr.className = "hover:bg-gray-700/20 text-gray-300 font-medium border-b border-gray-700/40";
                     tr.innerHTML = `
-                        <td class="p-2.5 font-semibold text-white flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
-                            ${user.username}
+                        <td class="p-2.5">
+                            <div class="font-semibold text-white flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full ${isLocked ? 'bg-red-500' : 'bg-green-500'}"></span>
+                                <span id="username-text-${user.id}">${user.username}</span>
+                            </div>
+                            <div class="text-[10px] text-gray-500 mt-0.5 uppercase tracking-wide font-mono">${user.role} ${isLocked ? '• LOCKED' : '• ACTIVE'}</div>
                         </td>
-                        <td class="p-2.5 text-center">
-                            <span class="px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider ${user.role === 'admin' ? 'bg-red-950/60 border border-red-800/80 text-red-400' : 'bg-gray-900 border border-gray-700 text-gray-400'}">
-                                ${user.role}
-                            </span>
+                        <td class="p-2.5">
+                            <div class="flex items-center justify-center gap-1.5">
+                                <button onclick="editMemberUsername('${user.id}', '${user.username}')" class="bg-gray-900 border border-gray-700 hover:border-orange-500 text-gray-300 px-2 py-1 rounded text-[10px] font-bold transition">Edit</button>
+                                <button onclick="toggleMemberLock('${user.id}', ${isLocked})" class="${isLocked ? 'bg-amber-950 border border-amber-800 text-amber-400' : 'bg-gray-900 border border-gray-700 text-gray-400'} px-2 py-1 rounded text-[10px] font-bold transition">${isLocked ? 'Unlock' : 'Lock'}</button>
+                                ${user.username !== 'admin' ? `<button onclick="deleteMemberAccount('${user.id}', '${user.username}')" class="bg-red-950/40 border border-red-900 text-red-400 hover:bg-red-900 hover:text-white px-2 py-1 rounded text-[10px] font-bold transition">Del</button>` : ''}
+                            </div>
                         </td>
                     `;
                     directoryBody.appendChild(tr);
                 });
             } catch (err) {
-                console.error("Error populating member selection dropdown options and directory panel mapping:", err);
+                console.error("Error populating directory panel mapping:", err);
+            }
+        }
+
+        // NEW UI HANDLER: Prompt admin for a new username string
+        async function editMemberUsername(id, currentName) {
+            const newName = prompt(`Change username for "${currentName}":`, currentName);
+            if (!newName || newName.trim() === "" || newName.trim() === currentName) return;
+
+            try {
+                const response = await fetch(`/api/users/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: newName.trim() })
+                });
+                if (response.ok) {
+                    alert("Username successfully updated!");
+                    loadMembersDropdownAndDirectory();
+                } else {
+                    alert("Failed to update username.");
+                }
+            } catch (err) {
+                alert("Communication error updating user details.");
+            }
+        }
+
+        // NEW UI HANDLER: Toggle lock state parameters
+        async function toggleMemberLock(id, currentlyLocked) {
+            const nextStatus = currentlyLocked ? 'active' : 'locked';
+            if (!confirm(`Are you sure you want to ${currentlyLocked ? 'unlock' : 'lock'} this member account?`)) return;
+
+            try {
+                const response = await fetch(`/api/users/${id}/toggle-lock`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: nextStatus })
+                });
+                if (response.ok) {
+                    loadMembersDropdownAndDirectory();
+                } else {
+                    alert("Failed to adjust account lock parameters.");
+                }
+            } catch (err) {
+                alert("Communication error processing account toggle lock.");
+            }
+        }
+
+        // NEW UI HANDLER: Permanent extraction deletion of account row
+        async function deleteMemberAccount(id, name) {
+            if (!confirm(`CRITICAL WARNING: Are you completely certain you want to permanently delete the referee account "${name}"? This action cannot be undone.`)) return;
+
+            try {
+                const response = await fetch(`/api/users/${id}`, { method: 'DELETE' });
+                if (response.ok) {
+                    alert("Account successfully deleted from directory database files.");
+                    loadMembersDropdownAndDirectory();
+                } else {
+                    alert("Server rejected the deletion command request processing.");
+                }
+            } catch (err) {
+                alert("Communication error targeting user delete pipelines execution paths.");
             }
         }
 
