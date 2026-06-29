@@ -22,7 +22,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// API: Verify and login accounts securely
+// API: Verify and login accounts securely with lock validation
 app.post('/api/login', async (req, res) => {
     try {
         const { username, password } = req.body;
@@ -36,6 +36,12 @@ app.post('/api/login', async (req, res) => {
         if (!user || user.password !== password) {
             return res.status(401).json({ error: "Invalid username or password." });
         }
+        
+        // Block login if account is locked
+        if (user.status === 'locked') {
+            return res.status(403).json({ error: "This account has been locked by the administrator." });
+        }
+
         res.json({ username: user.username, role: user.role });
     } catch (err) {
         res.status(500).json({ error: "Authentication system failure." });
@@ -46,7 +52,12 @@ app.post('/api/login', async (req, res) => {
 app.post('/api/users', async (req, res) => {
     try {
         const { username, password, role } = req.body;
-        const newUser = { username: username.trim(), password: password.trim(), role: role || 'member' };
+        const newUser = { 
+            username: username.trim(), 
+            password: password.trim(), 
+            role: role || 'member',
+            status: 'active' // Default status explicitly tracked
+        };
 
         const response = await axios.post(`${SUPABASE_URL}/rest/v1/users`, newUser, {
             headers: {
@@ -62,15 +73,69 @@ app.post('/api/users', async (req, res) => {
     }
 });
 
-// UPDATED API: Admin fetches all columns (including id) for management view
+// API: Admin fetches all columns for management view
 app.get('/api/users', async (req, res) => {
     try {
-        const response = await axios.get(`${SUPABASE_URL}/rest/v1/users?select=id,username,role`, {
+        const response = await axios.get(`${SUPABASE_URL}/rest/v1/users?select=id,username,role,status`, {
             headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
         });
         res.json(response.data);
     } catch (err) {
         res.status(500).json({ error: "Failed to retrieve members list." });
+    }
+});
+
+// NEW API: Admin updates a member's username
+app.put('/api/users/:id', async (req, res) => {
+    try {
+        const { username } = req.body;
+        const response = await axios.patch(`${SUPABASE_URL}/rest/v1/users?id=eq.${req.params.id}`, 
+            { username: username.trim() },
+            {
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=representation'
+                }
+            }
+        );
+        res.json(response.data);
+    } catch (err) {
+        res.status(500).json({ error: "Failed to update member username." });
+    }
+});
+
+// NEW API: Admin toggles status lock on an account
+app.patch('/api/users/:id/toggle-lock', async (req, res) => {
+    try {
+        const { status } = req.body; // Expects 'active' or 'locked'
+        const response = await axios.patch(`${SUPABASE_URL}/rest/v1/users?id=eq.${req.params.id}`, 
+            { status },
+            {
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=representation'
+                }
+            }
+        );
+        res.json(response.data);
+    } catch (err) {
+        res.status(500).json({ error: "Failed to toggle account lock state." });
+    }
+});
+
+// NEW API: Admin deletes a user account completely
+app.delete('/api/users/:id', async (req, res) => {
+    try {
+        const response = await axios.delete(`${SUPABASE_URL}/rest/v1/users?id=eq.${req.params.id}`, {
+            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+        });
+        res.json(response.data);
+    } catch (err) {
+        res.status(500).json({ error: "Failed to delete user account." });
     }
 });
 
