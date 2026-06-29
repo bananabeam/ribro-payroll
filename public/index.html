@@ -130,6 +130,35 @@
                 </div>
 
                 <div id="adminOnlyForms" class="hidden space-y-6">
+                    
+                    <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-xl">
+                        <h2 class="text-xl font-bold text-red-400 mb-1">Impose Fee Deduction</h2>
+                        <p class="text-[10px] text-gray-400 mb-4">Apply expenses or account balance corrections.</p>
+                        <form id="deductionForm" onsubmit="handleImposeDeduction(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Select Target Member</label>
+                                <select id="deductionUserSelect" required class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white focus:outline-none focus:border-red-500">
+                                    <option value="">-- Select Member --</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Reason for Deduction</label>
+                                <input type="text" id="deductionReason" required placeholder="e.g., Uniform Fee, Missing Equipment" class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-red-500">
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Amount (₱)</label>
+                                    <input type="number" id="deductionAmount" step="0.01" min="1" required placeholder="0.00" class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white focus:outline-none focus:border-red-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Date</label>
+                                    <input type="date" id="deductionDate" required class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white focus:outline-none focus:border-red-500">
+                                </div>
+                            </div>
+                            <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded transition duration-200 uppercase tracking-wide">Charge Deduction Penalty</button>
+                        </form>
+                    </div>
+
                     <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-xl">
                         <h2 class="text-xl font-bold text-teal-400 mb-4">Create Referee Account</h2>
                         <form id="createAccountForm" onsubmit="handleCreateAccount(event)" class="space-y-4">
@@ -239,7 +268,7 @@
                             📊 Export Withdrawal Excel
                         </button>
                     </div>
-                    <div class="bg-gray-800 rounded-xl border border-gray-700 shadow-xl overflow-hidden min-h-[200px]">
+                    <div class="bg-gray-800 rounded-xl border border-gray-700 shadow-xl overflow-hidden min-h-[180px]">
                         <table class="w-full text-left text-xs border-collapse">
                             <thead>
                                 <tr class="bg-gray-950 text-gray-400 uppercase font-bold border-b border-gray-700">
@@ -256,6 +285,25 @@
                     </div>
                 </div>
 
+                <div class="space-y-2 pt-2">
+                    <h3 class="text-sm font-black uppercase text-red-400 tracking-wider">🛑 Imposed Account Fee Deductions Ledger</h3>
+                    <div class="bg-gray-800 rounded-xl border border-gray-700 shadow-xl overflow-hidden min-h-[150px]">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead>
+                                <tr class="bg-gray-950 text-gray-400 uppercase font-bold border-b border-gray-700">
+                                    <th class="p-3">Referee</th>
+                                    <th class="p-3">Reason Description</th>
+                                    <th class="p-3">Charge Date</th>
+                                    <th class="p-3 text-right">Deducted Amount</th>
+                                    <th class="p-3 text-center">Administrative Audit</th>
+                                </tr>
+                            </thead>
+                            <tbody id="deductionsTableRowsContainer" class="divide-y divide-gray-700/50">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
             </div>
         </main>
     </div>
@@ -265,6 +313,7 @@
         let userRole = 'member';
         let payrollCachedRecords = [];
         let withdrawalsCachedRecords = [];
+        let deductionsCachedRecords = []; // NEW CACHE LAYER REGISTERED
         let globalCurrentWalletBalance = 0;
 
         const refNameInput = document.getElementById('refereeName');
@@ -306,6 +355,7 @@
                 document.getElementById('userDisplay').textContent = currentUser;
 
                 document.getElementById('withdrawDate').value = new Date().toISOString().slice(0, 10);
+                document.getElementById('deductionDate').value = new Date().toISOString().slice(0, 10);
 
                 if (userRole === 'admin') {
                     document.getElementById('adminBadge').classList.remove('hidden');
@@ -333,6 +383,7 @@
         async function fetchAllFinancialSystemRecords() {
             await fetchPayrollDataRecords();
             await fetchWithdrawalRecords();
+            await fetchDeductionsRecords(); // PIPELINE CONNECTED
             calculateAndRenderUnifiedFinancials();
         }
 
@@ -354,11 +405,23 @@
             }
         }
 
+        // NEW ASYNC DATABASE INTAKE PIPELINE
+        async function fetchDeductionsRecords() {
+            try {
+                const response = await fetch(`/api/deductions?username=${encodeURIComponent(currentUser)}&role=${userRole}`);
+                deductionsCachedRecords = await response.json();
+            } catch (err) {
+                console.error("Deductions fetch error:", err);
+            }
+        }
+
+        // UPDATED INTEGRATED WALLET CALCULATOR MATRIX
         function calculateAndRenderUnifiedFinancials() {
             const totalSummaryText = document.getElementById('grandSystemAccumulationPayout');
             const totalWithdrawalsText = document.getElementById('analyticsTotalWithdrawals');
             const walletBalanceText = document.getElementById('analyticsWalletBalance');
 
+            // 1. Approved gross game profits
             let grossEarnings = 0;
             payrollCachedRecords.forEach(row => {
                 if (row.status === 'approved') {
@@ -366,6 +429,7 @@
                 }
             });
 
+            // 2. Extracted cash distributions
             let grossWithdrawals = 0;
             withdrawalsCachedRecords.forEach(w => {
                 if (w.status === 'approved') {
@@ -373,7 +437,14 @@
                 }
             });
 
-            globalCurrentWalletBalance = grossEarnings - grossWithdrawals;
+            // 3. Imposed admin penalty expenses
+            let grossDeductions = 0;
+            deductionsCachedRecords.forEach(d => {
+                grossDeductions += (d.amount || 0);
+            });
+
+            // 4. Ultimate Running Remaining Wallet Balance: Profits - Withdrawals - Deductions
+            globalCurrentWalletBalance = grossEarnings - grossWithdrawals - grossDeductions;
 
             totalSummaryText.textContent = `₱${grossEarnings.toFixed(2)}`;
             totalWithdrawalsText.textContent = `₱${grossWithdrawals.toFixed(2)}`;
@@ -381,6 +452,7 @@
 
             renderPayrollTableData();
             renderWithdrawalsTableData();
+            renderDeductionsTableData(); // UI DRAW TRIGGER
         }
 
         function renderPayrollTableData() {
@@ -487,13 +559,94 @@
             });
         }
 
+        // NEW FEAT: DEDUCTIONS DATA RENDER LAYOUT
+        function renderDeductionsTableData() {
+            const container = document.getElementById('deductionsTableRowsContainer');
+            container.innerHTML = '';
+
+            let list = [...deductionsCachedRecords];
+            list.sort((a,b) => new Date(b.date) - new Date(a.date));
+
+            if (list.length === 0) {
+                container.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-500 font-medium">No fee deductions applied to this account dashboard.</td></tr>`;
+                return;
+            }
+
+            list.forEach(d => {
+                let adminCellAction = `<span class="text-gray-600 font-mono text-[11px]">Locked</span>`;
+                if (userRole === 'admin') {
+                    adminCellAction = `<button onclick="handleDeleteDeduction('${d.id}')" class="bg-red-950 text-red-400 border border-red-900 text-[10px] hover:bg-red-900 hover:text-white px-2 py-0.5 rounded font-bold uppercase transition">Remove</button>`;
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-gray-700/20 transition border-b border-gray-700/40 text-gray-300 font-medium";
+                tr.innerHTML = `
+                    <td class="p-3 text-white font-bold">${d.name}</td>
+                    <td class="p-3 text-gray-400 font-semibold">${d.reason}</td>
+                    <td class="p-3 font-mono text-gray-500">${d.date}</td>
+                    <td class="p-3 text-right font-black text-amber-500 font-mono">-₱${parseFloat(d.amount).toFixed(2)}</td>
+                    <td class="p-3 text-center">${adminCellAction}</td>
+                `;
+                container.appendChild(tr);
+            });
+        }
+
+        // NEW ACTION: ADMIN SUBMITS A NEW ACC NT EXPENSE DEDUCTION CHARGE
+        async function handleImposeDeduction(e) {
+            e.preventDefault();
+            const name = document.getElementById('deductionUserSelect').value;
+            const reason = document.getElementById('deductionReason').value;
+            const amount = document.getElementById('deductionAmount').value;
+            const date = document.getElementById('deductionDate').value;
+
+            if (!name) {
+                alert("Please select a target user account row.");
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/deductions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, reason, amount, date })
+                });
+
+                if (response.ok) {
+                    alert(`Deduction successfully imposed and charged against ${name}'s balance log parameters!`);
+                    document.getElementById('deductionReason').value = '';
+                    document.getElementById('deductionAmount').value = '';
+                    fetchAllFinancialSystemRecords();
+                } else {
+                    alert("Backend storage engine rejected addition of deduction payload.");
+                }
+            } catch (err) {
+                alert("Error routing payload to deductions processing API channels.");
+            }
+        }
+
+        // NEW ACTION: ADMIN REMOVES A CHARGED DEDUCTION
+        async function handleDeleteDeduction(id) {
+            if (!confirm("Are you sure you want to permanently delete and reverse this balance sheet deduction log row?")) return;
+
+            try {
+                const response = await fetch(`/api/deductions/${id}`, { method: 'DELETE' });
+                if (response.ok) {
+                    fetchAllFinancialSystemRecords();
+                } else {
+                    alert("Server error running record removal macros.");
+                }
+            } catch (err) {
+                alert("Network execution failure reversing balance fields variables.");
+            }
+        }
+
         async function handleRequestWithdrawal(e) {
             e.preventDefault();
             const amt = parseFloat(document.getElementById('withdrawAmount').value) || 0;
             const date = document.getElementById('withdrawDate').value;
 
             if (userRole !== 'admin' && amt > globalCurrentWalletBalance) {
-                alert(`Insufficient Funds! Your running wallet balance calculation holds ₱${globalCurrentWalletBalance.toFixed(2)}. You cannot request an extraction exceeding this amount.`);
+                alert(`Insufficient Funds! Your running wallet balance limit calculation holds ₱${globalCurrentWalletBalance.toFixed(2)}. You cannot request an extraction exceeding this amount.`);
                 return;
             }
 
@@ -536,16 +689,19 @@
             }
         }
 
+        // UPDATED DROP-DOWN INTERFACE GENERATOR (POPULATES BOTH USER FORMS AT ONCE)
         async function loadMembersDropdownAndDirectory() {
             try {
                 const response = await fetch('/api/users');
                 const users = await response.json();
                 
                 const selectElement = document.getElementById('resetUserSelect');
+                const deductionSelect = document.getElementById('deductionUserSelect'); // TARGET LINKED
                 const directoryBody = document.getElementById('memberDirectoryContainer');
                 const countBadge = document.getElementById('directoryCountBadge');
 
                 selectElement.innerHTML = '<option value="">-- Select a Member --</option>';
+                deductionSelect.innerHTML = '<option value="">-- Select Target Member --</option>';
                 directoryBody.innerHTML = '';
                 countBadge.textContent = `${users.length} Total`;
 
@@ -555,6 +711,12 @@
                         option.value = user.username;
                         option.textContent = `${user.username} (${user.role})`;
                         selectElement.appendChild(option);
+
+                        // Also append rows directly into the deductions target form selection array
+                        const optDed = document.createElement('option');
+                        optDed.value = user.username;
+                        optDed.textContent = user.username;
+                        deductionSelect.appendChild(optDed);
                     }
 
                     const isLocked = user.status === 'locked';
@@ -770,6 +932,7 @@
             userRole = 'member';
             payrollCachedRecords = [];
             withdrawalsCachedRecords = [];
+            deductionsCachedRecords = [];
             globalCurrentWalletBalance = 0;
             document.getElementById('usernameInput').value = '';
             document.getElementById('passwordInput').value = '';
@@ -807,14 +970,12 @@
             XLSX.writeFile(wb, `RIBRO_Inc_Approved_Payroll_Report_${datestamp}.xlsx`);
         }
 
-        // NEW JAVASCRIPT EXPORT FUNCTION: GENERATES EXCEL SHEET FOR APPROVED WITHDRAWALS
         function exportWithdrawalsToExcel() {
             if (withdrawalsCachedRecords.length === 0) {
                 alert("There are no withdrawal records currently available to export.");
                 return;
             }
 
-            // Isolate only approved withdrawals matching organization audit specifications
             const approvedWithdrawals = withdrawalsCachedRecords.filter(item => item.status === 'approved');
             if (approvedWithdrawals.length === 0) {
                 alert("No approved withdrawal entries found to generate report.");
