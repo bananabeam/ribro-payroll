@@ -73,19 +73,33 @@ app.post('/api/users', async (req, res) => {
     }
 });
 
-// API: Admin fetches all columns for management view
+// API: Admin fetches all columns for management view safely
 app.get('/api/users', async (req, res) => {
     try {
+        // Select id, username, role, status dynamically
         const response = await axios.get(`${SUPABASE_URL}/rest/v1/users?select=id,username,role,status`, {
             headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
         });
-        res.json(response.data);
+        
+        // Ensure data is always treated as an array payload back to front-end browser
+        const userData = Array.isArray(response.data) ? response.data : [];
+        
+        // Fallback sanitize check: if a user row is missing a 'status' field completely, set it to active
+        const safeUsers = userData.map(u => ({
+            ...u,
+            status: u.status || 'active',
+            role: u.role || 'member'
+        }));
+
+        res.json(safeUsers);
     } catch (err) {
-        res.status(500).json({ error: "Failed to retrieve members list." });
+        console.error("DEBUG ERR: Failed to retrieve members list from Supabase:", err.response?.data || err.message);
+        // Always return an empty array format so frontend components don't crash with 500 errors!
+        res.json([]);
     }
 });
 
-// NEW API: Admin updates a member's username
+// API: Admin updates a member's username
 app.put('/api/users/:id', async (req, res) => {
     try {
         const { username } = req.body;
@@ -106,7 +120,7 @@ app.put('/api/users/:id', async (req, res) => {
     }
 });
 
-// NEW API: Admin toggles status lock on an account
+// API: Admin toggles status lock on an account
 app.patch('/api/users/:id/toggle-lock', async (req, res) => {
     try {
         const { status } = req.body; // Expects 'active' or 'locked'
@@ -127,7 +141,7 @@ app.patch('/api/users/:id/toggle-lock', async (req, res) => {
     }
 });
 
-// NEW API: Admin deletes a user account completely
+// API: Admin deletes a user account completely
 app.delete('/api/users/:id', async (req, res) => {
     try {
         const response = await axios.delete(`${SUPABASE_URL}/rest/v1/users?id=eq.${req.params.id}`, {
