@@ -257,10 +257,6 @@ app.delete('/api/payroll/:id', async (req, res) => {
     }
 });
 
-// ==========================================
-// NEW FEATURES: WITHDRAWALS ROUTING API SYSTEM
-// ==========================================
-
 // Fetch withdrawal records conditionally based on role
 app.get('/api/withdrawals', async (req, res) => {
     try {
@@ -280,7 +276,7 @@ app.get('/api/withdrawals', async (req, res) => {
     }
 });
 
-// Post a new withdrawal request (always starts as pending)
+// Post a new withdrawal request
 app.post('/api/withdrawals', async (req, res) => {
     try {
         const { name, amount, date } = req.body;
@@ -305,10 +301,10 @@ app.post('/api/withdrawals', async (req, res) => {
     }
 });
 
-// Admin approves or rejects a specific withdrawal request
+// Admin approves or rejects a withdrawal request
 app.patch('/api/withdrawals/:id/status', async (req, res) => {
     try {
-        const { status } = req.body; // Expects 'approved' or 'rejected'
+        const { status } = req.body;
         const response = await axios.patch(`${SUPABASE_URL}/rest/v1/withdrawals?id=eq.${req.params.id}`, 
             { status },
             {
@@ -323,6 +319,66 @@ app.patch('/api/withdrawals/:id/status', async (req, res) => {
         res.json(response.data);
     } catch (err) {
         res.status(500).json({ error: "Failed to modify withdrawal action status." });
+    }
+});
+
+// ==========================================
+// NEW FEATURES: DEDUCTIONS ROUTING SYSTEM
+// ==========================================
+
+// Get deduction metrics filtering cleanly by role context parameters
+app.get('/api/deductions', async (req, res) => {
+    try {
+        const { username, role } = req.query;
+        let queryUrl = `${SUPABASE_URL}/rest/v1/deductions?select=*`;
+
+        if (role !== 'admin' && username) {
+            queryUrl += `&name=eq.${encodeURIComponent(username.trim())}`;
+        }
+
+        const response = await axios.get(queryUrl, {
+            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+        });
+        res.json(Array.isArray(response.data) ? response.data : []);
+    } catch (err) {
+        res.json([]);
+    }
+});
+
+// Admin creates a deduction penalty entry
+app.post('/api/deductions', async (req, res) => {
+    try {
+        const { name, reason, amount, date } = req.body;
+        const newDeduction = {
+            name: name.trim(),
+            reason: reason.trim(),
+            amount: parseFloat(amount) || 0,
+            date
+        };
+
+        const response = await axios.post(`${SUPABASE_URL}/rest/v1/deductions`, newDeduction, {
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=representation'
+            }
+        });
+        res.status(201).json(response.data);
+    } catch (err) {
+        res.status(500).json({ error: "Failed to store deduction record parameter." });
+    }
+});
+
+// Admin deletes an existing deduction log entry row
+app.delete('/api/deductions/:id', async (req, res) => {
+    try {
+        const response = await axios.delete(`${SUPABASE_URL}/rest/v1/deductions?id=eq.${req.params.id}`, {
+            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+        });
+        res.json(response.data);
+    } catch (err) {
+        res.status(500).json({ error: "Deduction row deletion failed." });
     }
 });
 
