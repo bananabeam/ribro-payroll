@@ -144,6 +144,25 @@
                             <button onclick="handlePasswordReset()" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 rounded transition duration-200 uppercase tracking-wide">Reset Password</button>
                         </div>
                     </div>
+
+                    <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-xl">
+                        <div class="flex items-center justify-between mb-3">
+                            <h2 class="text-xl font-bold text-indigo-400">Members Directory</h2>
+                            <span id="directoryCountBadge" class="bg-indigo-950 text-indigo-300 text-xs px-2 py-0.5 rounded border border-indigo-800 font-mono">0 Total</span>
+                        </div>
+                        <div class="overflow-hidden border border-gray-700 rounded-lg max-h-[260px] overflow-y-auto">
+                            <table class="w-full text-left text-xs border-collapse">
+                                <thead>
+                                    <tr class="bg-gray-950 text-gray-400 font-bold uppercase border-b border-gray-700">
+                                        <th class="p-2.5">Username</th>
+                                        <th class="p-2.5 text-center">System Role</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="memberDirectoryContainer" class="divide-y divide-gray-700/50">
+                                    </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
 
             </div>
@@ -250,7 +269,7 @@
                     refNameInput.value = '';
                     refNameInput.readOnly = false;
                     refNameInput.placeholder = "Enter referee name";
-                    loadMembersDropdown();
+                    loadMembersDropdownAndDirectory();
                 } else {
                     document.getElementById('adminBadge').classList.add('hidden');
                     document.getElementById('adminOnlyForms').classList.add('hidden');
@@ -265,24 +284,48 @@
             }
         }
 
-        async function loadMembersDropdown() {
+        // UPDATED JAVASCRIPT: Pulls full data arrays to populate dropdown selections AND directory grid values
+        async function loadMembersDropdownAndDirectory() {
             try {
                 const response = await fetch('/api/users');
                 const users = await response.json();
                 
                 const selectElement = document.getElementById('resetUserSelect');
+                const directoryBody = document.getElementById('memberDirectoryContainer');
+                const countBadge = document.getElementById('directoryCountBadge');
+
+                // Reset fields
                 selectElement.innerHTML = '<option value="">-- Select a Member --</option>';
-                
+                directoryBody.innerHTML = '';
+                countBadge.textContent = `${users.length} Total`;
+
                 users.forEach(user => {
+                    // Populate Reset Dropdown (skip 'admin' user profile if chosen)
                     if(user.username !== 'admin') {
                         const option = document.createElement('option');
                         option.value = user.username;
                         option.textContent = `${user.username} (${user.role})`;
                         selectElement.appendChild(option);
                     }
+
+                    // Append directory data rows natively
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-gray-700/20 text-gray-300 font-medium border-b border-gray-700/40";
+                    tr.innerHTML = `
+                        <td class="p-2.5 font-semibold text-white flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+                            ${user.username}
+                        </td>
+                        <td class="p-2.5 text-center">
+                            <span class="px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider ${user.role === 'admin' ? 'bg-red-950/60 border border-red-800/80 text-red-400' : 'bg-gray-900 border border-gray-700 text-gray-400'}">
+                                ${user.role}
+                            </span>
+                        </td>
+                    `;
+                    directoryBody.appendChild(tr);
                 });
             } catch (err) {
-                console.error("Error populating member selection dropdown options:", err);
+                console.error("Error populating member selection dropdown options and directory panel mapping:", err);
             }
         }
 
@@ -337,18 +380,15 @@
             const counterText = document.getElementById('recordsCounterDisplay');
             
             const sortVal = document.getElementById('sortConfigSelection').value;
-            const monthFilter = document.getElementById('filterMonthSelect').value; // Expected Format: YYYY-MM
+            const monthFilter = document.getElementById('filterMonthSelect').value;
             const searchQuery = document.getElementById('filterSearchQuery').value.toLowerCase().trim();
 
             container.innerHTML = '';
 
-            // Apply Runtime Filtering Rules
             let logs = [...payrollCachedRecords].filter(row => {
-                // 1. Month Filter matching
                 if (monthFilter) {
                     if (!row.date || !row.date.startsWith(monthFilter)) return false;
                 }
-                // 2. Text Search Query checking
                 if (searchQuery) {
                     const matchName = row.name ? row.name.toLowerCase().includes(searchQuery) : false;
                     const matchLeague = row.league ? row.league.toLowerCase().includes(searchQuery) : false;
@@ -357,7 +397,6 @@
                 return true;
             });
 
-            // Apply Runtime Sorting Engine rules
             if (sortVal === 'date-desc') logs.sort((a,b) => new Date(b.date) - new Date(a.date));
             if (sortVal === 'date-asc') logs.sort((a,b) => new Date(a.date) - new Date(b.date));
             if (sortVal === 'name-asc') logs.sort((a,b) => a.name.localeCompare(b.name));
@@ -397,7 +436,6 @@
                 container.appendChild(tr);
             });
 
-            // Update Global Dashboard Metrics Elements dynamically
             totalSummaryText.textContent = `₱${sumAccumulator.toFixed(2)}`;
             totalGamesText.textContent = gamesAccumulator.toLocaleString();
             avgEarningText.textContent = `₱${(sumAccumulator / logs.length).toFixed(2)}`;
@@ -465,7 +503,7 @@
                     alert(`Success: Referee account "${username}" has been fully registered!`);
                     document.getElementById('newUsername').value = '';
                     document.getElementById('newPassword').value = '';
-                    loadMembersDropdown();
+                    loadMembersDropdownAndDirectory();
                 } else {
                     alert("Failed to create user account. Username may be taken.");
                 }
