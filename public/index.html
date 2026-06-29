@@ -79,6 +79,14 @@
             
             <div id="controlPanelSide" class="space-y-6">
                 
+                <div id="overallReportSection" class="hidden bg-gradient-to-br from-blue-950/40 to-slate-900 border border-blue-800/60 p-6 rounded-xl shadow-xl space-y-3">
+                    <h2 class="text-lg font-black tracking-wide text-blue-400 uppercase">📊 System Management Audit</h2>
+                    <p class="text-xs text-gray-400 leading-relaxed">Generate a full audit statement comprising active incomes, cash release flows, and imposed referee fines inside an integrated multi-sheet Excel file.</p>
+                    <button onclick="exportOverallSystemMasterReport()" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2.5 rounded transition uppercase tracking-wider shadow">
+                        📥 Download Overall Financial Report
+                    </button>
+                </div>
+
                 <div id="addAssignmentSection" class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-xl">
                     <h2 class="text-xl font-bold text-orange-500 mb-2">Add Assignment Log</h2>
                     <p id="pendingNoticeText" class="text-[11px] text-amber-400 mb-4 font-medium leading-relaxed hidden">⚠️ Notice: Entries added by referees require administrator approval.</p>
@@ -313,7 +321,7 @@
         let userRole = 'member';
         let payrollCachedRecords = [];
         let withdrawalsCachedRecords = [];
-        let deductionsCachedRecords = []; // NEW CACHE LAYER REGISTERED
+        let deductionsCachedRecords = [];
         let globalCurrentWalletBalance = 0;
 
         const refNameInput = document.getElementById('refereeName');
@@ -360,6 +368,7 @@
                 if (userRole === 'admin') {
                     document.getElementById('adminBadge').classList.remove('hidden');
                     document.getElementById('adminOnlyForms').classList.remove('hidden');
+                    document.getElementById('overallReportSection').classList.remove('hidden'); // UNVEIL BLOCK
                     document.getElementById('pendingNoticeText').classList.add('hidden');
                     refNameInput.value = '';
                     refNameInput.readOnly = false;
@@ -368,6 +377,7 @@
                 } else {
                     document.getElementById('adminBadge').classList.add('hidden');
                     document.getElementById('adminOnlyForms').classList.add('hidden');
+                    document.getElementById('overallReportSection').classList.add('hidden');
                     document.getElementById('pendingNoticeText').classList.remove('hidden');
                     refNameInput.value = currentUser;
                     refNameInput.readOnly = true;
@@ -383,7 +393,7 @@
         async function fetchAllFinancialSystemRecords() {
             await fetchPayrollDataRecords();
             await fetchWithdrawalRecords();
-            await fetchDeductionsRecords(); // PIPELINE CONNECTED
+            await fetchDeductionsRecords();
             calculateAndRenderUnifiedFinancials();
         }
 
@@ -405,7 +415,6 @@
             }
         }
 
-        // NEW ASYNC DATABASE INTAKE PIPELINE
         async function fetchDeductionsRecords() {
             try {
                 const response = await fetch(`/api/deductions?username=${encodeURIComponent(currentUser)}&role=${userRole}`);
@@ -415,13 +424,11 @@
             }
         }
 
-        // UPDATED INTEGRATED WALLET CALCULATOR MATRIX
         function calculateAndRenderUnifiedFinancials() {
             const totalSummaryText = document.getElementById('grandSystemAccumulationPayout');
             const totalWithdrawalsText = document.getElementById('analyticsTotalWithdrawals');
             const walletBalanceText = document.getElementById('analyticsWalletBalance');
 
-            // 1. Approved gross game profits
             let grossEarnings = 0;
             payrollCachedRecords.forEach(row => {
                 if (row.status === 'approved') {
@@ -429,7 +436,6 @@
                 }
             });
 
-            // 2. Extracted cash distributions
             let grossWithdrawals = 0;
             withdrawalsCachedRecords.forEach(w => {
                 if (w.status === 'approved') {
@@ -437,13 +443,11 @@
                 }
             });
 
-            // 3. Imposed admin penalty expenses
             let grossDeductions = 0;
             deductionsCachedRecords.forEach(d => {
                 grossDeductions += (d.amount || 0);
             });
 
-            // 4. Ultimate Running Remaining Wallet Balance: Profits - Withdrawals - Deductions
             globalCurrentWalletBalance = grossEarnings - grossWithdrawals - grossDeductions;
 
             totalSummaryText.textContent = `₱${grossEarnings.toFixed(2)}`;
@@ -452,7 +456,7 @@
 
             renderPayrollTableData();
             renderWithdrawalsTableData();
-            renderDeductionsTableData(); // UI DRAW TRIGGER
+            renderDeductionsTableData();
         }
 
         function renderPayrollTableData() {
@@ -559,7 +563,6 @@
             });
         }
 
-        // NEW FEAT: DEDUCTIONS DATA RENDER LAYOUT
         function renderDeductionsTableData() {
             const container = document.getElementById('deductionsTableRowsContainer');
             container.innerHTML = '';
@@ -591,18 +594,12 @@
             });
         }
 
-        // NEW ACTION: ADMIN SUBMITS A NEW ACC NT EXPENSE DEDUCTION CHARGE
         async function handleImposeDeduction(e) {
             e.preventDefault();
             const name = document.getElementById('deductionUserSelect').value;
             const reason = document.getElementById('deductionReason').value;
             const amount = document.getElementById('deductionAmount').value;
             const date = document.getElementById('deductionDate').value;
-
-            if (!name) {
-                alert("Please select a target user account row.");
-                return;
-            }
 
             try {
                 const response = await fetch('/api/deductions', {
@@ -612,7 +609,7 @@
                 });
 
                 if (response.ok) {
-                    alert(`Deduction successfully imposed and charged against ${name}'s balance log parameters!`);
+                    alert(`Deduction successfully imposed and charged against ${name}'s balance!`);
                     document.getElementById('deductionReason').value = '';
                     document.getElementById('deductionAmount').value = '';
                     fetchAllFinancialSystemRecords();
@@ -624,9 +621,8 @@
             }
         }
 
-        // NEW ACTION: ADMIN REMOVES A CHARGED DEDUCTION
         async function handleDeleteDeduction(id) {
-            if (!confirm("Are you sure you want to permanently delete and reverse this balance sheet deduction log row?")) return;
+            if (!confirm("Are you sure you want to permanently delete and reverse this deduction log row?")) return;
 
             try {
                 const response = await fetch(`/api/deductions/${id}`, { method: 'DELETE' });
@@ -646,7 +642,7 @@
             const date = document.getElementById('withdrawDate').value;
 
             if (userRole !== 'admin' && amt > globalCurrentWalletBalance) {
-                alert(`Insufficient Funds! Your running wallet balance limit calculation holds ₱${globalCurrentWalletBalance.toFixed(2)}. You cannot request an extraction exceeding this amount.`);
+                alert(`Insufficient Funds! Your running wallet balance limit calculation holds ₱${globalCurrentWalletBalance.toFixed(2)}.`);
                 return;
             }
 
@@ -658,7 +654,7 @@
                 });
 
                 if (response.ok) {
-                    alert("Withdrawal cash extraction request successfully sent! Running awaiting admin confirmation pipelines.");
+                    alert("Withdrawal cash extraction request successfully sent!");
                     document.getElementById('withdrawAmount').value = '';
                     fetchAllFinancialSystemRecords();
                 } else {
@@ -689,14 +685,13 @@
             }
         }
 
-        // UPDATED DROP-DOWN INTERFACE GENERATOR (POPULATES BOTH USER FORMS AT ONCE)
         async function loadMembersDropdownAndDirectory() {
             try {
                 const response = await fetch('/api/users');
                 const users = await response.json();
                 
                 const selectElement = document.getElementById('resetUserSelect');
-                const deductionSelect = document.getElementById('deductionUserSelect'); // TARGET LINKED
+                const deductionSelect = document.getElementById('deductionUserSelect');
                 const directoryBody = document.getElementById('memberDirectoryContainer');
                 const countBadge = document.getElementById('directoryCountBadge');
 
@@ -712,7 +707,6 @@
                         option.textContent = `${user.username} (${user.role})`;
                         selectElement.appendChild(option);
 
-                        // Also append rows directly into the deductions target form selection array
                         const optDed = document.createElement('option');
                         optDed.value = user.username;
                         optDed.textContent = user.username;
@@ -787,7 +781,7 @@
         }
 
         async function deleteMemberAccount(id, name) {
-            if (!confirm(`CRITICAL WARNING: Are you completely certain you want to permanently delete the referee account "${name}"? This action cannot be undone.`)) return;
+            if (!confirm(`CRITICAL WARNING: Are you completely certain you want to permanently delete the referee account "${name}"?`)) return;
 
             try {
                 const response = await fetch(`/api/users/${id}`, { method: 'DELETE' });
@@ -811,10 +805,6 @@
                 return;
             }
 
-            if (!confirm(`Are you certain you wish to overwrite the active access login password row for ${username}?`)) {
-                return;
-            }
-
             try {
                 const response = await fetch('/api/users/reset-password', {
                     method: 'PATCH',
@@ -830,7 +820,7 @@
                     alert(`Error: ${data.error}`);
                 }
             } catch (err) {
-                alert("Failed to submit patch update tracking request payload to the server.");
+                alert("Failed to submit patch update tracking request payload.");
             }
         }
 
@@ -873,7 +863,7 @@
                 });
 
                 if (response.ok) {
-                    alert(userRole === 'admin' ? "Log saved and approved successfully!" : "Log submitted successfully! Awaiting admin approval.");
+                    alert(userRole === 'admin' ? "Log saved and approved successfully!" : "Log submitted successfully!");
                     document.getElementById('leagueTitle').value = '';
                     document.getElementById('matchDate').value = '';
                     document.getElementById('gamesCount').value = '1';
@@ -895,7 +885,7 @@
                 if (response.ok) {
                     fetchAllFinancialSystemRecords();
                 } else {
-                    alert("Deletion command rejected by backend cloud engine verification.");
+                    alert("Deletion command rejected by backend cloud engine.");
                 }
             } catch (err) {
                 alert("Communication error targeting row delete commands pipelines.");
@@ -945,13 +935,11 @@
                 alert("There are no records currently available to transfer to spreadsheet.");
                 return;
             }
-
             const approvedRecords = payrollCachedRecords.filter(item => item.status === 'approved');
             if (approvedRecords.length === 0) {
                 alert("No approved game entries found to export.");
                 return;
             }
-
             const cleanRows = approvedRecords.map((item, index) => ({
                 "Log ID": index + 1,
                 "Referee Name": item.name,
@@ -961,11 +949,9 @@
                 "Per Game Rate Fee (PHP)": item.rate,
                 "Total Payout Compensation (PHP)": item.total
             }));
-
             const ws = XLSX.utils.json_to_sheet(cleanRows);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "RIBRO Payroll Logs");
-            
             const datestamp = new Date().toISOString().slice(0,10);
             XLSX.writeFile(wb, `RIBRO_Inc_Approved_Payroll_Report_${datestamp}.xlsx`);
         }
@@ -975,13 +961,11 @@
                 alert("There are no withdrawal records currently available to export.");
                 return;
             }
-
             const approvedWithdrawals = withdrawalsCachedRecords.filter(item => item.status === 'approved');
             if (approvedWithdrawals.length === 0) {
                 alert("No approved withdrawal entries found to generate report.");
                 return;
             }
-
             const cleanRows = approvedWithdrawals.map((item, index) => ({
                 "Transaction ID": index + 1,
                 "Referee Name": item.name,
@@ -989,13 +973,88 @@
                 "Withdrawn Amount (PHP)": item.amount,
                 "Status": "Approved / Released"
             }));
-
             const ws = XLSX.utils.json_to_sheet(cleanRows);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "RIBRO Released Withdrawals");
-            
             const datestamp = new Date().toISOString().slice(0,10);
             XLSX.writeFile(wb, `RIBRO_Inc_Withdrawal_Report_${datestamp}.xlsx`);
+        }
+
+        // ==========================================
+        // NEW FEATURE: INTEGRATED CONSOLIDATED MASTER REPORT EXPORTER
+        // ==========================================
+        function exportOverallSystemMasterReport() {
+            if (payrollCachedRecords.length === 0 && withdrawalsCachedRecords.length === 0 && deductionsCachedRecords.length === 0) {
+                alert("No system data entries are currently cached to compile an audit report sheet.");
+                return;
+            }
+
+            // Create an empty workbook instance
+            const wb = XLSX.utils.book_new();
+
+            // 1. GENERATE TAB 1: EXECUTIVE FINANCIAL SUMMARY DATA FRAME
+            let totalIncomes = 0;
+            payrollCachedRecords.forEach(r => { if (r.status === 'approved') totalIncomes += (r.total || 0); });
+
+            let totalWithdrawals = 0;
+            withdrawalsCachedRecords.forEach(w => { if (w.status === 'approved') totalWithdrawals += (w.amount || 0); });
+
+            let totalDeductions = 0;
+            deductionsCachedRecords.forEach(d => { totalDeductions += (d.amount || 0); });
+
+            let netRemainingBalance = totalIncomes - totalWithdrawals - totalDeductions;
+
+            const summaryRows = [
+                ["ROXAS ISABELA BASKETBALL REFEREES ORGANIZATION INC. (RIBRO INC.)"],
+                ["SEC Reg. No. 2025048197717-63 | SYSTEM CONSOLIDATED AUDIT STATEMENT"],
+                [],
+                ["FINANCIAL BALANCE METRIC CHECKLIST", "VALUE (PHP)"],
+                ["Gross Approved Game Earnings (Total Incomes)", totalIncomes],
+                ["Total Approved Released Withdrawals", totalWithdrawals],
+                ["Total Imposed Account Fee Deductions", totalDeductions],
+                ["RIBRO Net Remaining Wallet Balance", netRemainingBalance]
+            ];
+            const wsSummary = XLSX.utils.aoa_to_sheet(summaryRows);
+            XLSX.utils.book_append_sheet(wb, wsSummary, "Executive Summary");
+
+            // 2. GENERATE TAB 2: GAME ASSIGNMENTS RECORDS SHEET
+            const cleanPayrollRows = payrollCachedRecords.map((item, index) => ({
+                "Log ID": index + 1,
+                "Referee Name": item.name,
+                "League / Tournament Description": item.league,
+                "Match Date": item.date,
+                "Games Count": item.games,
+                "Total Value (PHP)": item.total,
+                "Verification Status": item.status
+            }));
+            const wsPayroll = XLSX.utils.json_to_sheet(cleanPayrollRows);
+            XLSX.utils.book_append_sheet(wb, wsPayroll, "Game Assignment Ledger");
+
+            // 3. GENERATE TAB 3: WITHDRAWAL HISTORY EXTRACTIONS SHEET
+            const cleanWithdrawalRows = withdrawalsCachedRecords.map((item, index) => ({
+                "Transaction ID": index + 1,
+                "Referee Name": item.name,
+                "Request Date": item.date,
+                "Withdrawn Amount (PHP)": item.amount,
+                "Current Status": item.status
+            }));
+            const wsWithdrawals = XLSX.utils.json_to_sheet(cleanWithdrawalRows);
+            XLSX.utils.book_append_sheet(wb, wsWithdrawals, "Withdrawal Processing Records");
+
+            // 4. GENERATE TAB 4: IMPOSED FINES ACCOUNT DEDUCTIONS LEDGER SHEET
+            const cleanDeductionRows = deductionsCachedRecords.map((item, index) => ({
+                "Audit Row ID": index + 1,
+                "Referee Target Name": item.name,
+                "Reason Description Label": item.reason,
+                "Deducted Amount (PHP)": item.amount,
+                "Imposed Date": item.date
+            }));
+            const wsDeductions = XLSX.utils.json_to_sheet(cleanDeductionRows);
+            XLSX.utils.book_append_sheet(wb, wsDeductions, "Fee Deductions Ledger");
+
+            // Finalize download block trigger
+            const datestamp = new Date().toISOString().slice(0, 10);
+            XLSX.writeFile(wb, `RIBRO_Inc_Master_Financial_Report_${datestamp}.xlsx`);
         }
     </script>
 </body>
