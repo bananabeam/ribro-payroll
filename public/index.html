@@ -3,317 +3,519 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RIBRO Inc. | Referee Payroll Dashboard</title>
+    <title>RIBRO Inc. | Enterprise Payroll & Financial Ledger</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #111827; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #374151; border-radius: 3px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #4B5563; }
+    </style>
 </head>
-<body class="bg-gray-900 text-gray-100 min-h-screen font-sans">
+<body class="bg-gray-950 text-gray-100 min-h-screen font-sans antialiased custom-scrollbar">
 
-    <div id="loginScreen" class="flex items-center justify-center min-h-screen p-4">
-        <div class="bg-gray-800 p-8 rounded-xl border border-gray-700 shadow-xl max-w-md w-full space-y-6">
+    <div id="loginScreen" class="flex items-center justify-center min-h-screen p-4 bg-gradient-to-br from-gray-950 via-gray-900 to-orange-950/20">
+        <div class="bg-gray-900 p-8 rounded-2xl border border-gray-800 shadow-2xl max-w-md w-full space-y-6 relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500"></div>
             <div class="flex flex-col items-center text-center">
-                <img src="RIBroInc NEW LOGO.jpg" alt="RIBRO Inc. Logo" class="w-32 h-32 object-contain mb-4 drop-shadow-[0_4px_10px_rgba(249,115,22,0.3)]">
-                <h1 class="text-3xl font-black text-orange-500 uppercase tracking-wider">RIBRO Inc.</h1>
-                <p class="text-sm font-semibold text-gray-300 mt-1 uppercase text-center">Roxas Isabela Basketball Referees Organization Inc.</p>
-                <p class="text-xs text-gray-500 mt-1 bg-gray-900/50 py-1 px-2 rounded inline-block border border-gray-700/60">SEC Reg. No. 2025048197717-63</p>
+                <img src="RIBroInc NEW LOGO.jpg" alt="RIBRO Inc. Logo" class="w-28 h-28 object-contain mb-4 drop-shadow-[0_0_15px_rgba(249,115,22,0.4)]">
+                <h1 class="text-2xl font-black tracking-wider text-white uppercase">RIBRO INC.</h1>
+                <p class="text-xs font-bold text-gray-400 uppercase tracking-wide mt-1">Roxas Isabela Basketball Referees Organization</p>
+                <span class="text-[10px] text-gray-500 font-mono mt-1 bg-gray-950 px-2.5 py-1 rounded border border-gray-800">SEC Reg. No. 2025048197717-63</span>
             </div>
-
             <form id="loginForm" class="space-y-4" onsubmit="handleLogin(event)">
                 <div>
-                    <label class="block text-left text-xs font-bold uppercase text-gray-400 mb-1">Username</label>
-                    <input type="text" id="usernameInput" required placeholder="Enter username" class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-orange-500">
+                    <label class="block text-xs font-bold uppercase text-gray-400 mb-1.5 tracking-wider">Account Username</label>
+                    <div class="relative">
+                        <input type="text" id="usernameInput" required placeholder="Enter username" class="w-full bg-gray-950 border border-gray-700 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition duration-200">
+                    </div>
                 </div>
                 <div>
-                    <label class="block text-left text-xs font-bold uppercase text-gray-400 mb-1">Password</label>
-                    <input type="password" id="passwordInput" required placeholder="•••••" class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-orange-500">
+                    <label class="block text-xs font-bold uppercase text-gray-400 mb-1.5 tracking-wider">Security Password</label>
+                    <input type="password" id="passwordInput" required placeholder="••••••••" class="w-full bg-gray-950 border border-gray-700 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition duration-200">
                 </div>
-                <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 rounded transition duration-200 uppercase tracking-wide">Log In</button>
+                <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 rounded-xl transition duration-200 uppercase text-xs tracking-widest shadow-lg shadow-orange-600/20 mt-2">Verify Access Key</button>
             </form>
         </div>
     </div>
 
-    <div id="appDashboard" class="hidden min-h-screen flex flex-col">
-        <header class="bg-gray-950 border-b border-gray-800 px-6 py-4 flex flex-wrap items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
-                <img src="RIBroInc NEW LOGO.jpg" alt="Logo" class="w-10 h-10 object-contain">
+    <div id="appDashboard" class="hidden min-h-screen flex flex-col lg:flex-row">
+        
+        <aside class="hidden lg:flex flex-col w-64 bg-gray-900 border-r border-gray-800 h-screen sticky top-0 shrink-0 z-30">
+            <div class="p-5 border-b border-gray-800 flex items-center gap-3 bg-gray-950/40">
+                <img src="RIBroInc NEW LOGO.jpg" alt="RIBRO Logo" class="w-9 h-9 object-contain rounded-lg">
                 <div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-lg font-black text-orange-500 tracking-wider">RIBRO INC.</span>
-                        <span class="text-[10px] text-gray-400 font-medium hidden sm:inline">Roxas Isabela Basketball Referees Organization Inc.</span>
-                    </div>
-                    <p class="text-[9px] text-gray-500 font-mono">SEC Reg. No. 2025048197717-63</p>
+                    <h2 class="text-sm font-black text-white uppercase tracking-wider">RIBRO INC.</h2>
+                    <p class="text-[9px] text-gray-500 font-mono">SEC Management Core</p>
                 </div>
             </div>
-            <div class="flex items-center gap-3 ml-auto">
-                <span class="text-sm text-gray-400">User: <strong id="userDisplay" class="text-white"></strong></span>
-                <span id="adminBadge" class="hidden bg-red-900/60 border border-red-700 text-red-300 text-[10px] font-bold px-2 py-0.5 rounded">Admin Control View</span>
-                <button onclick="handleLogout()" class="bg-gray-800 hover:bg-gray-700 text-gray-300 px-3 py-1 text-xs rounded border border-gray-700 transition">Logout</button>
-            </div>
-        </header>
-
-        <section class="p-6 max-w-7xl w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="bg-gradient-to-br from-orange-600/20 to-amber-600/5 border border-orange-500/20 rounded-xl p-5 shadow-md flex justify-between items-center">
-                <div>
-                    <h4 class="text-xs uppercase font-bold tracking-wider text-orange-400">Gross Approved Earnings</h4>
-                    <p class="text-[10px] text-gray-400 mt-0.5">Sum of all approved logs</p>
-                </div>
-                <span id="grandSystemAccumulationPayout" class="text-2xl font-black text-orange-500 font-mono">₱0.00</span>
-            </div>
-            <div class="bg-gray-800 border border-gray-700 rounded-xl p-5 shadow-md flex justify-between items-center">
-                <div>
-                    <h4 class="text-xs uppercase font-bold tracking-wider text-red-400">Total Approved Withdrawals</h4>
-                    <p class="text-[10px] text-gray-400 mt-0.5">Successfully collected funds</p>
-                </div>
-                <span id="analyticsTotalWithdrawals" class="text-2xl font-black text-red-400 font-mono">₱0.00</span>
-            </div>
-            <div class="bg-gradient-to-br from-emerald-600/20 to-teal-600/5 border border-emerald-500/20 rounded-xl p-5 shadow-md flex justify-between items-center">
-                <div>
-                    <h4 class="text-xs uppercase font-bold tracking-wider text-emerald-400">Remaining Wallet Balance</h4>
-                    <p class="text-[10px] text-gray-400 mt-0.5">Available funds to withdraw</p>
-                </div>
-                <span id="analyticsWalletBalance" class="text-2xl font-black text-emerald-400 font-mono">₱0.00</span>
-            </div>
-        </section>
-
-        <main class="flex-1 px-6 pb-6 grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl w-full mx-auto">
             
-            <div id="controlPanelSide" class="space-y-6">
-                
-                <div id="overallReportSection" class="hidden bg-gradient-to-br from-blue-950/40 to-slate-900 border border-blue-800/60 p-6 rounded-xl shadow-xl space-y-3">
-                    <h2 class="text-lg font-black tracking-wide text-blue-400 uppercase">📊 System Management Audit</h2>
-                    <p class="text-xs text-gray-400 leading-relaxed">Generate a full audit statement comprising active incomes, cash release flows, and imposed referee fines inside an integrated multi-sheet Excel file.</p>
-                    <button onclick="exportOverallSystemMasterReport()" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2.5 rounded transition uppercase tracking-wider shadow">
-                        📥 Download Overall Financial Report
+            <nav class="flex-1 p-4 space-y-1.5 overflow-y-auto custom-scrollbar">
+                <div class="text-[10px] uppercase tracking-widest font-bold text-gray-500 px-3 mb-2">Main Controls</div>
+                <button onclick="switchViewChannel('dashboardView')" id="navLink-dashboardView" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition group bg-orange-600 text-white">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4 shrink-0"></i> Dashboard
+                </button>
+                <button onclick="switchViewChannel('assignmentsView')" id="navLink-assignmentsView" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition group text-gray-400 hover:bg-gray-800 hover:text-white">
+                    <i data-lucide="award" class="w-4 h-4 shrink-0"></i> Match Logs
+                </button>
+                <button onclick="switchViewChannel('withdrawalsView')" id="navLink-withdrawalsView" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition group text-gray-400 hover:bg-gray-800 hover:text-white">
+                    <i data-lucide="wallet" class="w-4 h-4 shrink-0"></i> Withdrawals
+                </button>
+                <button onclick="switchViewChannel('deductionsView')" id="navLink-deductionsView" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition group text-gray-400 hover:bg-gray-800 hover:text-white">
+                    <i data-lucide="shield-alert" class="w-4 h-4 shrink-0"></i> Deductions
+                </button>
+                <button onclick="switchViewChannel('reportsView')" id="navLink-reportsView" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition group text-gray-400 hover:bg-gray-800 hover:text-white">
+                    <i data-lucide="bar-chart-3" class="w-4 h-4 shrink-0"></i> Audit Reports
+                </button>
+
+                <div id="adminNavGroup" class="hidden pt-4 space-y-1.5 border-t border-gray-800/60 mt-4">
+                    <div class="text-[10px] uppercase tracking-widest font-bold text-red-400 px-3 mb-2">Administration</div>
+                    <button onclick="switchViewChannel('usersView')" id="navLink-usersView" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition group text-gray-400 hover:bg-gray-800 hover:text-white">
+                        <i data-lucide="users" class="w-4 h-4 shrink-0"></i> User Directory
                     </button>
                 </div>
+            </nav>
 
-                <div id="addAssignmentSection" class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-xl">
-                    <h2 class="text-xl font-bold text-orange-500 mb-2">Add Assignment Log</h2>
-                    <p id="pendingNoticeText" class="text-[11px] text-amber-400 mb-4 font-medium leading-relaxed hidden">⚠️ Notice: Entries added by referees require administrator approval.</p>
-                    <form id="payrollForm" onsubmit="handleSaveAssignment(event)" class="space-y-4">
-                        <div>
-                            <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Referee Name</label>
-                            <input type="text" id="refereeName" required class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold uppercase text-gray-400 mb-1">League Title</label>
-                            <input type="text" id="leagueTitle" required placeholder="e.g., Inter-Barangay, SK Cup" class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white placeholder-gray-500">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Date</label>
-                            <input type="date" id="matchDate" required class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white">
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Games Officiated</label>
-                                <input type="number" id="gamesCount" min="1" value="1" required class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Rate per Game (₱)</label>
-                                <input type="number" id="gameRate" step="0.01" value="500.00" required class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white">
-                            </div>
-                        </div>
-                        <div class="pt-2 flex items-center justify-between border-t border-gray-700/60">
-                            <span class="text-xs font-bold text-gray-400 uppercase">Assignment Total:</span>
-                            <span id="liveCalculationTotal" class="text-xl font-black text-green-400">₱0.00</span>
-                        </div>
-                        <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 rounded transition duration-200 uppercase tracking-wide">Save Assignment</button>
-                    </form>
-                </div>
-
-                <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-xl">
-                    <h2 class="text-xl font-bold text-emerald-500 mb-1">Request Withdrawal</h2>
-                    <p class="text-[10px] text-gray-400 mb-4">Submit fund processing extraction sheets.</p>
-                    <form id="withdrawalForm" onsubmit="handleRequestWithdrawal(event)" class="space-y-4">
-                        <div>
-                            <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Amount to Withdraw (₱)</label>
-                            <input type="number" id="withdrawAmount" step="0.01" min="1" required placeholder="0.00" class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Date</label>
-                            <input type="date" id="withdrawDate" required class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
-                        </div>
-                        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded transition duration-200 uppercase tracking-wide">Submit Withdrawal Request</button>
-                    </form>
-                </div>
-
-                <div id="adminOnlyForms" class="hidden space-y-6">
-                    
-                    <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-xl">
-                        <h2 class="text-xl font-bold text-red-400 mb-1">Impose Fee Deduction</h2>
-                        <p class="text-[10px] text-gray-400 mb-4">Apply expenses or account balance corrections.</p>
-                        <form id="deductionForm" onsubmit="handleImposeDeduction(event)" class="space-y-4">
-                            <div>
-                                <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Select Target Member</label>
-                                <select id="deductionUserSelect" required class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white focus:outline-none focus:border-red-500">
-                                    <option value="">-- Select Member --</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Reason for Deduction</label>
-                                <input type="text" id="deductionReason" required placeholder="e.g., Uniform Fee, Missing Equipment" class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-red-500">
-                            </div>
-                            <div class="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Amount (₱)</label>
-                                    <input type="number" id="deductionAmount" step="0.01" min="1" required placeholder="0.00" class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white focus:outline-none focus:border-red-500">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Date</label>
-                                    <input type="date" id="deductionDate" required class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white focus:outline-none focus:border-red-500">
-                                </div>
-                            </div>
-                            <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded transition duration-200 uppercase tracking-wide">Charge Deduction Penalty</button>
-                        </form>
-                    </div>
-
-                    <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-xl">
-                        <h2 class="text-xl font-bold text-teal-400 mb-4">Create Referee Account</h2>
-                        <form id="createAccountForm" onsubmit="handleCreateAccount(event)" class="space-y-4">
-                            <div>
-                                <label class="block text-xs font-bold uppercase text-gray-400 mb-1">New Username</label>
-                                <input type="text" id="newUsername" required placeholder="Referee unique name" class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white placeholder-gray-500">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Assign Password</label>
-                                <input type="text" id="newPassword" required placeholder="Assign entry password" class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white placeholder-gray-500">
-                            </div>
-                            <button type="submit" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 rounded transition duration-200 uppercase tracking-wide">Register Member Account</button>
-                        </form>
-                    </div>
-
-                    <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-xl">
-                        <h2 class="text-xl font-bold text-orange-500 mb-4">Manage Members & Passwords</h2>
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Select Member</label>
-                                <select id="resetUserSelect" class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white focus:outline-none focus:border-orange-500">
-                                    <option value="">-- Loading Members... --</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold uppercase text-gray-400 mb-1">New Password</label>
-                                <input type="text" id="resetNewPassword" placeholder="Enter temporary/new password" class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-orange-500">
-                            </div>
-                            <button onclick="handlePasswordReset()" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 rounded transition duration-200 uppercase tracking-wide">Reset Password</button>
-                        </div>
-                    </div>
-
-                    <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-xl">
-                        <div class="flex items-center justify-between mb-3">
-                            <h2 class="text-xl font-bold text-indigo-400">Members Directory</h2>
-                            <span id="directoryCountBadge" class="bg-indigo-950 text-indigo-300 text-xs px-2 py-0.5 rounded border border-indigo-800 font-mono">0 Total</span>
-                        </div>
-                        <div class="overflow-hidden border border-gray-700 rounded-lg max-h-[380px] overflow-y-auto">
-                            <table class="w-full text-left text-xs border-collapse">
-                                <thead>
-                                    <tr class="bg-gray-950 text-gray-400 font-bold uppercase border-b border-gray-700">
-                                        <th class="p-2.5">Member details</th>
-                                        <th class="p-2.5 text-center">Actions Management</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="memberDirectoryContainer" class="divide-y divide-gray-700/50">
-                                </tbody>
-                            </table>
-                        </div>
+            <div class="p-4 border-t border-gray-800 bg-gray-950/60 flex items-center justify-between">
+                <div class="flex items-center gap-2.5 truncate">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-orange-600 to-amber-500 flex items-center justify-center text-white font-black text-xs uppercase shadow" id="avatarLetter">U</div>
+                    <div class="truncate">
+                        <p class="text-xs font-bold text-white truncate" id="sidebarUserDisplay">User</p>
+                        <p class="text-[9px] text-gray-500 uppercase tracking-wider font-mono font-bold" id="sidebarRoleDisplay">Member</p>
                     </div>
                 </div>
-
+                <button onclick="handleLogout()" class="text-gray-500 hover:text-red-400 p-1.5 rounded-lg hover:bg-gray-800/50 transition" title="Logout System">
+                    <i data-lucide="log-out" class="w-4 h-4"></i>
+                </button>
             </div>
+        </aside>
 
-            <div class="lg:col-span-2 space-y-6 flex flex-col">
+        <div class="flex-1 flex flex-col min-w-0 pb-20 lg:pb-0">
+            <header class="bg-gray-900/80 backdrop-blur-md border-b border-gray-800 px-4 lg:px-6 py-4 sticky top-0 z-20 flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="lg:hidden flex items-center gap-2">
+                        <img src="RIBroInc NEW LOGO.jpg" alt="Logo" class="w-7 h-7 object-contain">
+                        <span class="text-sm font-black text-orange-500 tracking-wider">RIBRO</span>
+                    </div>
+                    <div class="hidden sm:flex items-center gap-2 text-xs font-medium text-gray-400">
+                        <span class="hover:text-gray-200 transition cursor-pointer">RIBRO Portal</span>
+                        <i data-lucide="chevron-right" class="w-3 h-3 text-gray-600"></i>
+                        <span class="text-gray-200 font-bold uppercase tracking-wider text-[11px]" id="breadcrumbActiveView">Dashboard Overview</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-4 ml-auto">
+                    <div class="relative hidden md:block">
+                        <i data-lucide="search" class="w-4 h-4 text-gray-500 absolute left-3 top-2.5"></i>
+                        <input type="text" placeholder="Global Ledger Search..." class="bg-gray-950 border border-gray-800 rounded-xl pl-9 pr-4 py-1.5 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-gray-700 w-52 transition">
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button class="relative text-gray-400 hover:text-white p-1.5 rounded-xl hover:bg-gray-800 transition">
+                            <i data-lucide="bell" class="w-4 h-4"></i>
+                            <span class="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-orange-500 rounded-full"></span>
+                        </button>
+                        <div id="adminTopBadge" class="hidden bg-red-950 text-red-400 border border-red-900 text-[9px] font-black tracking-widest uppercase px-2 py-1 rounded-md">Admin Mode</div>
+                    </div>
+                </div>
+            </header>
+
+            <main class="p-4 lg:p-6 space-y-6 flex-1">
                 
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-gray-950 p-4 rounded-xl border border-gray-800">
-                    <div>
-                        <label class="block text-[10px] text-gray-400 uppercase font-bold mb-1">Filter Month/Year</label>
-                        <input type="month" id="filterMonthSelect" onchange="renderPayrollTableData()" class="w-full bg-gray-900 border border-gray-700 rounded text-xs px-2 py-1.5 text-white">
+                <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="bg-gradient-to-br from-gray-900 to-gray-900/40 p-5 rounded-2xl border border-gray-800 flex justify-between items-center shadow-md relative group overflow-hidden">
+                        <div class="absolute right-0 bottom-0 translate-x-4 translate-y-4 opacity-5 group-hover:scale-110 transition duration-300 text-orange-500">
+                            <i data-lucide="banknote" class="w-24 h-24"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-[10px] uppercase font-black tracking-widest text-orange-400">Gross System Incomes</h4>
+                            <p class="text-2xl font-black text-white font-mono mt-1" id="kpiGrossIncomes">₱0.00</p>
+                            <p class="text-[10px] text-gray-500 mt-1">Sum of all approved match logs</p>
+                        </div>
+                        <div class="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-400 shadow-inner">
+                            <i data-lucide="trending-up" class="w-5 h-5"></i>
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-[10px] text-gray-400 uppercase font-bold mb-1">Search Referee / League</label>
-                        <input type="text" id="filterSearchQuery" oninput="renderPayrollTableData()" placeholder="Type to filter query..." class="w-full bg-gray-900 border border-gray-700 rounded text-xs px-2 py-1.5 text-white placeholder-gray-500">
+                    <div class="bg-gradient-to-br from-gray-900 to-gray-900/40 p-5 rounded-2xl border border-gray-800 flex justify-between items-center shadow-md relative group overflow-hidden">
+                        <div class="absolute right-0 bottom-0 translate-x-4 translate-y-4 opacity-5 group-hover:scale-110 transition duration-300 text-red-500">
+                            <i data-lucide="arrow-up-right" class="w-24 h-24"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-[10px] uppercase font-black tracking-widest text-red-400">Total Capital Released</h4>
+                            <p class="text-2xl font-black text-white font-mono mt-1" id="kpiTotalWithdrawals">₱0.00</p>
+                            <p class="text-[10px] text-gray-500 mt-1">Processed payout extraction receipts</p>
+                        </div>
+                        <div class="w-10 h-10 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 shadow-inner">
+                            <i data-lucide="external-link" class="w-5 h-5"></i>
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-[10px] text-gray-400 uppercase font-bold mb-1">Approval Query View</label>
-                        <select id="filterStatusQuery" onchange="renderPayrollTableData()" class="w-full bg-gray-900 border border-gray-700 rounded text-xs px-2 py-1.5 text-white">
-                            <option value="all" selected>Show All Logs</option>
-                            <option value="approved">Approved Logs Only</option>
-                            <option value="pending">Pending Logs Only</option>
-                        </select>
+                    <div class="bg-gradient-to-br from-gray-900 to-gray-900/40 p-5 rounded-2xl border border-gray-800 flex justify-between items-center shadow-md relative group overflow-hidden sm:col-span-2 lg:col-span-1">
+                        <div class="absolute right-0 bottom-0 translate-x-4 translate-y-4 opacity-5 group-hover:scale-110 transition duration-300 text-emerald-500">
+                            <i data-lucide="wallet" class="w-24 h-24"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-[10px] uppercase font-black tracking-widest text-emerald-400">Remaining Balance Pool</h4>
+                            <p class="text-2xl font-black text-emerald-400 font-mono mt-1" id="kpiNetBalance">₱0.00</p>
+                            <p class="text-[10px] text-gray-500 mt-1">Available operational liquid capital</p>
+                        </div>
+                        <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shadow-inner">
+                            <i data-lucide="wallet" class="w-5 h-5"></i>
+                        </div>
+                    </div>
+                </section>
+
+                <div id="dashboardView" class="view-panel space-y-6">
+                    <div class="bg-gray-900 p-4 rounded-2xl border border-gray-800">
+                        <div class="text-[10px] uppercase font-black tracking-widest text-gray-400 mb-3 px-1">Quick Action Command Deck</div>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                            <button onclick="switchViewChannel('assignmentsView')" class="bg-gray-950 hover:bg-gray-800 border border-gray-800 hover:border-gray-700 p-3.5 rounded-xl flex flex-col items-center justify-center text-center gap-2 group transition">
+                                <div class="p-2 rounded-lg bg-orange-500/10 text-orange-400 group-hover:bg-orange-500 group-hover:text-white transition"><i data-lucide="plus-circle" class="w-4 h-4"></i></div>
+                                <span class="text-[11px] font-bold uppercase tracking-wider text-gray-300">File Match Log</span>
+                            </button>
+                            <button onclick="switchViewChannel('withdrawalsView')" class="bg-gray-950 hover:bg-gray-800 border border-gray-800 hover:border-gray-700 p-3.5 rounded-xl flex flex-col items-center justify-center text-center gap-2 group transition">
+                                <div class="p-2 rounded-lg bg-emerald-500/10 text-emerald-400 group-hover:bg-emerald-500 group-hover:text-white transition"><i data-lucide="send" class="w-4 h-4"></i></div>
+                                <span class="text-[11px] font-bold uppercase tracking-wider text-gray-300">Cash Extraction</span>
+                            </button>
+                            <button onclick="switchViewChannel('reportsView')" class="bg-gray-950 hover:bg-gray-800 border border-gray-800 hover:border-gray-700 p-3.5 rounded-xl flex flex-col items-center justify-center text-center gap-2 group transition">
+                                <div class="p-2 rounded-lg bg-blue-500/10 text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition"><i data-lucide="file-spreadsheet" class="w-4 h-4"></i></div>
+                                <span class="text-[11px] font-bold uppercase tracking-wider text-gray-300">Master Report</span>
+                            </button>
+                            <button onclick="exportOverallSystemMasterReport()" class="bg-gradient-to-br from-gray-950 to-blue-950/20 hover:from-gray-900 hover:to-blue-900/30 border border-blue-900/40 p-3.5 rounded-xl flex flex-col items-center justify-center text-center gap-2 group transition">
+                                <div class="p-2 rounded-lg bg-blue-500 text-white shadow"><i data-lucide="download" class="w-4 h-4"></i></div>
+                                <span class="text-[11px] font-bold uppercase tracking-wider text-blue-400">Direct XLSX Export</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="bg-gray-900 p-5 rounded-2xl border border-gray-800 shadow lg:col-span-2 space-y-4">
+                            <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+                                <h3 class="text-xs font-black uppercase tracking-widest text-white flex items-center gap-2">
+                                    <i data-lucide="bar-chart-3" class="w-4 h-4 text-orange-400"></i> Organization Revenue Vectors Trend Matrix
+                                </h3>
+                                <span class="text-[10px] bg-gray-950 text-gray-400 border border-gray-800 px-2 py-0.5 rounded font-mono">Live Tracking</span>
+                            </div>
+                            <div class="relative h-64 w-full">
+                                <canvas id="dashboardTrendChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-900 p-5 rounded-2xl border border-gray-800 shadow space-y-4 flex flex-col h-full">
+                            <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+                                <h3 class="text-xs font-black uppercase tracking-widest text-white flex items-center gap-2">
+                                    <i data-lucide="bell" class="w-4 h-4 text-amber-400"></i> Operational Audit Board
+                                </h3>
+                                <i data-lucide="info" class="w-3.5 h-3.5 text-gray-600"></i>
+                            </div>
+                            <div class="flex-1 overflow-y-auto space-y-3 pr-1 custom-scrollbar max-h-[250px]">
+                                <div class="flex gap-3 p-2.5 rounded-xl bg-gray-950/60 border border-gray-800/80">
+                                    <div class="w-2 h-2 rounded-full bg-orange-500 mt-1.5 shrink-0"></div>
+                                    <div>
+                                        <p class="text-xs font-semibold text-gray-200">System Modernization Complete</p>
+                                        <p class="text-[10px] text-gray-500 mt-0.5 font-mono">2026-06-30</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-3 p-2.5 rounded-xl bg-gray-950/40 border border-gray-800/40">
+                                    <div class="w-2 h-2 rounded-full bg-emerald-500 mt-1.5 shrink-0"></div>
+                                    <div>
+                                        <p class="text-xs font-semibold text-gray-400">Multi-Sheet Excel Module Active</p>
+                                        <p class="text-[10px] text-gray-600 mt-0.5 font-mono">2026-06-29</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-3 p-2.5 rounded-xl bg-gray-950/40 border border-gray-800/40">
+                                    <div class="w-2 h-2 rounded-full bg-blue-500 mt-1.5 shrink-0"></div>
+                                    <div>
+                                        <p class="text-xs font-semibold text-gray-400">SEC Registry Records Verified</p>
+                                        <p class="text-[10px] text-gray-600 mt-0.5 font-mono">2025-04-12</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="space-y-2">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-sm font-black uppercase text-orange-500 tracking-wider">🏀 Game Officiating Assignment Ledger</h3>
-                        <button onclick="exportToExcelWorkbook()" class="bg-emerald-700 hover:bg-emerald-600 text-white text-[11px] font-bold px-2.5 py-1 rounded flex items-center gap-1 transition">
-                            📊 Export Excel
-                        </button>
+                <div id="assignmentsView" class="view-panel hidden space-y-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+                        <div class="bg-gray-900 p-5 rounded-2xl border border-gray-800 shadow space-y-4">
+                            <h3 class="text-xs font-black uppercase tracking-widest text-orange-400 flex items-center gap-2">
+                                <i data-lucide="plus-circle" class="w-4 h-4"></i> File Assignment Entry Log
+                            </h3>
+                            <form id="payrollForm" onsubmit="handleSaveAssignment(event)" class="space-y-3.5">
+                                <div>
+                                    <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Target Referee Name</label>
+                                    <input type="text" id="refereeName" required class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-orange-500">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">League Title Description</label>
+                                    <input type="text" id="leagueTitle" required placeholder="e.g., Inter-Barangay Cup" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-orange-500">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Match Execution Date</label>
+                                    <input type="date" id="matchDate" required class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-orange-500">
+                                </div>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Games Count</label>
+                                        <input type="number" id="gamesCount" min="1" value="1" required class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white text-center focus:outline-none focus:border-orange-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Rate per Game (₱)</label>
+                                        <input type="number" id="gameRate" step="0.01" value="500.00" required class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white text-center focus:outline-none focus:border-orange-500">
+                                    </div>
+                                </div>
+                                <div class="p-3 rounded-xl bg-gray-950 flex items-center justify-between border border-gray-800">
+                                    <span class="text-[10px] uppercase font-bold text-gray-500 tracking-wider">Calculated Total:</span>
+                                    <span id="liveCalculationTotal" class="text-base font-black text-green-400 font-mono">₱0.00</span>
+                                </div>
+                                <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider transition">Save Record</button>
+                            </form>
+                        </div>
+
+                        <div class="lg:col-span-2 space-y-3">
+                            <div class="flex flex-wrap items-center justify-between gap-3 bg-gray-900 p-3 rounded-xl border border-gray-800">
+                                <div class="flex items-center gap-2">
+                                    <input type="month" id="filterMonthSelect" onchange="renderPayrollTableData()" class="bg-gray-950 border border-gray-800 rounded-lg text-[11px] px-2.5 py-1 text-white">
+                                    <select id="filterStatusQuery" onchange="renderPayrollTableData()" class="bg-gray-950 border border-gray-800 rounded-lg text-[11px] px-2.5 py-1 text-white">
+                                        <option value="all">All States</option>
+                                        <option value="approved">Approved</option>
+                                        <option value="pending">Pending</option>
+                                    </select>
+                                </div>
+                                <input type="text" id="filterSearchQuery" oninput="renderPayrollTableData()" placeholder="Search referee..." class="bg-gray-950 border border-gray-800 rounded-lg text-[11px] px-3 py-1 text-white max-w-xs w-full">
+                            </div>
+
+                            <div class="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden shadow">
+                                <div class="overflow-x-auto custom-scrollbar">
+                                    <table class="w-full text-left text-xs border-collapse">
+                                        <thead>
+                                            <tr class="bg-gray-950 text-gray-400 uppercase tracking-wider text-[10px] font-bold border-b border-gray-800">
+                                                <th class="p-3">Referee</th>
+                                                <th class="p-3">Tournament Description</th>
+                                                <th class="p-3">Date</th>
+                                                <th class="p-3 text-center">Games</th>
+                                                <th class="p-3 text-right">Total Payout</th>
+                                                <th class="p-3 text-center">Status</th>
+                                                <th class="p-3 text-center">Management Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="payrollTableRowsContainer" class="divide-y divide-gray-800/60"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <span class="text-[10px] text-gray-500 font-mono pl-1" id="recordsCounterDisplay">Showing 0 log rows</span>
+                        </div>
                     </div>
-                    <div class="bg-gray-800 rounded-xl border border-gray-700 shadow-xl overflow-hidden min-h-[250px]">
-                        <table class="w-full text-left text-xs border-collapse">
-                            <thead>
-                                <tr class="bg-gray-950 text-gray-400 uppercase font-bold border-b border-gray-700">
-                                    <th class="p-3">Referee</th>
-                                    <th class="p-3">League</th>
-                                    <th class="p-3">Date</th>
-                                    <th class="p-3 text-center">Games</th>
-                                    <th class="p-3 text-right">Total</th>
-                                    <th class="p-3 text-center">Status</th>
-                                    <th class="p-3 text-center">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="payrollTableRowsContainer" class="divide-y divide-gray-700/50">
-                            </tbody>
-                        </table>
-                    </div>
-                    <span class="text-[11px] text-gray-500 font-semibold inline-block" id="recordsCounterDisplay">Showing 0 matching entries</span>
                 </div>
 
-                <div class="space-y-2 pt-2">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-sm font-black uppercase text-emerald-400 tracking-wider">💰 Withdrawal Processing Requests & History</h3>
-                        <button onclick="exportWithdrawalsToExcel()" class="bg-teal-700 hover:bg-teal-600 text-white text-[11px] font-bold px-2.5 py-1 rounded flex items-center gap-1 transition">
-                            📊 Export Withdrawal Excel
-                        </button>
-                    </div>
-                    <div class="bg-gray-800 rounded-xl border border-gray-700 shadow-xl overflow-hidden min-h-[180px]">
-                        <table class="w-full text-left text-xs border-collapse">
-                            <thead>
-                                <tr class="bg-gray-950 text-gray-400 uppercase font-bold border-b border-gray-700">
-                                    <th class="p-3">Referee Name</th>
-                                    <th class="p-3">Request Date</th>
-                                    <th class="p-3 text-right">Amount</th>
-                                    <th class="p-3 text-center">Status Check</th>
-                                    <th class="p-3 text-center">Administrative Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="withdrawalsTableRowsContainer" class="divide-y divide-gray-700/50">
-                            </tbody>
-                        </table>
+                <div id="withdrawalsView" class="view-panel hidden space-y-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+                        <div class="bg-gray-900 p-5 rounded-2xl border border-gray-800 shadow space-y-4">
+                            <h3 class="text-xs font-black uppercase tracking-widest text-emerald-400 flex items-center gap-2">
+                                <i data-lucide="send" class="w-4 h-4"></i> File Cash Extraction Request
+                            </h3>
+                            <form id="withdrawalForm" onsubmit="handleRequestWithdrawal(event)" class="space-y-4">
+                                <div>
+                                    <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Extraction Amount (₱)</label>
+                                    <input type="number" id="withdrawAmount" step="0.01" min="1" required placeholder="0.00" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Execution Date</label>
+                                    <input type="date" id="withdrawDate" required class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
+                                </div>
+                                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider transition">Transmit Request Ledger</button>
+                            </form>
+                        </div>
+
+                        <div class="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden shadow lg:col-span-2">
+                            <div class="p-3.5 bg-gray-950 text-xs font-black uppercase tracking-widest border-b border-gray-800 text-gray-400">Active Withdrawals Accounting Trail</div>
+                            <div class="overflow-x-auto custom-scrollbar">
+                                <table class="w-full text-left text-xs border-collapse">
+                                    <thead>
+                                        <tr class="bg-gray-950/60 text-gray-400 uppercase text-[10px] tracking-wider font-bold border-b border-gray-800">
+                                            <th class="p-3">Member Referee</th>
+                                            <th class="p-3">Filing Date</th>
+                                            <th class="p-3 text-right">Requested Sum</th>
+                                            <th class="p-3 text-center">Status Flag</th>
+                                            <th class="p-3 text-center">Administrative Authority</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="withdrawalsTableRowsContainer" class="divide-y divide-gray-800/60"></tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="space-y-2 pt-2">
-                    <h3 class="text-sm font-black uppercase text-red-400 tracking-wider">🛑 Imposed Account Fee Deductions Ledger</h3>
-                    <div class="bg-gray-800 rounded-xl border border-gray-700 shadow-xl overflow-hidden min-h-[150px]">
-                        <table class="w-full text-left text-xs border-collapse">
-                            <thead>
-                                <tr class="bg-gray-950 text-gray-400 uppercase font-bold border-b border-gray-700">
-                                    <th class="p-3">Referee</th>
-                                    <th class="p-3">Reason Description</th>
-                                    <th class="p-3">Charge Date</th>
-                                    <th class="p-3 text-right">Deducted Amount</th>
-                                    <th class="p-3 text-center">Administrative Audit</th>
-                                </tr>
-                            </thead>
-                            <tbody id="deductionsTableRowsContainer" class="divide-y divide-gray-700/50">
-                            </tbody>
-                        </table>
+                <div id="deductionsView" class="view-panel hidden space-y-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+                        <div id="adminDeductionFormWrapper" class="bg-gray-900 p-5 rounded-2xl border border-gray-800 shadow space-y-4">
+                            <h3 class="text-xs font-black uppercase tracking-widest text-red-400 flex items-center gap-2">
+                                <i data-lucide="shield-alert" class="w-4 h-4"></i> Charge Account Fee Penalty
+                            </h3>
+                            <form id="deductionForm" onsubmit="handleImposeDeduction(event)" class="space-y-3.5">
+                                <div>
+                                    <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Select Target Referee Member</label>
+                                    <select id="deductionUserSelect" required class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-500">
+                                        <option value="">-- Choose Account Row --</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Deduction Justification Reason</label>
+                                    <input type="text" id="deductionReason" required placeholder="e.g., Uniform replacement cost" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-500">
+                                </div>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Penalty Fee (₱)</label>
+                                        <input type="number" id="deductionAmount" step="0.01" min="1" required placeholder="0.00" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Imposed Date</label>
+                                        <input type="date" id="deductionDate" required class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-500">
+                                    </div>
+                                </div>
+                                <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider transition">Impose Penalty Charge</button>
+                            </form>
+                        </div>
+
+                        <div class="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden shadow lg:col-span-2">
+                            <div class="p-3.5 bg-gray-950 text-xs font-black uppercase tracking-widest border-b border-gray-800 text-gray-400">Internal Adjustments & Imposed Fines Log</div>
+                            <div class="overflow-x-auto custom-scrollbar">
+                                <table class="w-full text-left text-xs border-collapse">
+                                    <thead>
+                                        <tr class="bg-gray-950/60 text-gray-400 uppercase text-[10px] tracking-wider font-bold border-b border-gray-800">
+                                            <th class="p-3">Referee</th>
+                                            <th class="p-3">Reason / Context</th>
+                                            <th class="p-3">Date Applied</th>
+                                            <th class="p-3 text-right">Charged Fee</th>
+                                            <th class="p-3 text-center">Audit Authority</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="deductionsTableRowsContainer" class="divide-y divide-gray-800/60"></tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-            </div>
-        </main>
+                <div id="reportsView" class="view-panel hidden space-y-6">
+                    <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 space-y-6 shadow-xl relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-gray-800 pb-4">
+                            <div>
+                                <h3 class="text-base font-black uppercase tracking-wider text-white">📑 Central Financial Reporting Engine</h3>
+                                <p class="text-xs text-gray-400 mt-1">Generate unified balance analytics and extract spreadsheet reports.</p>
+                            </div>
+                            <button onclick="exportOverallSystemMasterReport()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl uppercase tracking-wider transition shadow flex items-center gap-2 self-start sm:self-auto">
+                                <i data-lucide="download" class="w-4 h-4"></i> Download Master Report (XLSX)
+                            </button>
+                        </div>
+
+                        <div class="bg-gray-950 p-1.5 rounded-xl border border-gray-800 grid grid-cols-3 max-w-md gap-1">
+                            <button onclick="toggleReportSubTab('reportTabIncomes')" id="btnReportSubTab-reportTabIncomes" class="py-1.5 text-center font-bold uppercase tracking-wider text-[10px] rounded-lg bg-gray-800 text-white transition">Incomes</button>
+                            <button onclick="toggleReportSubTab('reportTabWithdrawals')" id="btnReportSubTab-reportTabWithdrawals" class="py-1.5 text-center font-bold uppercase tracking-wider text-[10px] rounded-lg text-gray-400 hover:text-white transition">Extractions</button>
+                            <button onclick="toggleReportSubTab('reportTabFines')" id="btnReportSubTab-reportTabFines" class="py-1.5 text-center font-bold uppercase tracking-wider text-[10px] rounded-lg text-gray-400 hover:text-white transition">Deductions</button>
+                        </div>
+
+                        <div id="reportTabIncomes" class="report-sub-panel space-y-3">
+                            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">Historical Verified Payout Stream:</div>
+                            <div class="border border-gray-800 rounded-xl overflow-hidden max-h-60 overflow-y-auto custom-scrollbar">
+                                <table class="w-full text-left text-xs border-collapse">
+                                    <tr class="bg-gray-950 text-gray-400 text-[10px] uppercase border-b border-gray-800 font-bold"><th class="p-2.5">Referee</th><th class="p-2.5">League</th><th class="p-2.5 text-right">Value (PHP)</th></tr>
+                                    <tbody id="reportIncomesTableBody" class="divide-y divide-gray-800/40"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div id="reportTabWithdrawals" class="report-sub-panel hidden space-y-3">
+                            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">Disbursed Cash Extract Log:</div>
+                            <div class="border border-gray-800 rounded-xl overflow-hidden max-h-60 overflow-y-auto custom-scrollbar">
+                                <table class="w-full text-left text-xs border-collapse">
+                                    <tr class="bg-gray-950 text-gray-400 text-[10px] uppercase border-b border-gray-800 font-bold"><th class="p-2.5">Referee</th><th class="p-2.5">Date</th><th class="p-2.5 text-right">Disbursed Amount</th></tr>
+                                    <tbody id="reportWithdrawalsTableBody" class="divide-y divide-gray-800/40"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div id="reportTabFines" class="report-sub-panel hidden space-y-3">
+                            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">Account Adjustments Statement Summary:</div>
+                            <div class="border border-gray-800 rounded-xl overflow-hidden max-h-60 overflow-y-auto custom-scrollbar">
+                                <table class="w-full text-left text-xs border-collapse">
+                                    <tr class="bg-gray-950 text-gray-400 text-[10px] uppercase border-b border-gray-800 font-bold"><th class="p-2.5">Referee</th><th class="p-2.5">Reason</th><th class="p-2.5 text-right">Amount Deducted</th></tr>
+                                    <tbody id="reportDeductionsTableBody" class="divide-y divide-gray-800/40"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div id="usersView" class="view-panel hidden space-y-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+                        <div class="bg-gray-900 p-5 rounded-2xl border border-gray-800 shadow space-y-5">
+                            <div>
+                                <h3 class="text-xs font-black uppercase tracking-widest text-teal-400 flex items-center gap-2"><i data-lucide="user-plus" class="w-4 h-4"></i> Provision Referee Account</h3>
+                                <form id="createAccountForm" onsubmit="handleCreateAccount(event)" class="space-y-3 mt-3">
+                                    <input type="text" id="newUsername" required placeholder="Assign unique username" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-teal-500">
+                                    <input type="text" id="newPassword" required placeholder="Assign entry password" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-teal-500">
+                                    <button type="submit" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 rounded-xl text-xs uppercase tracking-wider transition">Register Credentials</button>
+                                </form>
+                            </div>
+                            
+                            <div class="pt-4 border-t border-gray-800/80">
+                                <h3 class="text-xs font-black uppercase tracking-widest text-orange-400 flex items-center gap-2"><i data-lucide="key-round" class="w-4 h-4"></i> Safety Credential Override</h3>
+                                <div class="space-y-3 mt-3">
+                                    <select id="resetUserSelect" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-orange-500">
+                                        <option value="">-- Choose Member Profile --</option>
+                                    </select>
+                                    <input type="text" id="resetNewPassword" placeholder="Input overwrite password string" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-orange-500">
+                                    <button onclick="handlePasswordReset()" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 rounded-xl text-xs uppercase tracking-wider transition">Execute Security Reset</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden shadow lg:col-span-2">
+                            <div class="p-3.5 bg-gray-950 text-xs font-black uppercase tracking-widest border-b border-gray-800 text-gray-400 flex justify-between items-center">
+                                <span>Operational User Authorization Map</span>
+                                <span id="directoryCountBadge" class="bg-gray-900 text-gray-400 text-[10px] px-2 py-0.5 rounded border border-gray-800 font-mono">0 Registered Profiles</span>
+                            </div>
+                            <div class="overflow-x-auto custom-scrollbar">
+                                <table class="w-full text-left text-xs border-collapse">
+                                    <thead>
+                                        <tr class="bg-gray-950/40 text-gray-400 uppercase text-[10px] tracking-wider font-bold border-b border-gray-800">
+                                            <th class="p-3">System Profile Key</th>
+                                            <th class="p-3 text-center">Interactive Directory Administrative Controls</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="memberDirectoryContainer" class="divide-y divide-gray-800/60"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+
+        <nav class="lg:hidden fixed bottom-0 left-0 w-full bg-gray-900 border-t border-gray-800 px-4 py-2 grid grid-cols-5 text-center gap-1 z-40 shadow-2xl backdrop-blur-md bg-gray-900/90">
+            <button onclick="switchViewChannel('dashboardView')" id="mobileNavLink-dashboardView" class="flex flex-col items-center justify-center text-orange-500 py-1 transition gap-0.5">
+                <i data-lucide="layout-dashboard" class="w-4 h-4"></i><span class="text-[9px] font-bold uppercase tracking-tight">Home</span>
+            </button>
+            <button onclick="switchViewChannel('assignmentsView')" id="mobileNavLink-assignmentsView" class="flex flex-col items-center justify-center text-gray-400 py-1 transition gap-0.5">
+                <i data-lucide="award" class="w-4 h-4"></i><span class="text-[9px] font-bold uppercase tracking-tight">Logs</span>
+            </button>
+            <button onclick="switchViewChannel('withdrawalsView')" id="mobileNavLink-withdrawalsView" class="flex flex-col items-center justify-center text-gray-400 py-1 transition gap-0.5">
+                <i data-lucide="wallet" class="w-4 h-4"></i><span class="text-[9px] font-bold uppercase tracking-tight">Cash Out</span>
+            </button>
+            <button onclick="switchViewChannel('reportsView')" id="mobileNavLink-reportsView" class="flex flex-col items-center justify-center text-gray-400 py-1 transition gap-0.5">
+                <i data-lucide="bar-chart-3" class="w-4 h-4"></i><span class="text-[9px] font-bold uppercase tracking-tight">Audit</span>
+            </button>
+            <button onclick="handleLogout()" class="flex flex-col items-center justify-center text-gray-500 py-1 transition gap-0.5">
+                <i data-lucide="log-out" class="w-4 h-4"></i><span class="text-[9px] font-bold uppercase tracking-tight">Exit</span>
+            </button>
+        </nav>
+
     </div>
 
     <script>
@@ -323,6 +525,7 @@
         let withdrawalsCachedRecords = [];
         let deductionsCachedRecords = [];
         let globalCurrentWalletBalance = 0;
+        let dashboardRenderedChartInstance = null;
 
         const refNameInput = document.getElementById('refereeName');
         const gamesInput = document.getElementById('gamesCount');
@@ -336,6 +539,60 @@
         }
         gamesInput.addEventListener('input', updateLiveTotalMathOutput);
         rateInput.addEventListener('input', updateLiveTotalMathOutput);
+
+        function switchViewChannel(viewTargetId) {
+            document.querySelectorAll('.view-panel').forEach(p => p.classList.add('hidden'));
+            document.getElementById(viewTargetId).classList.remove('hidden');
+
+            const viewLabelMapping = {
+                'dashboardView': 'Dashboard Overview',
+                'assignmentsView': 'Match Assignments Ledger',
+                'withdrawalsView': 'Withdrawal Processing Terminal',
+                'deductionsView': 'Imposed Penalty Ledger',
+                'reportsView': 'Financial Audit Reports Engine',
+                'usersView': 'System Account Profiles Directory'
+            };
+            document.getElementById('breadcrumbActiveView').textContent = viewLabelMapping[viewTargetId] || 'Portal Core';
+
+            // Desktop view active highlighting
+            document.querySelectorAll('aside nav button').forEach(b => {
+                b.classList.remove('bg-orange-600', 'text-white');
+                b.classList.add('text-gray-400', 'hover:bg-gray-800', 'hover:text-white');
+            });
+            const targetedDesktopBtn = document.getElementById(`navLink-${viewTargetId}`);
+            if (targetedDesktopBtn) {
+                targetedDesktopBtn.classList.remove('text-gray-400', 'hover:bg-gray-800', 'hover:text-white');
+                targetedDesktopBtn.classList.add('bg-orange-600', 'text-white');
+            }
+
+            // Mobile view active highlighting
+            document.querySelectorAll('nav[class*="fixed"] button').forEach(mb => {
+                if(!mb.getAttribute('onclick').includes('handleLogout')) {
+                    mb.classList.remove('text-orange-500');
+                    mb.classList.add('text-gray-400');
+                }
+            });
+            const targetedMobileBtn = document.getElementById(`mobileNavLink-${viewTargetId}`);
+            if (targetedMobileBtn) {
+                targetedMobileBtn.classList.remove('text-gray-400');
+                targetedMobileBtn.classList.add('text-orange-500');
+            }
+        }
+
+        function toggleReportSubTab(subTabElementId) {
+            document.querySelectorAll('.report-sub-panel').forEach(el => el.classList.add('hidden'));
+            document.getElementById(subTabElementId).classList.remove('hidden');
+
+            document.querySelectorAll('button[id^="btnReportSubTab-"]').forEach(btn => {
+                btn.classList.remove('bg-gray-800', 'text-white');
+                btn.classList.add('text-gray-400', 'hover:text-white');
+            });
+            const targetedSubBtn = document.getElementById(`btnReportSubTab-${subTabElementId}`);
+            if(targetedSubBtn) {
+                targetedSubBtn.classList.remove('text-gray-400', 'hover:text-white');
+                targetedSubBtn.classList.add('bg-gray-800', 'text-white');
+            }
+        }
 
         async function handleLogin(e) {
             e.preventDefault();
@@ -360,33 +617,35 @@
 
                 document.getElementById('loginScreen').classList.add('hidden');
                 document.getElementById('appDashboard').classList.remove('hidden');
-                document.getElementById('userDisplay').textContent = currentUser;
+                document.getElementById('sidebarUserDisplay').textContent = currentUser;
+                document.getElementById('sidebarRoleDisplay').textContent = userRole;
+                document.getElementById('avatarLetter').textContent = currentUser.charAt(0).toUpperCase();
 
                 document.getElementById('withdrawDate').value = new Date().toISOString().slice(0, 10);
                 document.getElementById('deductionDate').value = new Date().toISOString().slice(0, 10);
 
                 if (userRole === 'admin') {
-                    document.getElementById('adminBadge').classList.remove('hidden');
-                    document.getElementById('adminOnlyForms').classList.remove('hidden');
-                    document.getElementById('overallReportSection').classList.remove('hidden'); // UNVEIL BLOCK
-                    document.getElementById('pendingNoticeText').classList.add('hidden');
+                    document.getElementById('adminTopBadge').classList.remove('hidden');
+                    document.getElementById('adminNavGroup').classList.remove('hidden');
+                    document.getElementById('adminDeductionFormWrapper').classList.remove('hidden');
                     refNameInput.value = '';
                     refNameInput.readOnly = false;
                     refNameInput.placeholder = "Enter referee name";
                     loadMembersDropdownAndDirectory();
                 } else {
-                    document.getElementById('adminBadge').classList.add('hidden');
-                    document.getElementById('adminOnlyForms').classList.add('hidden');
-                    document.getElementById('overallReportSection').classList.add('hidden');
-                    document.getElementById('pendingNoticeText').classList.remove('hidden');
+                    document.getElementById('adminTopBadge').classList.add('hidden');
+                    document.getElementById('adminNavGroup').classList.add('hidden');
+                    document.getElementById('adminDeductionFormWrapper').classList.add('hidden');
                     refNameInput.value = currentUser;
                     refNameInput.readOnly = true;
                 }
 
                 updateLiveTotalMathOutput();
+                switchViewChannel('dashboardView');
                 fetchAllFinancialSystemRecords();
+                setTimeout(() => { lucide.createIcons(); }, 100);
             } catch (err) {
-                alert("Cannot establish communications with backend api engine.");
+                alert("Cannot establish communications with backend API engine.");
             }
         }
 
@@ -395,68 +654,50 @@
             await fetchWithdrawalRecords();
             await fetchDeductionsRecords();
             calculateAndRenderUnifiedFinancials();
+            renderInteractiveAnalyticsCharts();
         }
 
         async function fetchPayrollDataRecords() {
             try {
                 const response = await fetch(`/api/payroll?username=${encodeURIComponent(currentUser)}&role=${userRole}`);
                 payrollCachedRecords = await response.json();
-            } catch (err) {
-                console.error("Logs download connection failure:", err);
-            }
+            } catch (err) { console.error(err); }
         }
 
         async function fetchWithdrawalRecords() {
             try {
                 const response = await fetch(`/api/withdrawals?username=${encodeURIComponent(currentUser)}&role=${userRole}`);
                 withdrawalsCachedRecords = await response.json();
-            } catch (err) {
-                console.error("Withdrawals download connection failure:", err);
-            }
+            } catch (err) { console.error(err); }
         }
 
         async function fetchDeductionsRecords() {
             try {
                 const response = await fetch(`/api/deductions?username=${encodeURIComponent(currentUser)}&role=${userRole}`);
                 deductionsCachedRecords = await response.json();
-            } catch (err) {
-                console.error("Deductions fetch error:", err);
-            }
+            } catch (err) { console.error(err); }
         }
 
         function calculateAndRenderUnifiedFinancials() {
-            const totalSummaryText = document.getElementById('grandSystemAccumulationPayout');
-            const totalWithdrawalsText = document.getElementById('analyticsTotalWithdrawals');
-            const walletBalanceText = document.getElementById('analyticsWalletBalance');
-
             let grossEarnings = 0;
-            payrollCachedRecords.forEach(row => {
-                if (row.status === 'approved') {
-                    grossEarnings += (row.total || 0);
-                }
-            });
+            payrollCachedRecords.forEach(row => { if (row.status === 'approved') grossEarnings += (row.total || 0); });
 
             let grossWithdrawals = 0;
-            withdrawalsCachedRecords.forEach(w => {
-                if (w.status === 'approved') {
-                    grossWithdrawals += (w.amount || 0);
-                }
-            });
+            withdrawalsCachedRecords.forEach(w => { if (w.status === 'approved') grossWithdrawals += (w.amount || 0); });
 
             let grossDeductions = 0;
-            deductionsCachedRecords.forEach(d => {
-                grossDeductions += (d.amount || 0);
-            });
+            deductionsCachedRecords.forEach(d => { grossDeductions += (d.amount || 0); });
 
             globalCurrentWalletBalance = grossEarnings - grossWithdrawals - grossDeductions;
 
-            totalSummaryText.textContent = `₱${grossEarnings.toFixed(2)}`;
-            totalWithdrawalsText.textContent = `₱${grossWithdrawals.toFixed(2)}`;
-            walletBalanceText.textContent = `₱${globalCurrentWalletBalance.toFixed(2)}`;
+            document.getElementById('kpiGrossIncomes').textContent = `₱${grossEarnings.toFixed(2)}`;
+            document.getElementById('kpiTotalWithdrawals').textContent = `₱${grossWithdrawals.toFixed(2)}`;
+            document.getElementById('kpiNetBalance').textContent = `₱${globalCurrentWalletBalance.toFixed(2)}`;
 
             renderPayrollTableData();
             renderWithdrawalsTableData();
             renderDeductionsTableData();
+            populateReportsSubTabsDisplays();
         }
 
         function renderPayrollTableData() {
@@ -467,15 +708,10 @@
             const statusFilter = document.getElementById('filterStatusQuery').value;
 
             container.innerHTML = '';
-
             let logs = [...payrollCachedRecords].filter(row => {
                 if (monthFilter && (!row.date || !row.date.startsWith(monthFilter))) return false;
                 if (statusFilter !== 'all' && row.status !== statusFilter) return false;
-                if (searchQuery) {
-                    const matchName = row.name ? row.name.toLowerCase().includes(searchQuery) : false;
-                    const matchLeague = row.league ? row.league.toLowerCase().includes(searchQuery) : false;
-                    if (!matchName && !matchLeague) return false;
-                }
+                if (searchQuery && !row.name.toLowerCase().includes(searchQuery) && !row.league.toLowerCase().includes(searchQuery)) return false;
                 return true;
             });
 
@@ -483,38 +719,37 @@
             counterText.textContent = `Showing ${logs.length} matching data assignment logs`;
 
             if (logs.length === 0) {
-                container.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-gray-500 font-medium">No game rows matched search queries.</td></tr>`;
+                container.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-gray-500 font-medium">No match log fields detected.</td></tr>`;
                 return;
             }
 
             logs.forEach(row => {
                 const isPending = row.status === 'pending';
                 const isRejected = row.status === 'rejected';
-                
-                let statusBadge = `<span class="bg-emerald-950 text-emerald-400 border border-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Approved</span>`;
-                if (isPending) statusBadge = `<span class="bg-amber-950 text-amber-400 border border-amber-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Pending</span>`;
-                if (isRejected) statusBadge = `<span class="bg-red-950 text-red-400 border border-red-900 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Rejected</span>`;
+                let statusBadge = `<span class="bg-emerald-950 text-emerald-400 border border-emerald-900 text-[10px] font-bold px-2 py-0.5 rounded-md uppercase">Approved</span>`;
+                if (isPending) statusBadge = `<span class="bg-amber-950 text-amber-400 border border-amber-900 text-[10px] font-bold px-2 py-0.5 rounded-md uppercase">Pending</span>`;
+                if (isRejected) statusBadge = `<span class="bg-red-950 text-red-400 border border-red-900 text-[10px] font-bold px-2 py-0.5 rounded-md uppercase line-through">Rejected</span>`;
 
-                let controlsMarkup = `<button onclick="handleDeleteAssignment('${row.id}')" class="bg-red-950/40 border border-red-900 text-red-400 hover:bg-red-900 hover:text-white px-2 py-1 rounded text-[10px] uppercase font-bold transition">Delete</button>`;
+                let controls = `<button onclick="handleDeleteAssignment('${row.id}')" class="text-red-400 hover:text-red-300 font-bold uppercase text-[10px] tracking-wide transition">Delete</button>`;
                 if (userRole === 'admin' && isPending) {
-                    controlsMarkup = `
-                        <div class="flex items-center gap-1 justify-center">
-                            <button onclick="approvePayrollLog('${row.id}', 'approved')" class="bg-emerald-700 hover:bg-emerald-600 text-white px-1.5 py-0.5 rounded text-[10px] font-bold uppercase transition">Approve</button>
-                            <button onclick="approvePayrollLog('${row.id}', 'rejected')" class="bg-gray-700 hover:bg-gray-600 text-gray-300 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase transition">Deny</button>
+                    controls = `
+                        <div class="flex items-center gap-2 justify-center">
+                            <button onclick="approvePayrollLog('${row.id}', 'approved')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase transition">Approve</button>
+                            <button onclick="approvePayrollLog('${row.id}', 'rejected')" class="bg-gray-800 hover:bg-gray-700 text-gray-300 px-2 py-0.5 rounded text-[10px] font-bold uppercase transition">Deny</button>
                         </div>
                     `;
                 }
 
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-gray-700/30 transition border-b border-gray-700/40 text-gray-300 font-medium";
+                tr.className = "hover:bg-gray-800/30 text-gray-300 font-medium border-b border-gray-800/40";
                 tr.innerHTML = `
                     <td class="p-3 font-semibold text-white">${row.name}</td>
                     <td class="p-3 text-gray-400">${row.league}</td>
-                    <td class="p-3 font-mono text-gray-400">${row.date}</td>
+                    <td class="p-3 font-mono text-gray-500">${row.date}</td>
                     <td class="p-3 text-center font-bold">${row.games}</td>
-                    <td class="p-3 text-right font-black ${isPending ? 'text-amber-500' : isRejected ? 'text-gray-500 line-through' : 'text-green-400'} font-mono">₱${parseFloat(row.total).toFixed(2)}</td>
+                    <td class="p-3 text-right font-bold text-gray-200 font-mono">₱${parseFloat(row.total).toFixed(2)}</td>
                     <td class="p-3 text-center">${statusBadge}</td>
-                    <td class="p-3 text-center">${controlsMarkup}</td>
+                    <td class="p-3 text-center">${controls}</td>
                 `;
                 container.appendChild(tr);
             });
@@ -523,39 +758,35 @@
         function renderWithdrawalsTableData() {
             const container = document.getElementById('withdrawalsTableRowsContainer');
             container.innerHTML = '';
-
-            let items = [...withdrawalsCachedRecords];
-            items.sort((a,b) => new Date(b.date) - new Date(a.date));
+            let items = [...withdrawalsCachedRecords].sort((a,b) => new Date(b.date) - new Date(a.date));
 
             if (items.length === 0) {
-                container.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-500 font-medium">No processed withdrawal extraction history logs found.</td></tr>`;
+                container.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-500 font-medium">No withdrawal parameters located.</td></tr>`;
                 return;
             }
 
             items.forEach(w => {
                 const isPending = w.status === 'pending';
-                const isRejected = w.status === 'rejected';
+                let badge = `<span class="bg-emerald-950 text-emerald-400 border border-emerald-900 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Released</span>`;
+                if (isPending) badge = `<span class="bg-amber-950 text-amber-400 border border-amber-900 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Pending</span>`;
+                if (w.status === 'rejected') badge = `<span class="bg-gray-950 text-gray-600 border border-gray-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase line-through">Rejected</span>`;
 
-                let badge = `<span class="bg-emerald-950 text-emerald-400 border border-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Approved</span>`;
-                if (isPending) badge = `<span class="bg-amber-950 text-amber-400 border border-amber-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Pending Approval</span>`;
-                if (isRejected) badge = `<span class="bg-gray-900 text-gray-500 border border-gray-700 text-[10px] font-bold px-2 py-0.5 rounded uppercase line-through">Rejected</span>`;
-
-                let actions = `<span class="text-gray-600 font-mono text-[11px]">Processed</span>`;
+                let actions = `<span class="text-gray-600 font-mono text-[10px]">Settled</span>`;
                 if (userRole === 'admin' && isPending) {
                     actions = `
-                        <div class="flex items-center gap-1 justify-center">
-                            <button onclick="processWithdrawalStatusToggles('${w.id}', 'approved')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase transition">Release</button>
-                            <button onclick="processWithdrawalStatusToggles('${w.id}', 'rejected')" class="bg-red-950 text-red-400 border border-red-900 hover:bg-red-900 hover:text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase transition">Reject</button>
+                        <div class="flex items-center gap-2 justify-center">
+                            <button onclick="processWithdrawalStatusToggles('${w.id}', 'approved')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase transition">Disburse</button>
+                            <button onclick="processWithdrawalStatusToggles('${w.id}', 'rejected')" class="text-red-400 hover:text-red-300 text-[10px] font-bold uppercase transition">Reject</button>
                         </div>
                     `;
                 }
 
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-gray-700/20 transition border-b border-gray-700/40 text-gray-300 font-medium";
+                tr.className = "hover:bg-gray-800/30 text-gray-300 font-medium border-b border-gray-800/40";
                 tr.innerHTML = `
                     <td class="p-3 text-white font-bold">${w.name}</td>
-                    <td class="p-3 font-mono text-gray-400">${w.date}</td>
-                    <td class="p-3 text-right font-black text-red-400 font-mono">₱${parseFloat(w.amount).toFixed(2)}</td>
+                    <td class="p-3 font-mono text-gray-500">${w.date}</td>
+                    <td class="p-3 text-right font-bold text-red-400 font-mono">₱${parseFloat(w.amount).toFixed(2)}</td>
                     <td class="p-3 text-center">${badge}</td>
                     <td class="p-3 text-center">${actions}</td>
                 `;
@@ -566,31 +797,80 @@
         function renderDeductionsTableData() {
             const container = document.getElementById('deductionsTableRowsContainer');
             container.innerHTML = '';
-
-            let list = [...deductionsCachedRecords];
-            list.sort((a,b) => new Date(b.date) - new Date(a.date));
+            let list = [...deductionsCachedRecords].sort((a,b) => new Date(b.date) - new Date(a.date));
 
             if (list.length === 0) {
-                container.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-500 font-medium">No fee deductions applied to this account dashboard.</td></tr>`;
+                container.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-500 font-medium">No applied system account adjustments recorded.</td></tr>`;
                 return;
             }
 
             list.forEach(d => {
-                let adminCellAction = `<span class="text-gray-600 font-mono text-[11px]">Locked</span>`;
+                let actionCell = `<span class="text-gray-600 font-mono text-[10px]">Immutable</span>`;
                 if (userRole === 'admin') {
-                    adminCellAction = `<button onclick="handleDeleteDeduction('${d.id}')" class="bg-red-950 text-red-400 border border-red-900 text-[10px] hover:bg-red-900 hover:text-white px-2 py-0.5 rounded font-bold uppercase transition">Remove</button>`;
+                    actionCell = `<button onclick="handleDeleteDeduction('${d.id}')" class="text-red-400 hover:text-red-300 text-[10px] uppercase font-bold transition">Reverse</button>`;
                 }
-
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-gray-700/20 transition border-b border-gray-700/40 text-gray-300 font-medium";
+                tr.className = "hover:bg-gray-800/30 text-gray-300 font-medium border-b border-gray-800/40";
                 tr.innerHTML = `
                     <td class="p-3 text-white font-bold">${d.name}</td>
-                    <td class="p-3 text-gray-400 font-semibold">${d.reason}</td>
+                    <td class="p-3 text-gray-400 font-medium">${d.reason}</td>
                     <td class="p-3 font-mono text-gray-500">${d.date}</td>
-                    <td class="p-3 text-right font-black text-amber-500 font-mono">-₱${parseFloat(d.amount).toFixed(2)}</td>
-                    <td class="p-3 text-center">${adminCellAction}</td>
+                    <td class="p-3 text-right font-bold text-amber-500 font-mono">-₱${parseFloat(d.amount).toFixed(2)}</td>
+                    <td class="p-3 text-center">${actionCell}</td>
                 `;
                 container.appendChild(tr);
+            });
+        }
+
+        function populateReportsSubTabsDisplays() {
+            document.getElementById('reportIncomesTableBody').innerHTML = payrollCachedRecords.filter(r => r.status==='approved').map(r=>`
+                <tr class="border-b border-gray-800/40"><td class="p-2 text-white font-bold">${r.name}</td><td class="p-2 text-gray-400">${r.league}</td><td class="p-2 text-right text-emerald-400 font-mono font-bold">₱${parseFloat(r.total).toFixed(2)}</td></tr>
+            `).join('') || '<tr><td colspan="3" class="p-2 text-center text-gray-600">No incomes data available.</td></tr>';
+
+            document.getElementById('reportWithdrawalsTableBody').innerHTML = withdrawalsCachedRecords.filter(w => w.status==='approved').map(w=>`
+                <tr class="border-b border-gray-800/40"><td class="p-2 text-white font-bold">${w.name}</td><td class="p-2 text-gray-400 font-mono">${w.date}</td><td class="p-2 text-right text-red-400 font-mono font-bold">₱${parseFloat(w.amount).toFixed(2)}</td></tr>
+            `).join('') || '<tr><td colspan="3" class="p-2 text-center text-gray-600">No withdrawals data available.</td></tr>';
+
+            document.getElementById('reportDeductionsTableBody').innerHTML = deductionsCachedRecords.map(d=>`
+                <tr class="border-b border-gray-800/40"><td class="p-2 text-white font-bold">${d.name}</td><td class="p-2 text-gray-400">${d.reason}</td><td class="p-2 text-right text-amber-500 font-mono font-bold">₱${parseFloat(d.amount).toFixed(2)}</td></tr>
+            `).join('') || '<tr><td colspan="3" class="p-2 text-center text-gray-600">No penalties data available.</td></tr>';
+        }
+
+        function renderInteractiveAnalyticsCharts() {
+            const ctx = document.getElementById('dashboardTrendChart').getContext('2d');
+            if (dashboardRenderedChartInstance) { dashboardRenderedChartInstance.destroy(); }
+
+            // Group by date logic strings components
+            let dateMap = {};
+            payrollCachedRecords.forEach(r => { if(r.status==='approved') dateMap[r.date] = (dateMap[r.date] || 0) + r.total; });
+            let sortedDates = Object.keys(dateMap).sort((a,b)=> new Date(a) - new Date(b)).slice(-7);
+            let revenueValues = sortedDates.map(d => dateMap[d]);
+
+            if(sortedDates.length === 0) { sortedDates = ['No Data Available']; revenueValues = [0]; }
+
+            dashboardRenderedChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: sortedDates,
+                    datasets: [{
+                        label: 'Gross Approved Match Valuation',
+                        data: revenueValues,
+                        borderColor: '#f97316',
+                        backgroundColor: 'rgba(249, 115, 22, 0.05)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { color: '#1f2937' }, ticks: { color: '#9ca3af', font: { size: 10 } } },
+                        y: { grid: { color: '#1f2937' }, ticks: { color: '#9ca3af', font: { size: 10 } } }
+                    }
+                }
             });
         }
 
@@ -607,33 +887,21 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name, reason, amount, date })
                 });
-
                 if (response.ok) {
-                    alert(`Deduction successfully imposed and charged against ${name}'s balance!`);
+                    alert(`Account modification penalty charge appended to ${name}`);
                     document.getElementById('deductionReason').value = '';
                     document.getElementById('deductionAmount').value = '';
                     fetchAllFinancialSystemRecords();
-                } else {
-                    alert("Backend storage engine rejected addition of deduction payload.");
-                }
-            } catch (err) {
-                alert("Error routing payload to deductions processing API channels.");
-            }
+                } else { alert("Failed to append structural balance alteration."); }
+            } catch (err) { alert("Communication link error."); }
         }
 
         async function handleDeleteDeduction(id) {
-            if (!confirm("Are you sure you want to permanently delete and reverse this deduction log row?")) return;
-
+            if (!confirm("Reverse this penalty charge allocation from ledger?")) return;
             try {
                 const response = await fetch(`/api/deductions/${id}`, { method: 'DELETE' });
-                if (response.ok) {
-                    fetchAllFinancialSystemRecords();
-                } else {
-                    alert("Server error running record removal macros.");
-                }
-            } catch (err) {
-                alert("Network execution failure reversing balance fields variables.");
-            }
+                if (response.ok) fetchAllFinancialSystemRecords();
+            } catch (err) { alert("Execution connection failed."); }
         }
 
         async function handleRequestWithdrawal(e) {
@@ -642,7 +910,7 @@
             const date = document.getElementById('withdrawDate').value;
 
             if (userRole !== 'admin' && amt > globalCurrentWalletBalance) {
-                alert(`Insufficient Funds! Your running wallet balance limit calculation holds ₱${globalCurrentWalletBalance.toFixed(2)}.`);
+                alert(`Insufficient liquid balance values. Limit: ₱${globalCurrentWalletBalance.toFixed(2)}`);
                 return;
             }
 
@@ -652,37 +920,23 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name: currentUser, amount: amt, date })
                 });
-
                 if (response.ok) {
-                    alert("Withdrawal cash extraction request successfully sent!");
+                    alert("Extraction record catalogued. Awaiting administrator release pipeline authorization.");
                     document.getElementById('withdrawAmount').value = '';
                     fetchAllFinancialSystemRecords();
-                } else {
-                    alert("Backend server error filing withdrawal records parameters.");
                 }
-            } catch (err) {
-                alert("Network communication error routing cash flow variables.");
-            }
+            } catch (err) { alert("Network payload delivery timeout."); }
         }
 
         async function processWithdrawalStatusToggles(id, decision) {
-            if (!confirm(`Are you certain you wish to mark this extraction request as: ${decision.toUpperCase()}?`)) return;
-
             try {
                 const response = await fetch(`/api/withdrawals/${id}/status`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ status: decision })
                 });
-
-                if (response.ok) {
-                    fetchAllFinancialSystemRecords();
-                } else {
-                    alert("Server rejected the withdrawal transaction adjustment request state.");
-                }
-            } catch (err) {
-                alert("Communication execution error tracking financial pipelines.");
-            }
+                if (response.ok) fetchAllFinancialSystemRecords();
+            } catch (err) { alert("Server tracking breakdown."); }
         }
 
         async function loadMembersDropdownAndDirectory() {
@@ -695,115 +949,64 @@
                 const directoryBody = document.getElementById('memberDirectoryContainer');
                 const countBadge = document.getElementById('directoryCountBadge');
 
-                selectElement.innerHTML = '<option value="">-- Select a Member --</option>';
-                deductionSelect.innerHTML = '<option value="">-- Select Target Member --</option>';
+                selectElement.innerHTML = '<option value="">-- Choose Profile --</option>';
+                deductionSelect.innerHTML = '<option value="">-- Choose Account Row --</option>';
                 directoryBody.innerHTML = '';
-                countBadge.textContent = `${users.length} Total`;
+                countBadge.textContent = `${users.length} Active System Credentials`;
 
                 users.forEach(user => {
                     if(user.username !== 'admin') {
-                        const option = document.createElement('option');
-                        option.value = user.username;
-                        option.textContent = `${user.username} (${user.role})`;
+                        const option = document.createElement('option'); option.value = user.username; option.textContent = user.username;
                         selectElement.appendChild(option);
-
-                        const optDed = document.createElement('option');
-                        optDed.value = user.username;
-                        optDed.textContent = user.username;
-                        deductionSelect.appendChild(optDed);
+                        const optDed = option.cloneNode(true); deductionSelect.appendChild(optDed);
                     }
-
                     const isLocked = user.status === 'locked';
                     const tr = document.createElement('tr');
-                    tr.className = "hover:bg-gray-700/20 text-gray-300 font-medium border-b border-gray-700/40";
+                    tr.className = "hover:bg-gray-800/20 text-gray-300 font-medium border-b border-gray-800/40";
                     tr.innerHTML = `
-                        <td class="p-2.5">
-                            <div class="font-semibold text-white flex items-center gap-2">
-                                <span class="w-2 h-2 rounded-full ${isLocked ? 'bg-red-500' : 'bg-green-500'}"></span>
-                                <span id="username-text-${user.id}">${user.username}</span>
+                        <td class="p-3">
+                            <div class="font-bold text-white flex items-center gap-2">
+                                <span class="w-1.5 h-1.5 rounded-full ${isLocked ? 'bg-red-500':'bg-green-500'}"></span>
+                                <span>${user.username}</span>
                             </div>
-                            <div class="text-[10px] text-gray-500 mt-0.5 uppercase tracking-wide font-mono">${user.role} ${isLocked ? '• LOCKED' : '• ACTIVE'}</div>
+                            <div class="text-[9px] text-gray-500 font-mono uppercase mt-0.5">${user.role} • ${user.status || 'Active'}</div>
                         </td>
-                        <td class="p-2.5">
-                            <div class="flex items-center justify-center gap-1.5">
-                                <button onclick="editMemberUsername('${user.id}', '${user.username}')" class="bg-gray-900 border border-gray-700 hover:border-orange-500 text-gray-300 px-2 py-1 rounded text-[10px] font-bold transition">Edit</button>
-                                <button onclick="toggleMemberLock('${user.id}', ${isLocked})" class="${isLocked ? 'bg-amber-950 border border-amber-800 text-amber-400' : 'bg-gray-900 border border-gray-700 text-gray-400'} px-2 py-1 rounded text-[10px] font-bold transition">${isLocked ? 'Unlock' : 'Lock'}</button>
-                                ${user.username !== 'admin' ? `<button onclick="deleteMemberAccount('${user.id}', '${user.username}')" class="bg-red-950/40 border border-red-900 text-red-400 hover:bg-red-900 hover:text-white px-2 py-1 rounded text-[10px] font-bold transition">Del</button>` : ''}
+                        <td class="p-3 text-center">
+                            <div class="flex items-center justify-center gap-2">
+                                <button onclick="toggleMemberLock('${user.id}', ${isLocked})" class="text-xs ${isLocked?'text-green-400':'text-amber-500'} font-bold uppercase tracking-wide">${isLocked?'Unlock':'Lock'}</button>
+                                ${user.username !== 'admin' ? `<button onclick="deleteMemberAccount('${user.id}', '${user.username}')" class="text-xs text-red-400 hover:text-red-300 font-bold uppercase tracking-wide">Delete</button>`:''}
                             </div>
                         </td>
                     `;
                     directoryBody.appendChild(tr);
                 });
-            } catch (err) {
-                console.error("Error populating directory panel:", err);
-            }
-        }
-
-        async function editMemberUsername(id, currentName) {
-            const newName = prompt(`Change username for "${currentName}":`, currentName);
-            if (!newName || newName.trim() === "" || newName.trim() === currentName) return;
-
-            try {
-                const response = await fetch(`/api/users/${id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username: newName.trim() })
-                });
-                if (response.ok) {
-                    alert("Username successfully updated!");
-                    loadMembersDropdownAndDirectory();
-                } else {
-                    alert("Failed to update username.");
-                }
-            } catch (err) {
-                alert("Communication error updating user details.");
-            }
+            } catch (err) { console.error(err); }
         }
 
         async function toggleMemberLock(id, currentlyLocked) {
             const nextStatus = currentlyLocked ? 'active' : 'locked';
-            if (!confirm(`Are you sure you want to ${currentlyLocked ? 'unlock' : 'lock'} this member account?`)) return;
-
             try {
                 const response = await fetch(`/api/users/${id}/toggle-lock`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ status: nextStatus })
                 });
-                if (response.ok) {
-                    loadMembersDropdownAndDirectory();
-                } else {
-                    alert("Failed to adjust account lock parameters.");
-                }
-            } catch (err) {
-                alert("Communication error processing account toggle lock.");
-            }
+                if (response.ok) loadMembersDropdownAndDirectory();
+            } catch (err) { alert("Lock adjustment script exception."); }
         }
 
         async function deleteMemberAccount(id, name) {
-            if (!confirm(`CRITICAL WARNING: Are you completely certain you want to permanently delete the referee account "${name}"?`)) return;
-
+            if (!confirm(`Purge account registry row key: "${name}"?`)) return;
             try {
                 const response = await fetch(`/api/users/${id}`, { method: 'DELETE' });
-                if (response.ok) {
-                    alert("Account successfully deleted.");
-                    loadMembersDropdownAndDirectory();
-                } else {
-                    alert("Server rejected deletion command request processing.");
-                }
-            } catch (err) {
-                alert("Communication error targeting user delete pipelines paths.");
-            }
+                if (response.ok) loadMembersDropdownAndDirectory();
+            } catch (err) { alert("Deletion pathway block exception."); }
         }
 
         async function handlePasswordReset() {
             const username = document.getElementById('resetUserSelect').value;
             const newPassword = document.getElementById('resetNewPassword').value;
-
-            if (!username || !newPassword) {
-                alert("Please select a target user account row and provide a new entry password.");
-                return;
-            }
+            if (!username || !newPassword) return;
 
             try {
                 const response = await fetch('/api/users/reset-password', {
@@ -811,37 +1014,19 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, newPassword })
                 });
-                const data = await response.json();
-
-                if (response.ok) {
-                    alert(data.message);
-                    document.getElementById('resetNewPassword').value = '';
-                } else {
-                    alert(`Error: ${data.error}`);
-                }
-            } catch (err) {
-                alert("Failed to submit patch update tracking request payload.");
-            }
+                if (response.ok) { alert("Security parameters updated successfully."); document.getElementById('resetNewPassword').value = ''; }
+            } catch (err) { alert("Patch update tracking processing failure."); }
         }
 
         async function approvePayrollLog(id, decision) {
-            if (!confirm(`Are you sure you want to change this entry status to: ${decision.toUpperCase()}?`)) return;
-
             try {
                 const response = await fetch(`/api/payroll/${id}/approve`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ status: decision })
                 });
-
-                if (response.ok) {
-                    fetchAllFinancialSystemRecords();
-                } else {
-                    alert("Failed to adjust log entry verification.");
-                }
-            } catch (err) {
-                alert("Communication network breakdown during approval toggle.");
-            }
+                if (response.ok) fetchAllFinancialSystemRecords();
+            } catch (err) { alert("Approval pipeline handshake failed."); }
         }
 
         async function handleSaveAssignment(e) {
@@ -861,35 +1046,22 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-
                 if (response.ok) {
-                    alert(userRole === 'admin' ? "Log saved and approved successfully!" : "Log submitted successfully!");
+                    alert("Match record logged.");
                     document.getElementById('leagueTitle').value = '';
                     document.getElementById('matchDate').value = '';
-                    document.getElementById('gamesCount').value = '1';
                     updateLiveTotalMathOutput();
                     fetchAllFinancialSystemRecords();
-                } else {
-                    alert("Failed to submit assignment entry values.");
                 }
-            } catch (err) {
-                alert("Error sending payroll logs parameters across data channels.");
-            }
+            } catch (err) { alert("Payload routing pipeline timeout exception."); }
         }
 
         async function handleDeleteAssignment(id) {
-            if (!confirm("Are you absolutely sure you want to permanently delete this assignment entry log row?")) return;
-
+            if (!confirm("Permanently clear this database entry string?")) return;
             try {
                 const response = await fetch(`/api/payroll/${id}`, { method: 'DELETE' });
-                if (response.ok) {
-                    fetchAllFinancialSystemRecords();
-                } else {
-                    alert("Deletion command rejected by backend cloud engine.");
-                }
-            } catch (err) {
-                alert("Communication error targeting row delete commands pipelines.");
-            }
+                if (response.ok) fetchAllFinancialSystemRecords();
+            } catch (err) { alert("Data storage block mismatch error."); }
         }
 
         async function handleCreateAccount(e) {
@@ -903,158 +1075,92 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, password, role: 'member' })
                 });
-
                 if (response.ok) {
-                    alert(`Success: Referee account "${username}" has been fully registered!`);
+                    alert(`Account created: ${username}`);
                     document.getElementById('newUsername').value = '';
                     document.getElementById('newPassword').value = '';
                     loadMembersDropdownAndDirectory();
-                } else {
-                    alert("Failed to create user account. Username may be taken.");
-                }
-            } catch (err) {
-                alert("Network failure processing user creation requests.");
-            }
+                } else { alert("Username conflict detected inside local database mapping rows."); }
+            } catch (err) { alert("Connection parameters processing error."); }
         }
 
         function handleLogout() {
-            currentUser = null;
-            userRole = 'member';
-            payrollCachedRecords = [];
-            withdrawalsCachedRecords = [];
-            deductionsCachedRecords = [];
-            globalCurrentWalletBalance = 0;
+            currentUser = null; userRole = 'member';
+            payrollCachedRecords = []; withdrawalsCachedRecords = []; deductionsCachedRecords = [];
             document.getElementById('usernameInput').value = '';
             document.getElementById('passwordInput').value = '';
             document.getElementById('appDashboard').classList.add('hidden');
             document.getElementById('loginScreen').classList.remove('hidden');
         }
 
-        function exportToExcelWorkbook() {
-            if (payrollCachedRecords.length === 0) {
-                alert("There are no records currently available to transfer to spreadsheet.");
-                return;
-            }
-            const approvedRecords = payrollCachedRecords.filter(item => item.status === 'approved');
-            if (approvedRecords.length === 0) {
-                alert("No approved game entries found to export.");
-                return;
-            }
-            const cleanRows = approvedRecords.map((item, index) => ({
-                "Log ID": index + 1,
-                "Referee Name": item.name,
-                "League / Tournament": item.league,
-                "Match Officiated Date": item.date,
-                "Games Counts": item.games,
-                "Per Game Rate Fee (PHP)": item.rate,
-                "Total Payout Compensation (PHP)": item.total
-            }));
-            const ws = XLSX.utils.json_to_sheet(cleanRows);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "RIBRO Payroll Logs");
-            const datestamp = new Date().toISOString().slice(0,10);
-            XLSX.writeFile(wb, `RIBRO_Inc_Approved_Payroll_Report_${datestamp}.xlsx`);
-        }
-
-        function exportWithdrawalsToExcel() {
-            if (withdrawalsCachedRecords.length === 0) {
-                alert("There are no withdrawal records currently available to export.");
-                return;
-            }
-            const approvedWithdrawals = withdrawalsCachedRecords.filter(item => item.status === 'approved');
-            if (approvedWithdrawals.length === 0) {
-                alert("No approved withdrawal entries found to generate report.");
-                return;
-            }
-            const cleanRows = approvedWithdrawals.map((item, index) => ({
-                "Transaction ID": index + 1,
-                "Referee Name": item.name,
-                "Release Date": item.date,
-                "Withdrawn Amount (PHP)": item.amount,
-                "Status": "Approved / Released"
-            }));
-            const ws = XLSX.utils.json_to_sheet(cleanRows);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "RIBRO Released Withdrawals");
-            const datestamp = new Date().toISOString().slice(0,10);
-            XLSX.writeFile(wb, `RIBRO_Inc_Withdrawal_Report_${datestamp}.xlsx`);
-        }
-
         // ==========================================
-        // NEW FEATURE: INTEGRATED CONSOLIDATED MASTER REPORT EXPORTER
+        // MULTI-SHEET ENTERPRISE WORKBOOK EXPORT CORE MACRO
         // ==========================================
         function exportOverallSystemMasterReport() {
             if (payrollCachedRecords.length === 0 && withdrawalsCachedRecords.length === 0 && deductionsCachedRecords.length === 0) {
-                alert("No system data entries are currently cached to compile an audit report sheet.");
+                alert("No cached data vectors detected.");
                 return;
             }
 
-            // Create an empty workbook instance
             const wb = XLSX.utils.book_new();
 
-            // 1. GENERATE TAB 1: EXECUTIVE FINANCIAL SUMMARY DATA FRAME
-            let totalIncomes = 0;
-            payrollCachedRecords.forEach(r => { if (r.status === 'approved') totalIncomes += (r.total || 0); });
-
-            let totalWithdrawals = 0;
-            withdrawalsCachedRecords.forEach(w => { if (w.status === 'approved') totalWithdrawals += (w.amount || 0); });
-
-            let totalDeductions = 0;
-            deductionsCachedRecords.forEach(d => { totalDeductions += (d.amount || 0); });
-
+            // SHEET TAB 1: EXECUTIVE FINANCIAL SUMMARY DATA MAPPING MATRIX
+            let totalIncomes = 0; payrollCachedRecords.forEach(r => { if (r.status === 'approved') totalIncomes += (r.total || 0); });
+            let totalWithdrawals = 0; withdrawalsCachedRecords.forEach(w => { if (w.status === 'approved') totalWithdrawals += (w.amount || 0); });
+            let totalDeductions = 0; deductionsCachedRecords.forEach(d => { totalDeductions += (d.amount || 0); });
             let netRemainingBalance = totalIncomes - totalWithdrawals - totalDeductions;
 
             const summaryRows = [
                 ["ROXAS ISABELA BASKETBALL REFEREES ORGANIZATION INC. (RIBRO INC.)"],
-                ["SEC Reg. No. 2025048197717-63 | SYSTEM CONSOLIDATED AUDIT STATEMENT"],
+                ["SEC Reg. No. 2025048197717-63 | CONSOLIDATED FINANCIAL MANAGEMENT LEDGER"],
                 [],
-                ["FINANCIAL BALANCE METRIC CHECKLIST", "VALUE (PHP)"],
-                ["Gross Approved Game Earnings (Total Incomes)", totalIncomes],
-                ["Total Approved Released Withdrawals", totalWithdrawals],
-                ["Total Imposed Account Fee Deductions", totalDeductions],
-                ["RIBRO Net Remaining Wallet Balance", netRemainingBalance]
+                ["FINANCIAL METRIC MATRIX STATEMENT", "BALANCE ALLOCATION VALUE (PHP)"],
+                ["Gross Approved Game Earnings (Total Corporate Incomes)", totalIncomes],
+                ["Total Approved Released Withdrawals (Capital Payout Outflow)", totalWithdrawals],
+                ["Total Imposed Account Fee Deductions (Internal Adjustments)", totalDeductions],
+                ["RIBRO Net Remaining Wallet Balance Pool", netRemainingBalance]
             ];
             const wsSummary = XLSX.utils.aoa_to_sheet(summaryRows);
-            XLSX.utils.book_append_sheet(wb, wsSummary, "Executive Summary");
+            XLSX.utils.book_append_sheet(wb, wsSummary, "Executive Ledger Summary");
 
-            // 2. GENERATE TAB 2: GAME ASSIGNMENTS RECORDS SHEET
+            // SHEET TAB 2: ACTIVE PAYROLL OFFICIATING ENTRIES
             const cleanPayrollRows = payrollCachedRecords.map((item, index) => ({
-                "Log ID": index + 1,
-                "Referee Name": item.name,
-                "League / Tournament Description": item.league,
+                "Log Sequence ID": index + 1,
+                "Referee Identification Name": item.name,
+                "League/Tournament Description": item.league,
                 "Match Date": item.date,
-                "Games Count": item.games,
-                "Total Value (PHP)": item.total,
-                "Verification Status": item.status
+                "Officiated Games Count": item.games,
+                "Compensation Payout (PHP)": item.total,
+                "Verification State Status": item.status
             }));
             const wsPayroll = XLSX.utils.json_to_sheet(cleanPayrollRows);
-            XLSX.utils.book_append_sheet(wb, wsPayroll, "Game Assignment Ledger");
+            XLSX.utils.book_append_sheet(wb, wsPayroll, "Game Assignments Ledger");
 
-            // 3. GENERATE TAB 3: WITHDRAWAL HISTORY EXTRACTIONS SHEET
+            // SHEET TAB 3: DISBURSED EXTRACTIONS STATEMENT TRAIL
             const cleanWithdrawalRows = withdrawalsCachedRecords.map((item, index) => ({
-                "Transaction ID": index + 1,
-                "Referee Name": item.name,
-                "Request Date": item.date,
-                "Withdrawn Amount (PHP)": item.amount,
-                "Current Status": item.status
+                "Disbursement Row Index": index + 1,
+                "Referee Account Name": item.name,
+                "Filing Processing Date": item.date,
+                "Extracted Payout Sum (PHP)": item.amount,
+                "Transaction Status Checked Flag": item.status
             }));
             const wsWithdrawals = XLSX.utils.json_to_sheet(cleanWithdrawalRows);
-            XLSX.utils.book_append_sheet(wb, wsWithdrawals, "Withdrawal Processing Records");
+            XLSX.utils.book_append_sheet(wb, wsWithdrawals, "Withdrawal Processing Requests");
 
-            // 4. GENERATE TAB 4: IMPOSED FINES ACCOUNT DEDUCTIONS LEDGER SHEET
+            // SHEET TAB 4: ACCOUNT LIQUIDATION & DEDUCTIONS BALANCING TRAIL
             const cleanDeductionRows = deductionsCachedRecords.map((item, index) => ({
-                "Audit Row ID": index + 1,
-                "Referee Target Name": item.name,
-                "Reason Description Label": item.reason,
-                "Deducted Amount (PHP)": item.amount,
-                "Imposed Date": item.date
+                "Adjustment Modification Line Key": index + 1,
+                "Target Referee Name": item.name,
+                "Reason Allocation Justification": item.reason,
+                "Subtracted Fine Sum (PHP)": item.amount,
+                "Imposed Action Date Stamp": item.date
             }));
             const wsDeductions = XLSX.utils.json_to_sheet(cleanDeductionRows);
-            XLSX.utils.book_append_sheet(wb, wsDeductions, "Fee Deductions Ledger");
+            XLSX.utils.book_append_sheet(wb, wsDeductions, "Imposed Fee Deductions Ledger");
 
-            // Finalize download block trigger
+            // Trigger standard automated desktop workbook file extraction process
             const datestamp = new Date().toISOString().slice(0, 10);
-            XLSX.writeFile(wb, `RIBRO_Inc_Master_Financial_Report_${datestamp}.xlsx`);
+            XLSX.writeFile(wb, `RIBRO_Inc_Master_Audit_Report_${datestamp}.xlsx`);
         }
     </script>
 </body>
