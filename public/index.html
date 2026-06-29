@@ -54,22 +54,22 @@
         <section class="p-6 max-w-7xl w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-4">
             <div class="bg-gradient-to-br from-orange-600/20 to-amber-600/5 border border-orange-500/20 rounded-xl p-5 shadow-md flex justify-between items-center">
                 <div>
-                    <h4 class="text-xs uppercase font-bold tracking-wider text-orange-400">Total System Payout</h4>
-                    <p class="text-[10px] text-gray-400 mt-0.5">Sum of all filtered records</p>
+                    <h4 class="text-xs uppercase font-bold tracking-wider text-orange-400">Approved System Payout</h4>
+                    <p class="text-[10px] text-gray-400 mt-0.5">Excludes pending verification logs</p>
                 </div>
                 <span id="grandSystemAccumulationPayout" class="text-2xl font-black text-orange-500 font-mono">₱0.00</span>
             </div>
             <div class="bg-gray-800 border border-gray-700 rounded-xl p-5 shadow-md flex justify-between items-center">
                 <div>
-                    <h4 class="text-xs uppercase font-bold tracking-wider text-blue-400">Total Games Officiated</h4>
-                    <p class="text-[10px] text-gray-400 mt-0.5">Accumulated count of games</p>
+                    <h4 class="text-xs uppercase font-bold tracking-wider text-blue-400">Approved Games</h4>
+                    <p class="text-[10px] text-gray-400 mt-0.5">Accumulated approved game entries</p>
                 </div>
                 <span id="analyticsTotalGames" class="text-2xl font-black text-blue-400 font-mono">0</span>
             </div>
             <div class="bg-gray-800 border border-gray-700 rounded-xl p-5 shadow-md flex justify-between items-center">
                 <div>
-                    <h4 class="text-xs uppercase font-bold tracking-wider text-emerald-400">Avg. Payout Per Log</h4>
-                    <p class="text-[10px] text-gray-400 mt-0.5">Average earning per assignment entry</p>
+                    <h4 class="text-xs uppercase font-bold tracking-wider text-emerald-400">Avg. Approved Payout</h4>
+                    <p class="text-[10px] text-gray-400 mt-0.5">Average earning per approved entry</p>
                 </div>
                 <span id="analyticsAvgEarning" class="text-2xl font-black text-emerald-400 font-mono">₱0.00</span>
             </div>
@@ -80,7 +80,8 @@
             <div id="controlPanelSide" class="space-y-6">
                 
                 <div id="addAssignmentSection" class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-xl">
-                    <h2 class="text-xl font-bold text-orange-500 mb-4">Add Assignment Log</h2>
+                    <h2 class="text-xl font-bold text-orange-500 mb-2">Add Assignment Log</h2>
+                    <p id="pendingNoticeText" class="text-[11px] text-amber-400 mb-4 font-medium leading-relaxed hidden">⚠️ Notice: Entries added by referees will remain pending until approved by the administrator.</p>
                     <form id="payrollForm" onsubmit="handleSaveAssignment(event)" class="space-y-4">
                         <div>
                             <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Referee Name</label>
@@ -179,12 +180,11 @@
                         <input type="text" id="filterSearchQuery" oninput="renderPayrollTableData()" placeholder="Type to filter query..." class="w-full bg-gray-900 border border-gray-700 rounded text-xs px-2 py-1.5 text-white placeholder-gray-500">
                     </div>
                     <div>
-                        <label class="block text-[10px] text-gray-400 uppercase font-bold mb-1">Sort Configuration</label>
-                        <select id="sortConfigSelection" onchange="renderPayrollTableData()" class="w-full bg-gray-900 border border-gray-700 rounded text-xs px-2 py-1.5 text-white">
-                            <option value="date-desc">Date (Newest First)</option>
-                            <option value="date-asc">Date (Oldest First)</option>
-                            <option value="name-asc">Referee Name (A-Z)</option>
-                            <option value="total-desc">Highest Payout Amount</option>
+                        <label class="block text-[10px] text-gray-400 uppercase font-bold mb-1">Approval Query View</label>
+                        <select id="filterStatusQuery" onchange="renderPayrollTableData()" class="w-full bg-gray-900 border border-gray-700 rounded text-xs px-2 py-1.5 text-white">
+                            <option value="all">Show All Logs</option>
+                            <option value="approved">Approved Logs Only</option>
+                            <option value="pending" selected>Pending Logs Only</option>
                         </select>
                     </div>
                 </div>
@@ -205,8 +205,8 @@
                                     <th class="p-3">League</th>
                                     <th class="p-3">Date</th>
                                     <th class="p-3 text-center">Games</th>
-                                    <th class="p-3 text-right">Rate</th>
                                     <th class="p-3 text-right">Total</th>
+                                    <th class="p-3 text-center">Status</th>
                                     <th class="p-3 text-center">Actions</th>
                                 </tr>
                             </thead>
@@ -237,7 +237,6 @@
         gamesInput.addEventListener('input', updateLiveTotalMathOutput);
         rateInput.addEventListener('input', updateLiveTotalMathOutput);
 
-        // Security Authentication Router Session Login Logic
         async function handleLogin(e) {
             e.preventDefault();
             const username = document.getElementById('usernameInput').value;
@@ -266,6 +265,8 @@
                 if (userRole === 'admin') {
                     document.getElementById('adminBadge').classList.remove('hidden');
                     document.getElementById('adminOnlyForms').classList.remove('hidden');
+                    document.getElementById('pendingNoticeText').classList.add('hidden');
+                    document.getElementById('filterStatusQuery').value = 'all'; // Default to all for admin
                     refNameInput.value = '';
                     refNameInput.readOnly = false;
                     refNameInput.placeholder = "Enter referee name";
@@ -273,6 +274,8 @@
                 } else {
                     document.getElementById('adminBadge').classList.add('hidden');
                     document.getElementById('adminOnlyForms').classList.add('hidden');
+                    document.getElementById('pendingNoticeText').classList.remove('hidden');
+                    document.getElementById('filterStatusQuery').value = 'all'; // Let users view pending vs approved
                     refNameInput.value = currentUser;
                     refNameInput.readOnly = true;
                 }
@@ -327,11 +330,10 @@
                     directoryBody.appendChild(tr);
                 });
             } catch (err) {
-                console.error("Error populating directory panel mapping:", err);
+                console.error("Error populating directory panel:", err);
             }
         }
 
-        // NEW UI HANDLER: Prompt admin for a new username string
         async function editMemberUsername(id, currentName) {
             const newName = prompt(`Change username for "${currentName}":`, currentName);
             if (!newName || newName.trim() === "" || newName.trim() === currentName) return;
@@ -353,7 +355,6 @@
             }
         }
 
-        // NEW UI HANDLER: Toggle lock state parameters
         async function toggleMemberLock(id, currentlyLocked) {
             const nextStatus = currentlyLocked ? 'active' : 'locked';
             if (!confirm(`Are you sure you want to ${currentlyLocked ? 'unlock' : 'lock'} this member account?`)) return;
@@ -374,7 +375,6 @@
             }
         }
 
-        // NEW UI HANDLER: Permanent extraction deletion of account row
         async function deleteMemberAccount(id, name) {
             if (!confirm(`CRITICAL WARNING: Are you completely certain you want to permanently delete the referee account "${name}"? This action cannot be undone.`)) return;
 
@@ -410,7 +410,6 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, newPassword })
                 });
-
                 const data = await response.json();
 
                 if (response.ok) {
@@ -434,6 +433,27 @@
             }
         }
 
+        // ADMIN APPROVAL ACTION HANDLER
+        async function approvePayrollLog(id, decision) {
+            if (!confirm(`Are you sure you want to change this entry status to: ${decision.toUpperCase()}?`)) return;
+
+            try {
+                const response = await fetch(`/api/payroll/${id}/approve`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: decision })
+                });
+
+                if (response.ok) {
+                    fetchPayrollDataRecords();
+                } else {
+                    alert("Failed to adjust log entry verification.");
+                }
+            } catch (err) {
+                alert("Communication network breakdown during approval toggle.");
+            }
+        }
+
         function renderPayrollTableData() {
             const container = document.getElementById('payrollTableRowsContainer');
             const totalSummaryText = document.getElementById('grandSystemAccumulationPayout');
@@ -441,16 +461,16 @@
             const avgEarningText = document.getElementById('analyticsAvgEarning');
             const counterText = document.getElementById('recordsCounterDisplay');
             
-            const sortVal = document.getElementById('sortConfigSelection').value;
             const monthFilter = document.getElementById('filterMonthSelect').value;
             const searchQuery = document.getElementById('filterSearchQuery').value.toLowerCase().trim();
+            const statusFilter = document.getElementById('filterStatusQuery').value;
 
             container.innerHTML = '';
 
+            // Filter logic
             let logs = [...payrollCachedRecords].filter(row => {
-                if (monthFilter) {
-                    if (!row.date || !row.date.startsWith(monthFilter)) return false;
-                }
+                if (monthFilter && (!row.date || !row.date.startsWith(monthFilter))) return false;
+                if (statusFilter !== 'all' && row.status !== statusFilter) return false;
                 if (searchQuery) {
                     const matchName = row.name ? row.name.toLowerCase().includes(searchQuery) : false;
                     const matchLeague = row.league ? row.league.toLowerCase().includes(searchQuery) : false;
@@ -459,48 +479,73 @@
                 return true;
             });
 
-            if (sortVal === 'date-desc') logs.sort((a,b) => new Date(b.date) - new Date(a.date));
-            if (sortVal === 'date-asc') logs.sort((a,b) => new Date(a.date) - new Date(b.date));
-            if (sortVal === 'name-asc') logs.sort((a,b) => a.name.localeCompare(b.name));
-            if (sortVal === 'total-desc') logs.sort((a,b) => b.total - a.total);
+            // Always default sort by date descending
+            logs.sort((a,b) => new Date(b.date) - new Date(a.date));
 
+            // CRITICAL CHANGE: Only sum parameters for entries that are APPROVED!
             let sumAccumulator = 0;
             let gamesAccumulator = 0;
+            let approvedLogsCount = 0;
 
-            counterText.textContent = `Showing ${logs.length} matching data entries`;
+            payrollCachedRecords.forEach(row => {
+                if (row.status === 'approved') {
+                    sumAccumulator += (row.total || 0);
+                    gamesAccumulator += (parseInt(row.games) || 0);
+                    approvedLogsCount++;
+                }
+            });
+
+            counterText.textContent = `Showing ${logs.length} matching entries in view`;
 
             if (logs.length === 0) {
-                container.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-500 tracking-wide">No assignment logs matched your search or monthly filter.</td></tr>`;
-                totalSummaryText.textContent = "₱0.00";
-                totalGamesText.textContent = "0";
-                avgEarningText.textContent = "₱0.00";
+                container.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-500 tracking-wide">No assignment logs found matching your filters.</td></tr>`;
+                totalSummaryText.textContent = `₱${sumAccumulator.toFixed(2)}`;
+                totalGamesText.textContent = gamesAccumulator.toLocaleString();
+                avgEarningText.textContent = `₱${approvedLogsCount > 0 ? (sumAccumulator / approvedLogsCount).toFixed(2) : '0.00'}`;
                 return;
             }
 
             logs.forEach(row => {
-                sumAccumulator += (row.total || 0);
-                gamesAccumulator += (parseInt(row.games) || 0);
+                const isPending = row.status === 'pending';
+                const isRejected = row.status === 'rejected';
+                
+                let statusBadge = `<span class="bg-emerald-950 text-emerald-400 border border-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Approved</span>`;
+                if (isPending) {
+                    statusBadge = `<span class="bg-amber-950 text-amber-400 border border-amber-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Pending</span>`;
+                } else if (isRejected) {
+                    statusBadge = `<span class="bg-red-950 text-red-400 border border-red-900 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Rejected</span>`;
+                }
+
+                // Action controls change dynamically depending on if user is admin vs member
+                let controlsMarkup = `<button onclick="handleDeleteAssignment('${row.id}')" class="bg-red-950/40 border border-red-900 text-red-400 hover:bg-red-900 hover:text-white px-2 py-1 rounded text-[10px] uppercase font-bold transition">Delete</button>`;
+                
+                if (userRole === 'admin' && isPending) {
+                    controlsMarkup = `
+                        <div class="flex items-center gap-1 justify-center">
+                            <button onclick="approvePayrollLog('${row.id}', 'approved')" class="bg-emerald-700 hover:bg-emerald-600 text-white px-2 py-1 rounded text-[10px] font-bold uppercase transition">Approve</button>
+                            <button onclick="approvePayrollLog('${row.id}', 'rejected')" class="bg-gray-700 hover:bg-gray-600 text-gray-300 px-2 py-1 rounded text-[10px] font-bold uppercase transition">Deny</button>
+                        </div>
+                    `;
+                }
 
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-gray-700/30 transition border-b border-gray-700/40 text-gray-300 font-medium";
+                tr.className = `hover:bg-gray-700/30 transition border-b border-gray-700/40 text-gray-300 font-medium ${isPending ? 'opacity-85 bg-gray-900/30' : ''}`;
                 
                 tr.innerHTML = `
                     <td class="p-3 font-semibold text-white">${row.name}</td>
                     <td class="p-3 text-gray-400">${row.league}</td>
                     <td class="p-3 font-mono text-gray-400">${row.date}</td>
                     <td class="p-3 text-center font-bold">${row.games}</td>
-                    <td class="p-3 text-right font-mono text-gray-400">₱${parseFloat(row.rate).toFixed(2)}</td>
-                    <td class="p-3 text-right font-black text-green-400 font-mono">₱${parseFloat(row.total).toFixed(2)}</td>
-                    <td class="p-3 text-center">
-                        <button onclick="handleDeleteAssignment('${row.id}')" class="bg-red-950/80 border border-red-800 text-red-400 hover:bg-red-900 hover:text-white px-2 py-1 rounded text-[10px] uppercase font-bold transition">Delete</button>
-                    </td>
+                    <td class="p-3 text-right font-black ${isPending ? 'text-amber-500' : isRejected ? 'text-gray-500 line-through' : 'text-green-400'} font-mono">₱${parseFloat(row.total).toFixed(2)}</td>
+                    <td class="p-3 text-center">${statusBadge}</td>
+                    <td class="p-3 text-center">${controlsMarkup}</td>
                 `;
                 container.appendChild(tr);
             });
 
             totalSummaryText.textContent = `₱${sumAccumulator.toFixed(2)}`;
             totalGamesText.textContent = gamesAccumulator.toLocaleString();
-            avgEarningText.textContent = `₱${(sumAccumulator / logs.length).toFixed(2)}`;
+            avgEarningText.textContent = `₱${approvedLogsCount > 0 ? (sumAccumulator / approvedLogsCount).toFixed(2) : '0.00'}`;
         }
 
         async function handleSaveAssignment(e) {
@@ -510,7 +555,8 @@
                 league: document.getElementById('leagueTitle').value,
                 date: document.getElementById('matchDate').value,
                 games: document.getElementById('gamesCount').value,
-                rate: document.getElementById('gameRate').value
+                rate: document.getElementById('gameRate').value,
+                role: userRole // Pass role context to allow auto-approval for admins
             };
 
             try {
@@ -521,6 +567,7 @@
                 });
 
                 if (response.ok) {
+                    alert(userRole === 'admin' ? "Log saved and approved successfully!" : "Log submitted successfully! Awaiting admin approval.");
                     document.getElementById('leagueTitle').value = '';
                     document.getElementById('matchDate').value = '';
                     document.getElementById('gamesCount').value = '1';
@@ -586,11 +633,19 @@
 
         function exportToExcelWorkbook() {
             if (payrollCachedRecords.length === 0) {
-                alert("There are no records currently available data fields to transfer to spreadsheet.");
+                alert("There are no records currently available to transfer to spreadsheet.");
                 return;
             }
 
-            const cleanRows = payrollCachedRecords.map((item, index) => ({
+            // Filter for only approved data for external payroll reporting exports
+            const approvedRecords = payrollCachedRecords.filter(item => item.status === 'approved');
+
+            if (approvedRecords.length === 0) {
+                alert("No approved entries found to export.");
+                return;
+            }
+
+            const cleanRows = approvedRecords.map((item, index) => ({
                 "Log ID": index + 1,
                 "Referee Name": item.name,
                 "League / Tournament": item.league,
@@ -605,7 +660,7 @@
             XLSX.utils.book_append_sheet(wb, ws, "RIBRO Payroll Logs");
             
             const datestamp = new Date().toISOString().slice(0,10);
-            XLSX.writeFile(wb, `RIBRO_Inc_Payroll_Report_${datestamp}.xlsx`);
+            XLSX.writeFile(wb, `RIBRO_Inc_Approved_Payroll_Report_${datestamp}.xlsx`);
         }
     </script>
 </body>
