@@ -1,667 +1,335 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RIBRO Inc. | Referee Payroll Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-</head>
-<body class="bg-gray-900 text-gray-100 min-h-screen font-sans">
+const express = require('express');
+const axios = require('axios');
+const cors = require('cors');
+const path = require('path');
 
-    <div id="loginScreen" class="flex items-center justify-center min-h-screen p-4">
-        <div class="bg-gray-800 p-8 rounded-xl border border-gray-700 shadow-xl max-w-md w-full space-y-6">
-            <div class="flex flex-col items-center text-center">
-                <img src="RIBroInc NEW LOGO.jpg" alt="RIBRO Inc. Logo" class="w-32 h-32 object-contain mb-4 drop-shadow-[0_4px_10px_rgba(249,115,22,0.3)]">
-                <h1 class="text-3xl font-black text-orange-500 uppercase tracking-wider">RIBRO Inc.</h1>
-                <p class="text-sm font-semibold text-gray-300 mt-1 uppercase text-center">Roxas Isabela Basketball Referees Organization Inc.</p>
-                <p class="text-xs text-gray-500 mt-1 bg-gray-900/50 py-1 px-2 rounded inline-block border border-gray-700/60">SEC Reg. No. 2025048197717-63</p>
-            </div>
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-            <form id="loginForm" class="space-y-4" onsubmit="handleLogin(event)">
-                <div>
-                    <label class="block text-left text-xs font-bold uppercase text-gray-400 mb-1">Username</label>
-                    <input type="text" id="usernameInput" required placeholder="Enter username" class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-orange-500">
-                </div>
-                <div>
-                    <label class="block text-left text-xs font-bold uppercase text-gray-400 mb-1">Password</label>
-                    <input type="password" id="passwordInput" required placeholder="•••••" class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-orange-500">
-                </div>
-                <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 rounded transition duration-200 uppercase tracking-wide">Log In</button>
-            </form>
-        </div>
-    </div>
+const cleanEnvVar = (val) => {
+    if (!val) return '';
+    return val.replace(/['"\[\]\s]/g, '').trim();
+};
 
-    <div id="appDashboard" class="hidden min-h-screen flex flex-col">
-        <header class="bg-gray-950 border-b border-gray-800 px-6 py-4 flex flex-wrap items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
-                <img src="RIBroInc NEW LOGO.jpg" alt="Logo" class="w-10 h-10 object-contain">
-                <div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-lg font-black text-orange-500 tracking-wider">RIBRO INC.</span>
-                        <span class="text-[10px] text-gray-400 font-medium hidden sm:inline">Roxas Isabela Basketball Referees Organization Inc.</span>
-                    </div>
-                    <p class="text-[9px] text-gray-500 font-mono">SEC Reg. No. 2025048197717-63</p>
-                </div>
-            </div>
-            <div class="flex items-center gap-3 ml-auto">
-                <span class="text-sm text-gray-400">User: <strong id="userDisplay" class="text-white"></strong></span>
-                <span id="adminBadge" class="hidden bg-red-900/60 border border-red-700 text-red-300 text-[10px] font-bold px-2 py-0.5 rounded">Admin Control View</span>
-                <button onclick="handleLogout()" class="bg-gray-800 hover:bg-gray-700 text-gray-300 px-3 py-1 text-xs rounded border border-gray-700 transition">Logout</button>
-            </div>
-        </header>
+let SUPABASE_URL = cleanEnvVar(process.env.SUPABASE_URL);
+const SUPABASE_KEY = cleanEnvVar(process.env.SUPABASE_KEY);
 
-        <section class="p-6 max-w-7xl w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="bg-gradient-to-br from-orange-600/20 to-amber-600/5 border border-orange-500/20 rounded-xl p-5 shadow-md flex justify-between items-center">
-                <div>
-                    <h4 class="text-xs uppercase font-bold tracking-wider text-orange-400">Approved System Payout</h4>
-                    <p class="text-[10px] text-gray-400 mt-0.5">Excludes pending verification logs</p>
-                </div>
-                <span id="grandSystemAccumulationPayout" class="text-2xl font-black text-orange-500 font-mono">₱0.00</span>
-            </div>
-            <div class="bg-gray-800 border border-gray-700 rounded-xl p-5 shadow-md flex justify-between items-center">
-                <div>
-                    <h4 class="text-xs uppercase font-bold tracking-wider text-blue-400">Approved Games</h4>
-                    <p class="text-[10px] text-gray-400 mt-0.5">Accumulated approved game entries</p>
-                </div>
-                <span id="analyticsTotalGames" class="text-2xl font-black text-blue-400 font-mono">0</span>
-            </div>
-            <div class="bg-gray-800 border border-gray-700 rounded-xl p-5 shadow-md flex justify-between items-center">
-                <div>
-                    <h4 class="text-xs uppercase font-bold tracking-wider text-emerald-400">Avg. Approved Payout</h4>
-                    <p class="text-[10px] text-gray-400 mt-0.5">Average earning per approved entry</p>
-                </div>
-                <span id="analyticsAvgEarning" class="text-2xl font-black text-emerald-400 font-mono">₱0.00</span>
-            </div>
-        </section>
+if (SUPABASE_URL && !SUPABASE_URL.startsWith('http://') && !SUPABASE_URL.startsWith('https://')) {
+    SUPABASE_URL = `https://${SUPABASE_URL}`;
+}
 
-        <main class="flex-1 px-6 pb-6 grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl w-full mx-auto">
-            
-            <div id="controlPanelSide" class="space-y-6">
-                
-                <div id="addAssignmentSection" class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-xl">
-                    <h2 class="text-xl font-bold text-orange-500 mb-2">Add Assignment Log</h2>
-                    <p id="pendingNoticeText" class="text-[11px] text-amber-400 mb-4 font-medium leading-relaxed hidden">⚠️ Notice: Entries added by referees will remain pending until approved by the administrator.</p>
-                    <form id="payrollForm" onsubmit="handleSaveAssignment(event)" class="space-y-4">
-                        <div>
-                            <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Referee Name</label>
-                            <input type="text" id="refereeName" required class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold uppercase text-gray-400 mb-1">League Title</label>
-                            <input type="text" id="leagueTitle" required placeholder="e.g., Inter-Barangay, SK Cup, SK League" class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white placeholder-gray-500">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Date</label>
-                            <input type="date" id="matchDate" required class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white">
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Games Officiated</label>
-                                <input type="number" id="gamesCount" min="1" value="1" required class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Rate per Game (₱)</label>
-                                <input type="number" id="gameRate" step="0.01" value="500.00" required class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white">
-                            </div>
-                        </div>
-                        <div class="pt-2 flex items-center justify-between border-t border-gray-700/60">
-                            <span class="text-xs font-bold text-gray-400 uppercase">Assignment Total:</span>
-                            <span id="liveCalculationTotal" class="text-xl font-black text-green-400">₱0.00</span>
-                        </div>
-                        <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 rounded transition duration-200 uppercase tracking-wide">Save Assignment</button>
-                    </form>
-                </div>
+app.use(cors());
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
-                <div id="adminOnlyForms" class="hidden space-y-6">
-                    <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-xl">
-                        <h2 class="text-xl font-bold text-teal-400 mb-4">Create Referee Account</h2>
-                        <form id="createAccountForm" onsubmit="handleCreateAccount(event)" class="space-y-4">
-                            <div>
-                                <label class="block text-xs font-bold uppercase text-gray-400 mb-1">New Username</label>
-                                <input type="text" id="newUsername" required placeholder="Referee unique name" class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white placeholder-gray-500">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Assign Password</label>
-                                <input type="text" id="newPassword" required placeholder="Assign entry password" class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white placeholder-gray-500">
-                            </div>
-                            <button type="submit" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 rounded transition duration-200 uppercase tracking-wide">Register Member Account</button>
-                        </form>
-                    </div>
+// API: Verify and login accounts securely with lock validation
+app.post('/api/login', async (req, res) => {
+    try {
+        const { username, password } = req.body;
+        if (!username || !password) return res.status(400).json({ error: "Username and password required." });
 
-                    <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-xl">
-                        <h2 class="text-xl font-bold text-orange-500 mb-4">Manage Members & Passwords</h2>
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Select Member</label>
-                                <select id="resetUserSelect" class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white focus:outline-none focus:border-orange-500">
-                                    <option value="">-- Loading Members... --</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold uppercase text-gray-400 mb-1">New Password</label>
-                                <input type="text" id="resetNewPassword" placeholder="Enter temporary/new password" class="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-orange-500">
-                            </div>
-                            <button onclick="handlePasswordReset()" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 rounded transition duration-200 uppercase tracking-wide">Reset Password</button>
-                        </div>
-                    </div>
+        const response = await axios.get(`${SUPABASE_URL}/rest/v1/users?username=eq.${encodeURIComponent(username.trim())}`, {
+            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+        });
 
-                    <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-xl">
-                        <div class="flex items-center justify-between mb-3">
-                            <h2 class="text-xl font-bold text-indigo-400">Members Directory</h2>
-                            <span id="directoryCountBadge" class="bg-indigo-950 text-indigo-300 text-xs px-2 py-0.5 rounded border border-indigo-800 font-mono">0 Total</span>
-                        </div>
-                        <div class="overflow-hidden border border-gray-700 rounded-lg max-h-[380px] overflow-y-auto">
-                            <table class="w-full text-left text-xs border-collapse">
-                                <thead>
-                                    <tr class="bg-gray-950 text-gray-400 font-bold uppercase border-b border-gray-700">
-                                        <th class="p-2.5">Member details</th>
-                                        <th class="p-2.5 text-center">Actions Management</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="memberDirectoryContainer" class="divide-y divide-gray-700/50">
-                                    </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="lg:col-span-2 space-y-4 flex flex-col">
-                
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-gray-950 p-4 rounded-xl border border-gray-800">
-                    <div>
-                        <label class="block text-[10px] text-gray-400 uppercase font-bold mb-1">Filter Month/Year</label>
-                        <input type="month" id="filterMonthSelect" onchange="renderPayrollTableData()" class="w-full bg-gray-900 border border-gray-700 rounded text-xs px-2 py-1.5 text-white">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] text-gray-400 uppercase font-bold mb-1">Search Referee / League</label>
-                        <input type="text" id="filterSearchQuery" oninput="renderPayrollTableData()" placeholder="Type to filter query..." class="w-full bg-gray-900 border border-gray-700 rounded text-xs px-2 py-1.5 text-white placeholder-gray-500">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] text-gray-400 uppercase font-bold mb-1">Approval Query View</label>
-                        <select id="filterStatusQuery" onchange="renderPayrollTableData()" class="w-full bg-gray-900 border border-gray-700 rounded text-xs px-2 py-1.5 text-white">
-                            <option value="all">Show All Logs</option>
-                            <option value="approved">Approved Logs Only</option>
-                            <option value="pending" selected>Pending Logs Only</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="flex items-center justify-between">
-                    <span class="text-xs text-gray-400 font-semibold" id="recordsCounterDisplay">Showing 0 matching data entries</span>
-                    <button onclick="exportToExcelWorkbook()" class="bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 rounded flex items-center gap-1.5 transition">
-                        📊 Download Excel File
-                    </button>
-                </div>
-
-                <div class="bg-gray-800 rounded-xl border border-gray-700 shadow-xl overflow-hidden flex-1 flex flex-col min-h-[400px]">
-                    <div class="overflow-x-auto w-full flex-1">
-                        <table class="w-full text-left text-xs border-collapse">
-                            <thead>
-                                <tr class="bg-gray-950 text-gray-400 uppercase font-bold border-b border-gray-700">
-                                    <th class="p-3">Referee</th>
-                                    <th class="p-3">League</th>
-                                    <th class="p-3">Date</th>
-                                    <th class="p-3 text-center">Games</th>
-                                    <th class="p-3 text-right">Total</th>
-                                    <th class="p-3 text-center">Status</th>
-                                    <th class="p-3 text-center">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="payrollTableRowsContainer" class="divide-y divide-y-gray-700/50">
-                                </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <script>
-        let currentUser = null;
-        let userRole = 'member';
-        let payrollCachedRecords = [];
-
-        const refNameInput = document.getElementById('refereeName');
-        const gamesInput = document.getElementById('gamesCount');
-        const rateInput = document.getElementById('gameRate');
-        const liveTotalText = document.getElementById('liveCalculationTotal');
-
-        function updateLiveTotalMathOutput() {
-            const g = parseInt(gamesInput.value) || 0;
-            const r = parseFloat(rateInput.value) || 0;
-            liveTotalText.textContent = `₱${(g * r).toFixed(2)}`;
+        const user = response.data[0];
+        if (!user || user.password !== password) {
+            return res.status(401).json({ error: "Invalid username or password." });
         }
-        gamesInput.addEventListener('input', updateLiveTotalMathOutput);
-        rateInput.addEventListener('input', updateLiveTotalMathOutput);
+        
+        if (user.status === 'locked') {
+            return res.status(403).json({ error: "This account has been locked by the administrator." });
+        }
 
-        async function handleLogin(e) {
-            e.preventDefault();
-            const username = document.getElementById('usernameInput').value;
-            const password = document.getElementById('passwordInput').value;
+        res.json({ username: user.username, role: user.role });
+    } catch (err) {
+        res.status(500).json({ error: "Authentication system failure." });
+    }
+});
 
-            try {
-                const response = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password })
-                });
-                const data = await response.json();
+// API: Admin creates new member accounts
+app.post('/api/users', async (req, res) => {
+    try {
+        const { username, password, role } = req.body;
+        const newUser = { 
+            username: username.trim(), 
+            password: password.trim(), 
+            role: role || 'member',
+            status: 'active'
+        };
 
-                if (!response.ok) {
-                    alert(data.error || "Authentication system failure.");
-                    return;
+        const response = await axios.post(`${SUPABASE_URL}/rest/v1/users`, newUser, {
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=representation'
+            }
+        });
+        res.status(201).json(response.data);
+    } catch (err) {
+        res.status(400).json({ error: "Account creation failed." });
+    }
+});
+
+// API: Admin fetches all columns for management view safely
+app.get('/api/users', async (req, res) => {
+    try {
+        const response = await axios.get(`${SUPABASE_URL}/rest/v1/users?select=id,username,role,status`, {
+            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+        });
+        
+        const userData = Array.isArray(response.data) ? response.data : [];
+        const safeUsers = userData.map(u => ({
+            ...u,
+            status: u.status || 'active',
+            role: u.role || 'member'
+        }));
+
+        res.json(safeUsers);
+    } catch (err) {
+        res.json([]);
+    }
+});
+
+// API: Admin updates a member's username
+app.put('/api/users/:id', async (req, res) => {
+    try {
+        const { username } = req.body;
+        const response = await axios.patch(`${SUPABASE_URL}/rest/v1/users?id=eq.${req.params.id}`, 
+            { username: username.trim() },
+            {
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=representation'
                 }
+            }
+        );
+        res.json(response.data);
+    } catch (err) {
+        res.status(500).json({ error: "Failed to update member username." });
+    }
+});
 
-                currentUser = data.username;
-                userRole = data.role;
-
-                document.getElementById('loginScreen').classList.add('hidden');
-                document.getElementById('appDashboard').classList.remove('hidden');
-                document.getElementById('userDisplay').textContent = currentUser;
-
-                if (userRole === 'admin') {
-                    document.getElementById('adminBadge').classList.remove('hidden');
-                    document.getElementById('adminOnlyForms').classList.remove('hidden');
-                    document.getElementById('pendingNoticeText').classList.add('hidden');
-                    document.getElementById('filterStatusQuery').value = 'all'; // Default to all for admin
-                    refNameInput.value = '';
-                    refNameInput.readOnly = false;
-                    refNameInput.placeholder = "Enter referee name";
-                    loadMembersDropdownAndDirectory();
-                } else {
-                    document.getElementById('adminBadge').classList.add('hidden');
-                    document.getElementById('adminOnlyForms').classList.add('hidden');
-                    document.getElementById('pendingNoticeText').classList.remove('hidden');
-                    document.getElementById('filterStatusQuery').value = 'all'; // Let users view pending vs approved
-                    refNameInput.value = currentUser;
-                    refNameInput.readOnly = true;
+// API: Admin toggles status lock on an account
+app.patch('/api/users/:id/toggle-lock', async (req, res) => {
+    try {
+        const { status } = req.body;
+        const response = await axios.patch(`${SUPABASE_URL}/rest/v1/users?id=eq.${req.params.id}`, 
+            { status },
+            {
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=representation'
                 }
-
-                updateLiveTotalMathOutput();
-                fetchPayrollDataRecords();
-            } catch (err) {
-                alert("Cannot establish communications with backend api engine.");
             }
-        }
+        );
+        res.json(response.data);
+    } catch (err) {
+        res.status(500).json({ error: "Failed to toggle account lock state." });
+    }
+});
 
-        async function loadMembersDropdownAndDirectory() {
-            try {
-                const response = await fetch('/api/users');
-                const users = await response.json();
-                
-                const selectElement = document.getElementById('resetUserSelect');
-                const directoryBody = document.getElementById('memberDirectoryContainer');
-                const countBadge = document.getElementById('directoryCountBadge');
+// API: Admin deletes a user account completely
+app.delete('/api/users/:id', async (req, res) => {
+    try {
+        const response = await axios.delete(`${SUPABASE_URL}/rest/v1/users?id=eq.${req.params.id}`, {
+            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+        });
+        res.json(response.data);
+    } catch (err) {
+        res.status(500).json({ error: "Failed to delete user account." });
+    }
+});
 
-                selectElement.innerHTML = '<option value="">-- Select a Member --</option>';
-                directoryBody.innerHTML = '';
-                countBadge.textContent = `${users.length} Total`;
-
-                users.forEach(user => {
-                    if(user.username !== 'admin') {
-                        const option = document.createElement('option');
-                        option.value = user.username;
-                        option.textContent = `${user.username} (${user.role})`;
-                        selectElement.appendChild(option);
-                    }
-
-                    const isLocked = user.status === 'locked';
-                    const tr = document.createElement('tr');
-                    tr.className = "hover:bg-gray-700/20 text-gray-300 font-medium border-b border-gray-700/40";
-                    tr.innerHTML = `
-                        <td class="p-2.5">
-                            <div class="font-semibold text-white flex items-center gap-2">
-                                <span class="w-2 h-2 rounded-full ${isLocked ? 'bg-red-500' : 'bg-green-500'}"></span>
-                                <span id="username-text-${user.id}">${user.username}</span>
-                            </div>
-                            <div class="text-[10px] text-gray-500 mt-0.5 uppercase tracking-wide font-mono">${user.role} ${isLocked ? '• LOCKED' : '• ACTIVE'}</div>
-                        </td>
-                        <td class="p-2.5">
-                            <div class="flex items-center justify-center gap-1.5">
-                                <button onclick="editMemberUsername('${user.id}', '${user.username}')" class="bg-gray-900 border border-gray-700 hover:border-orange-500 text-gray-300 px-2 py-1 rounded text-[10px] font-bold transition">Edit</button>
-                                <button onclick="toggleMemberLock('${user.id}', ${isLocked})" class="${isLocked ? 'bg-amber-950 border border-amber-800 text-amber-400' : 'bg-gray-900 border border-gray-700 text-gray-400'} px-2 py-1 rounded text-[10px] font-bold transition">${isLocked ? 'Unlock' : 'Lock'}</button>
-                                ${user.username !== 'admin' ? `<button onclick="deleteMemberAccount('${user.id}', '${user.username}')" class="bg-red-950/40 border border-red-900 text-red-400 hover:bg-red-900 hover:text-white px-2 py-1 rounded text-[10px] font-bold transition">Del</button>` : ''}
-                            </div>
-                        </td>
-                    `;
-                    directoryBody.appendChild(tr);
-                });
-            } catch (err) {
-                console.error("Error populating directory panel:", err);
-            }
-        }
-
-        async function editMemberUsername(id, currentName) {
-            const newName = prompt(`Change username for "${currentName}":`, currentName);
-            if (!newName || newName.trim() === "" || newName.trim() === currentName) return;
-
-            try {
-                const response = await fetch(`/api/users/${id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username: newName.trim() })
-                });
-                if (response.ok) {
-                    alert("Username successfully updated!");
-                    loadMembersDropdownAndDirectory();
-                } else {
-                    alert("Failed to update username.");
+// API: Admin resets a member's password
+app.patch('/api/users/reset-password', async (req, res) => {
+    try {
+        const { username, newPassword } = req.body;
+        const response = await axios.patch(
+            `${SUPABASE_URL}/rest/v1/users?username=eq.${encodeURIComponent(username.trim())}`,
+            { password: newPassword.trim() },
+            {
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=representation'
                 }
-            } catch (err) {
-                alert("Communication error updating user details.");
             }
+        );
+        if (response.data.length === 0) return res.status(404).json({ error: "User not found." });
+        res.json({ message: `Password for ${username} has been successfully reset.` });
+    } catch (err) {
+        res.status(500).json({ error: "Failed to reset password." });
+    }
+});
+
+// Fetch payroll rows conditionally based on role
+app.get('/api/payroll', async (req, res) => {
+    try {
+        const { username, role } = req.query;
+        let queryUrl = `${SUPABASE_URL}/rest/v1/payroll?select=*`;
+
+        if (role !== 'admin' && username) {
+            queryUrl += `&name=eq.${encodeURIComponent(username.trim())}`;
         }
 
-        async function toggleMemberLock(id, currentlyLocked) {
-            const nextStatus = currentlyLocked ? 'active' : 'locked';
-            if (!confirm(`Are you sure you want to ${currentlyLocked ? 'unlock' : 'lock'} this member account?`)) return;
+        const response = await axios.get(queryUrl, {
+            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+        });
+        
+        const data = Array.isArray(response.data) ? response.data : [];
+        const cleanData = data.map(item => ({
+            ...item,
+            status: item.status || 'approved'
+        }));
+        
+        res.json(cleanData);
+    } catch (err) {
+        res.json([]);
+    }
+});
 
-            try {
-                const response = await fetch(`/api/users/${id}/toggle-lock`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ status: nextStatus })
-                });
-                if (response.ok) {
-                    loadMembersDropdownAndDirectory();
-                } else {
-                    alert("Failed to adjust account lock parameters.");
+// Post a new payroll log item
+app.post('/api/payroll', async (req, res) => {
+    try {
+        const { name, league, date, games, rate, role } = req.body;
+        
+        const newEntry = {
+            name: name.trim(), 
+            league: league.trim(), 
+            date,
+            games: parseInt(games) || 0,
+            rate: parseFloat(rate) || 0,
+            total: (parseInt(games) || 0) * (parseFloat(rate) || 0),
+            status: (role === 'admin') ? 'approved' : 'pending'
+        };
+
+        const response = await axios.post(`${SUPABASE_URL}/rest/v1/payroll`, newEntry, {
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=representation'
+            }
+        });
+        res.status(201).json(response.data);
+    } catch (err) {
+        res.status(500).json({ error: "Failed to save data." });
+    }
+});
+
+// API: Admin approves a specific payroll entry
+app.patch('/api/payroll/:id/approve', async (req, res) => {
+    try {
+        const { status } = req.body;
+        const response = await axios.patch(`${SUPABASE_URL}/rest/v1/payroll?id=eq.${req.params.id}`, 
+            { status },
+            {
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=representation'
                 }
-            } catch (err) {
-                alert("Communication error processing account toggle lock.");
             }
+        );
+        res.json(response.data);
+    } catch (err) {
+        res.status(500).json({ error: "Failed to update entry status." });
+    }
+});
+
+// Delete assignment entry rows
+app.delete('/api/payroll/:id', async (req, res) => {
+    try {
+        const response = await axios.delete(`${SUPABASE_URL}/rest/v1/payroll?id=eq.${req.params.id}`, {
+            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+        });
+        res.json(response.data);
+    } catch (err) {
+        res.status(500).json({ error: "Deletion failed." });
+    }
+});
+
+// ==========================================
+// NEW FEATURES: WITHDRAWALS ROUTING API SYSTEM
+// ==========================================
+
+// Fetch withdrawal records conditionally based on role
+app.get('/api/withdrawals', async (req, res) => {
+    try {
+        const { username, role } = req.query;
+        let queryUrl = `${SUPABASE_URL}/rest/v1/withdrawals?select=*`;
+
+        if (role !== 'admin' && username) {
+            queryUrl += `&name=eq.${encodeURIComponent(username.trim())}`;
         }
 
-        async function deleteMemberAccount(id, name) {
-            if (!confirm(`CRITICAL WARNING: Are you completely certain you want to permanently delete the referee account "${name}"? This action cannot be undone.`)) return;
+        const response = await axios.get(queryUrl, {
+            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+        });
+        res.json(Array.isArray(response.data) ? response.data : []);
+    } catch (err) {
+        res.json([]);
+    }
+});
 
-            try {
-                const response = await fetch(`/api/users/${id}`, { method: 'DELETE' });
-                if (response.ok) {
-                    alert("Account successfully deleted from directory database files.");
-                    loadMembersDropdownAndDirectory();
-                } else {
-                    alert("Server rejected the deletion command request processing.");
+// Post a new withdrawal request (always starts as pending)
+app.post('/api/withdrawals', async (req, res) => {
+    try {
+        const { name, amount, date } = req.body;
+        const newWithdrawal = {
+            name: name.trim(),
+            amount: parseFloat(amount) || 0,
+            date,
+            status: 'pending'
+        };
+
+        const response = await axios.post(`${SUPABASE_URL}/rest/v1/withdrawals`, newWithdrawal, {
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=representation'
+            }
+        });
+        res.status(201).json(response.data);
+    } catch (err) {
+        res.status(500).json({ error: "Failed to process withdrawal request." });
+    }
+});
+
+// Admin approves or rejects a specific withdrawal request
+app.patch('/api/withdrawals/:id/status', async (req, res) => {
+    try {
+        const { status } = req.body; // Expects 'approved' or 'rejected'
+        const response = await axios.patch(`${SUPABASE_URL}/rest/v1/withdrawals?id=eq.${req.params.id}`, 
+            { status },
+            {
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=representation'
                 }
-            } catch (err) {
-                alert("Communication error targeting user delete pipelines execution paths.");
             }
-        }
+        );
+        res.json(response.data);
+    } catch (err) {
+        res.status(500).json({ error: "Failed to modify withdrawal action status." });
+    }
+});
 
-        async function handlePasswordReset() {
-            const username = document.getElementById('resetUserSelect').value;
-            const newPassword = document.getElementById('resetNewPassword').value;
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
-            if (!username || !newPassword) {
-                alert("Please select a target user account row and provide a new entry password.");
-                return;
-            }
-
-            if (!confirm(`Are you certain you wish to overwrite the active access login password row for ${username}?`)) {
-                return;
-            }
-
-            try {
-                const response = await fetch('/api/users/reset-password', {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, newPassword })
-                });
-                const data = await response.json();
-
-                if (response.ok) {
-                    alert(data.message);
-                    document.getElementById('resetNewPassword').value = '';
-                } else {
-                    alert(`Error: ${data.error}`);
-                }
-            } catch (err) {
-                alert("Failed to submit patch update tracking request payload to the server.");
-            }
-        }
-
-        async function fetchPayrollDataRecords() {
-            try {
-                const response = await fetch(`/api/payroll?username=${encodeURIComponent(currentUser)}&role=${userRole}`);
-                payrollCachedRecords = await response.json();
-                renderPayrollTableData();
-            } catch (err) {
-                console.error("Logs download connection failure mapping engine stack streams.");
-            }
-        }
-
-        // ADMIN APPROVAL ACTION HANDLER
-        async function approvePayrollLog(id, decision) {
-            if (!confirm(`Are you sure you want to change this entry status to: ${decision.toUpperCase()}?`)) return;
-
-            try {
-                const response = await fetch(`/api/payroll/${id}/approve`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ status: decision })
-                });
-
-                if (response.ok) {
-                    fetchPayrollDataRecords();
-                } else {
-                    alert("Failed to adjust log entry verification.");
-                }
-            } catch (err) {
-                alert("Communication network breakdown during approval toggle.");
-            }
-        }
-
-        function renderPayrollTableData() {
-            const container = document.getElementById('payrollTableRowsContainer');
-            const totalSummaryText = document.getElementById('grandSystemAccumulationPayout');
-            const totalGamesText = document.getElementById('analyticsTotalGames');
-            const avgEarningText = document.getElementById('analyticsAvgEarning');
-            const counterText = document.getElementById('recordsCounterDisplay');
-            
-            const monthFilter = document.getElementById('filterMonthSelect').value;
-            const searchQuery = document.getElementById('filterSearchQuery').value.toLowerCase().trim();
-            const statusFilter = document.getElementById('filterStatusQuery').value;
-
-            container.innerHTML = '';
-
-            // Filter logic
-            let logs = [...payrollCachedRecords].filter(row => {
-                if (monthFilter && (!row.date || !row.date.startsWith(monthFilter))) return false;
-                if (statusFilter !== 'all' && row.status !== statusFilter) return false;
-                if (searchQuery) {
-                    const matchName = row.name ? row.name.toLowerCase().includes(searchQuery) : false;
-                    const matchLeague = row.league ? row.league.toLowerCase().includes(searchQuery) : false;
-                    if (!matchName && !matchLeague) return false;
-                }
-                return true;
-            });
-
-            // Always default sort by date descending
-            logs.sort((a,b) => new Date(b.date) - new Date(a.date));
-
-            // CRITICAL CHANGE: Only sum parameters for entries that are APPROVED!
-            let sumAccumulator = 0;
-            let gamesAccumulator = 0;
-            let approvedLogsCount = 0;
-
-            payrollCachedRecords.forEach(row => {
-                if (row.status === 'approved') {
-                    sumAccumulator += (row.total || 0);
-                    gamesAccumulator += (parseInt(row.games) || 0);
-                    approvedLogsCount++;
-                }
-            });
-
-            counterText.textContent = `Showing ${logs.length} matching entries in view`;
-
-            if (logs.length === 0) {
-                container.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-500 tracking-wide">No assignment logs found matching your filters.</td></tr>`;
-                totalSummaryText.textContent = `₱${sumAccumulator.toFixed(2)}`;
-                totalGamesText.textContent = gamesAccumulator.toLocaleString();
-                avgEarningText.textContent = `₱${approvedLogsCount > 0 ? (sumAccumulator / approvedLogsCount).toFixed(2) : '0.00'}`;
-                return;
-            }
-
-            logs.forEach(row => {
-                const isPending = row.status === 'pending';
-                const isRejected = row.status === 'rejected';
-                
-                let statusBadge = `<span class="bg-emerald-950 text-emerald-400 border border-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Approved</span>`;
-                if (isPending) {
-                    statusBadge = `<span class="bg-amber-950 text-amber-400 border border-amber-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Pending</span>`;
-                } else if (isRejected) {
-                    statusBadge = `<span class="bg-red-950 text-red-400 border border-red-900 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Rejected</span>`;
-                }
-
-                // Action controls change dynamically depending on if user is admin vs member
-                let controlsMarkup = `<button onclick="handleDeleteAssignment('${row.id}')" class="bg-red-950/40 border border-red-900 text-red-400 hover:bg-red-900 hover:text-white px-2 py-1 rounded text-[10px] uppercase font-bold transition">Delete</button>`;
-                
-                if (userRole === 'admin' && isPending) {
-                    controlsMarkup = `
-                        <div class="flex items-center gap-1 justify-center">
-                            <button onclick="approvePayrollLog('${row.id}', 'approved')" class="bg-emerald-700 hover:bg-emerald-600 text-white px-2 py-1 rounded text-[10px] font-bold uppercase transition">Approve</button>
-                            <button onclick="approvePayrollLog('${row.id}', 'rejected')" class="bg-gray-700 hover:bg-gray-600 text-gray-300 px-2 py-1 rounded text-[10px] font-bold uppercase transition">Deny</button>
-                        </div>
-                    `;
-                }
-
-                const tr = document.createElement('tr');
-                tr.className = `hover:bg-gray-700/30 transition border-b border-gray-700/40 text-gray-300 font-medium ${isPending ? 'opacity-85 bg-gray-900/30' : ''}`;
-                
-                tr.innerHTML = `
-                    <td class="p-3 font-semibold text-white">${row.name}</td>
-                    <td class="p-3 text-gray-400">${row.league}</td>
-                    <td class="p-3 font-mono text-gray-400">${row.date}</td>
-                    <td class="p-3 text-center font-bold">${row.games}</td>
-                    <td class="p-3 text-right font-black ${isPending ? 'text-amber-500' : isRejected ? 'text-gray-500 line-through' : 'text-green-400'} font-mono">₱${parseFloat(row.total).toFixed(2)}</td>
-                    <td class="p-3 text-center">${statusBadge}</td>
-                    <td class="p-3 text-center">${controlsMarkup}</td>
-                `;
-                container.appendChild(tr);
-            });
-
-            totalSummaryText.textContent = `₱${sumAccumulator.toFixed(2)}`;
-            totalGamesText.textContent = gamesAccumulator.toLocaleString();
-            avgEarningText.textContent = `₱${approvedLogsCount > 0 ? (sumAccumulator / approvedLogsCount).toFixed(2) : '0.00'}`;
-        }
-
-        async function handleSaveAssignment(e) {
-            e.preventDefault();
-            const payload = {
-                name: document.getElementById('refereeName').value,
-                league: document.getElementById('leagueTitle').value,
-                date: document.getElementById('matchDate').value,
-                games: document.getElementById('gamesCount').value,
-                rate: document.getElementById('gameRate').value,
-                role: userRole // Pass role context to allow auto-approval for admins
-            };
-
-            try {
-                const response = await fetch('/api/payroll', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (response.ok) {
-                    alert(userRole === 'admin' ? "Log saved and approved successfully!" : "Log submitted successfully! Awaiting admin approval.");
-                    document.getElementById('leagueTitle').value = '';
-                    document.getElementById('matchDate').value = '';
-                    document.getElementById('gamesCount').value = '1';
-                    updateLiveTotalMathOutput();
-                    fetchPayrollDataRecords();
-                } else {
-                    alert("Failed to submit assignment entry values.");
-                }
-            } catch (err) {
-                alert("Error sending payroll logs parameters across data channels.");
-            }
-        }
-
-        async function handleDeleteAssignment(id) {
-            if (!confirm("Are you absolutely sure you want to permanently delete this assignment entry log row?")) return;
-
-            try {
-                const response = await fetch(`/api/payroll/${id}`, { method: 'DELETE' });
-                if (response.ok) {
-                    fetchPayrollDataRecords();
-                } else {
-                    alert("Deletion command rejected by backend cloud engine verification.");
-                }
-            } catch (err) {
-                alert("Communication error targeting row delete commands pipelines.");
-            }
-        }
-
-        async function handleCreateAccount(e) {
-            e.preventDefault();
-            const username = document.getElementById('newUsername').value;
-            const password = document.getElementById('newPassword').value;
-
-            try {
-                const response = await fetch('/api/users', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password, role: 'member' })
-                });
-
-                if (response.ok) {
-                    alert(`Success: Referee account "${username}" has been fully registered!`);
-                    document.getElementById('newUsername').value = '';
-                    document.getElementById('newPassword').value = '';
-                    loadMembersDropdownAndDirectory();
-                } else {
-                    alert("Failed to create user account. Username may be taken.");
-                }
-            } catch (err) {
-                alert("Network failure processing user creation requests.");
-            }
-        }
-
-        function handleLogout() {
-            currentUser = null;
-            userRole = 'member';
-            payrollCachedRecords = [];
-            document.getElementById('usernameInput').value = '';
-            document.getElementById('passwordInput').value = '';
-            document.getElementById('appDashboard').classList.add('hidden');
-            document.getElementById('loginScreen').classList.remove('hidden');
-        }
-
-        function exportToExcelWorkbook() {
-            if (payrollCachedRecords.length === 0) {
-                alert("There are no records currently available to transfer to spreadsheet.");
-                return;
-            }
-
-            // Filter for only approved data for external payroll reporting exports
-            const approvedRecords = payrollCachedRecords.filter(item => item.status === 'approved');
-
-            if (approvedRecords.length === 0) {
-                alert("No approved entries found to export.");
-                return;
-            }
-
-            const cleanRows = approvedRecords.map((item, index) => ({
-                "Log ID": index + 1,
-                "Referee Name": item.name,
-                "League / Tournament": item.league,
-                "Match Officiated Date": item.date,
-                "Games Counts": item.games,
-                "Per Game Rate Fee (PHP)": item.rate,
-                "Total Payout Compensation (PHP)": item.total
-            }));
-
-            const ws = XLSX.utils.json_to_sheet(cleanRows);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "RIBRO Payroll Logs");
-            
-            const datestamp = new Date().toISOString().slice(0,10);
-            XLSX.writeFile(wb, `RIBRO_Inc_Approved_Payroll_Report_${datestamp}.xlsx`);
-        }
-    </script>
-</body>
-</html>
+app.listen(PORT, () => {
+    console.log(`🚀 Server Engine running on port ${PORT}`);
+});
