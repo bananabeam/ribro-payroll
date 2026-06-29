@@ -62,10 +62,10 @@ app.post('/api/users', async (req, res) => {
     }
 });
 
-// API: Admin fetches all registered members
+// UPDATED API: Admin fetches all columns (including id) for management view
 app.get('/api/users', async (req, res) => {
     try {
-        const response = await axios.get(`${SUPABASE_URL}/rest/v1/users?select=username,role`, {
+        const response = await axios.get(`${SUPABASE_URL}/rest/v1/users?select=id,username,role`, {
             headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
         });
         res.json(response.data);
@@ -116,7 +116,7 @@ app.get('/api/payroll', async (req, res) => {
     }
 });
 
-// FIXED API: Post a new payroll log item (Dropped non-existent column)
+// Post a new payroll log item
 app.post('/api/payroll', async (req, res) => {
     try {
         const { name, league, date, games, rate } = req.body;
@@ -139,7 +139,6 @@ app.post('/api/payroll', async (req, res) => {
         });
         res.status(201).json(response.data);
     } catch (err) {
-        console.error("Supabase Save Error:", err.response ? err.response.data : err.message);
         res.status(500).json({ error: "Failed to save data." });
     }
 });
