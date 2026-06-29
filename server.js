@@ -88,7 +88,6 @@ app.get('/api/users', async (req, res) => {
 
         res.json(safeUsers);
     } catch (err) {
-        console.error("DEBUG ERR:", err.message);
         res.json([]);
     }
 });
@@ -170,7 +169,7 @@ app.patch('/api/users/reset-password', async (req, res) => {
     }
 });
 
-// Fetch payroll rows conditionally based on role (Includes status field)
+// Fetch payroll rows conditionally based on role
 app.get('/api/payroll', async (req, res) => {
     try {
         const { username, role } = req.query;
@@ -185,7 +184,6 @@ app.get('/api/payroll', async (req, res) => {
         });
         
         const data = Array.isArray(response.data) ? response.data : [];
-        // Fallback sanitization for status tracking field
         const cleanData = data.map(item => ({
             ...item,
             status: item.status || 'approved'
@@ -197,7 +195,7 @@ app.get('/api/payroll', async (req, res) => {
     }
 });
 
-// Post a new payroll log item (Defaults entries to 'pending')
+// Post a new payroll log item
 app.post('/api/payroll', async (req, res) => {
     try {
         const { name, league, date, games, rate, role } = req.body;
@@ -209,7 +207,6 @@ app.post('/api/payroll', async (req, res) => {
             games: parseInt(games) || 0,
             rate: parseFloat(rate) || 0,
             total: (parseInt(games) || 0) * (parseFloat(rate) || 0),
-            // Admins bypass pending logs, regular members enter as pending
             status: (role === 'admin') ? 'approved' : 'pending'
         };
 
@@ -227,10 +224,10 @@ app.post('/api/payroll', async (req, res) => {
     }
 });
 
-// NEW API ROUTE: Admin approves a specific payroll entry
+// API: Admin approves a specific payroll entry
 app.patch('/api/payroll/:id/approve', async (req, res) => {
     try {
-        const { status } = req.body; // 'approved' or 'rejected'
+        const { status } = req.body;
         const response = await axios.patch(`${SUPABASE_URL}/rest/v1/payroll?id=eq.${req.params.id}`, 
             { status },
             {
@@ -257,6 +254,75 @@ app.delete('/api/payroll/:id', async (req, res) => {
         res.json(response.data);
     } catch (err) {
         res.status(500).json({ error: "Deletion failed." });
+    }
+});
+
+// ==========================================
+// NEW FEATURES: WITHDRAWALS ROUTING API SYSTEM
+// ==========================================
+
+// Fetch withdrawal records conditionally based on role
+app.get('/api/withdrawals', async (req, res) => {
+    try {
+        const { username, role } = req.query;
+        let queryUrl = `${SUPABASE_URL}/rest/v1/withdrawals?select=*`;
+
+        if (role !== 'admin' && username) {
+            queryUrl += `&name=eq.${encodeURIComponent(username.trim())}`;
+        }
+
+        const response = await axios.get(queryUrl, {
+            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+        });
+        res.json(Array.isArray(response.data) ? response.data : []);
+    } catch (err) {
+        res.json([]);
+    }
+});
+
+// Post a new withdrawal request (always starts as pending)
+app.post('/api/withdrawals', async (req, res) => {
+    try {
+        const { name, amount, date } = req.body;
+        const newWithdrawal = {
+            name: name.trim(),
+            amount: parseFloat(amount) || 0,
+            date,
+            status: 'pending'
+        };
+
+        const response = await axios.post(`${SUPABASE_URL}/rest/v1/withdrawals`, newWithdrawal, {
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=representation'
+            }
+        });
+        res.status(201).json(response.data);
+    } catch (err) {
+        res.status(500).json({ error: "Failed to process withdrawal request." });
+    }
+});
+
+// Admin approves or rejects a specific withdrawal request
+app.patch('/api/withdrawals/:id/status', async (req, res) => {
+    try {
+        const { status } = req.body; // Expects 'approved' or 'rejected'
+        const response = await axios.patch(`${SUPABASE_URL}/rest/v1/withdrawals?id=eq.${req.params.id}`, 
+            { status },
+            {
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=representation'
+                }
+            }
+        );
+        res.json(response.data);
+    } catch (err) {
+        res.status(500).json({ error: "Failed to modify withdrawal action status." });
     }
 });
 
