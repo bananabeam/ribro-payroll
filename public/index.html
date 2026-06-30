@@ -21,7 +21,7 @@
         <div class="bg-gray-900 p-8 rounded-2xl border border-gray-800 shadow-2xl max-w-md w-full space-y-6 relative overflow-hidden">
             <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500"></div>
             <div class="flex flex-col items-center text-center">
-                <img src="RIBroInc NEW LOGO.jpg" alt="RIBRO Inc. Logo" class="w-28 h-28 object-contain mb-4 drop-shadow-[0_0_15px_rgba(249,115,22,0.4)]">
+                <img src="RIBROnc NEW LOGO.jpg" alt="RIBRO Inc. Logo" class="w-28 h-28 object-contain mb-4 drop-shadow-[0_0_15px_rgba(249,115,22,0.4)]">
                 <h1 class="text-2xl font-black tracking-wider text-white uppercase">RIBRO INC.</h1>
                 <p class="text-xs font-bold text-gray-400 uppercase tracking-wide mt-1">Roxas Isabela Basketball Referees Organization</p>
                 <span class="text-[10px] text-gray-500 font-mono mt-1 bg-gray-950 px-2.5 py-1 rounded border border-gray-800">SEC Reg. No. 2025048197717-63</span>
@@ -46,7 +46,7 @@
         
         <aside class="hidden lg:flex flex-col w-64 bg-gray-900 border-r border-gray-800 h-screen sticky top-0 shrink-0 z-30">
             <div class="p-5 border-b border-gray-800 flex items-center gap-3 bg-gray-950/40">
-                <img src="RIBroInc NEW LOGO.jpg" alt="RIBRO Logo" class="w-9 h-9 object-contain rounded-lg">
+                <img src="RIBROnc NEW LOGO.jpg" alt="RIBRO Logo" class="w-9 h-9 object-contain rounded-lg">
                 <div>
                     <h2 class="text-sm font-black text-white uppercase tracking-wider">RIBRO INC.</h2>
                     <p class="text-[9px] text-gray-500 font-mono">SEC Management Core</p>
@@ -69,6 +69,9 @@
                 </button>
                 <button onclick="switchViewChannel('reportsView')" id="navLink-reportsView" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition group text-gray-400 hover:bg-gray-800 hover:text-white">
                     <i data-lucide="bar-chart-3" class="w-4 h-4 shrink-0"></i> Audit Reports
+                </button>
+                <button onclick="switchViewChannel('settingsView')" id="navLink-settingsView" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition group text-gray-400 hover:bg-gray-800 hover:text-white">
+                    <i data-lucide="settings" class="w-4 h-4 shrink-0"></i> Account Settings
                 </button>
 
                 <div id="adminNavGroup" class="hidden pt-4 space-y-1.5 border-t border-gray-800/60 mt-4">
@@ -97,7 +100,7 @@
             <header class="bg-gray-900/80 backdrop-blur-md border-b border-gray-800 px-4 lg:px-6 py-4 sticky top-0 z-20 flex items-center justify-between gap-4">
                 <div class="flex items-center gap-3">
                     <div class="lg:hidden flex items-center gap-2">
-                        <img src="RIBroInc NEW LOGO.jpg" alt="Logo" class="w-7 h-7 object-contain">
+                        <img src="RIBROnc NEW LOGO.jpg" alt="Logo" class="w-7 h-7 object-contain">
                         <span class="text-sm font-black text-orange-500 tracking-wider">RIBRO</span>
                     </div>
                     <div class="hidden sm:flex items-center gap-2 text-xs font-medium text-gray-400">
@@ -262,7 +265,7 @@
                                     </div>
                                     <div>
                                         <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Rate per Game (₱)</label>
-                                        <input type="number" id="gameRate" step="0.01" value=" " required class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white text-center focus:outline-none focus:border-orange-500">
+                                        <input type="number" id="gameRate" step="0.01" value="500.00" required class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white text-center focus:outline-none focus:border-orange-500">
                                     </div>
                                 </div>
                                 <div class="p-3 rounded-xl bg-gray-950 flex items-center justify-between border border-gray-800">
@@ -447,7 +450,30 @@
                                 </table>
                             </div>
                         </div>
+                    </div>
+                </div>
 
+                <div id="settingsView" class="view-panel hidden space-y-6">
+                    <div class="max-w-md bg-gray-900 p-6 rounded-2xl border border-gray-800 shadow-xl space-y-4">
+                        <div class="border-b border-gray-800 pb-3">
+                            <h3 class="text-sm font-black uppercase tracking-wider text-orange-400 flex items-center gap-2">
+                                <i data-lucide="key-round" class="w-4 h-4"></i> Security Credential Vault
+                            </h3>
+                            <p class="text-xs text-gray-400 mt-1">Update your authentication key passcode below.</p>
+                        </div>
+                        <form id="memberSelfPasswordForm" onsubmit="handleSelfPasswordChange(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">New System Passcode String</label>
+                                <input type="password" id="selfNewPasswordInput" required placeholder="••••••••" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2.5 text-xs text-white placeholder-gray-700 focus:outline-none focus:border-orange-500">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Confirm Security String Match</label>
+                                <input type="password" id="selfConfirmPasswordInput" required placeholder="••••••••" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2.5 text-xs text-white placeholder-gray-700 focus:outline-none focus:border-orange-500">
+                            </div>
+                            <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider transition shadow">
+                                Rewrite Account Passcode
+                            </button>
+                        </form>
                     </div>
                 </div>
 
@@ -508,8 +534,8 @@
             <button onclick="switchViewChannel('withdrawalsView')" id="mobileNavLink-withdrawalsView" class="flex flex-col items-center justify-center text-gray-400 py-1 transition gap-0.5">
                 <i data-lucide="wallet" class="w-4 h-4"></i><span class="text-[9px] font-bold uppercase tracking-tight">Cash Out</span>
             </button>
-            <button onclick="switchViewChannel('reportsView')" id="mobileNavLink-reportsView" class="flex flex-col items-center justify-center text-gray-400 py-1 transition gap-0.5">
-                <i data-lucide="bar-chart-3" class="w-4 h-4"></i><span class="text-[9px] font-bold uppercase tracking-tight">Audit</span>
+            <button onclick="switchViewChannel('settingsView')" id="mobileNavLink-settingsView" class="flex flex-col items-center justify-center text-gray-400 py-1 transition gap-0.5">
+                <i data-lucide="settings" class="w-4 h-4"></i><span class="text-[9px] font-bold uppercase tracking-tight">Settings</span>
             </button>
             <button onclick="handleLogout()" class="flex flex-col items-center justify-center text-gray-500 py-1 transition gap-0.5">
                 <i data-lucide="log-out" class="w-4 h-4"></i><span class="text-[9px] font-bold uppercase tracking-tight">Exit</span>
@@ -550,6 +576,7 @@
                 'withdrawalsView': 'Withdrawal Processing Terminal',
                 'deductionsView': 'Imposed Penalty Ledger',
                 'reportsView': 'Financial Audit Reports Engine',
+                'settingsView': 'Security & Account Profile Settings',
                 'usersView': 'System Account Profiles Directory'
             };
             document.getElementById('breadcrumbActiveView').textContent = viewLabelMapping[viewTargetId] || 'Portal Core';
@@ -646,6 +673,40 @@
                 setTimeout(() => { lucide.createIcons(); }, 100);
             } catch (err) {
                 alert("Cannot establish communications with backend API engine.");
+            }
+        }
+
+        // ==========================================
+        // NEW MEMBER SELF-SERVICE PASSWORD CHANGE ACTION
+        // ==========================================
+        async function handleSelfPasswordChange(e) {
+            e.preventDefault();
+            const newPassword = document.getElementById('selfNewPasswordInput').value;
+            const confirmPassword = document.getElementById('selfConfirmPasswordInput').value;
+
+            if (newPassword !== confirmPassword) {
+                alert("Passcode confirmation match failed. Please enter the same text string.");
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/users/change-password-self', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: currentUser, password: newPassword })
+                });
+
+                if (response.ok) {
+                    alert("Your security password credentials have been successfully updated!");
+                    document.getElementById('selfNewPasswordInput').value = '';
+                    document.getElementById('selfConfirmPasswordInput').value = '';
+                    switchViewChannel('dashboardView');
+                } else {
+                    const data = await response.json();
+                    alert(data.error || "Failed to update account passcode key.");
+                }
+            } catch (err) {
+                alert("Connection parameters processing error with backend API service.");
             }
         }
 
@@ -840,7 +901,6 @@
             const ctx = document.getElementById('dashboardTrendChart').getContext('2d');
             if (dashboardRenderedChartInstance) { dashboardRenderedChartInstance.destroy(); }
 
-            // Group by date logic strings components
             let dateMap = {};
             payrollCachedRecords.forEach(r => { if(r.status==='approved') dateMap[r.date] = (dateMap[r.date] || 0) + r.total; });
             let sortedDates = Object.keys(dateMap).sort((a,b)=> new Date(a) - new Date(b)).slice(-7);
@@ -1093,9 +1153,6 @@
             document.getElementById('loginScreen').classList.remove('hidden');
         }
 
-        // ==========================================
-        // MULTI-SHEET ENTERPRISE WORKBOOK EXPORT CORE MACRO
-        // ==========================================
         function exportOverallSystemMasterReport() {
             if (payrollCachedRecords.length === 0 && withdrawalsCachedRecords.length === 0 && deductionsCachedRecords.length === 0) {
                 alert("No cached data vectors detected.");
@@ -1104,7 +1161,6 @@
 
             const wb = XLSX.utils.book_new();
 
-            // SHEET TAB 1: EXECUTIVE FINANCIAL SUMMARY DATA MAPPING MATRIX
             let totalIncomes = 0; payrollCachedRecords.forEach(r => { if (r.status === 'approved') totalIncomes += (r.total || 0); });
             let totalWithdrawals = 0; withdrawalsCachedRecords.forEach(w => { if (w.status === 'approved') totalWithdrawals += (w.amount || 0); });
             let totalDeductions = 0; deductionsCachedRecords.forEach(d => { totalDeductions += (d.amount || 0); });
@@ -1123,7 +1179,6 @@
             const wsSummary = XLSX.utils.aoa_to_sheet(summaryRows);
             XLSX.utils.book_append_sheet(wb, wsSummary, "Executive Ledger Summary");
 
-            // SHEET TAB 2: ACTIVE PAYROLL OFFICIATING ENTRIES
             const cleanPayrollRows = payrollCachedRecords.map((item, index) => ({
                 "Log Sequence ID": index + 1,
                 "Referee Identification Name": item.name,
@@ -1136,7 +1191,6 @@
             const wsPayroll = XLSX.utils.json_to_sheet(cleanPayrollRows);
             XLSX.utils.book_append_sheet(wb, wsPayroll, "Game Assignments Ledger");
 
-            // SHEET TAB 3: DISBURSED EXTRACTIONS STATEMENT TRAIL
             const cleanWithdrawalRows = withdrawalsCachedRecords.map((item, index) => ({
                 "Disbursement Row Index": index + 1,
                 "Referee Account Name": item.name,
@@ -1147,7 +1201,6 @@
             const wsWithdrawals = XLSX.utils.json_to_sheet(cleanWithdrawalRows);
             XLSX.utils.book_append_sheet(wb, wsWithdrawals, "Withdrawal Processing Requests");
 
-            // SHEET TAB 4: ACCOUNT LIQUIDATION & DEDUCTIONS BALANCING TRAIL
             const cleanDeductionRows = deductionsCachedRecords.map((item, index) => ({
                 "Adjustment Modification Line Key": index + 1,
                 "Target Referee Name": item.name,
@@ -1158,7 +1211,6 @@
             const wsDeductions = XLSX.utils.json_to_sheet(cleanDeductionRows);
             XLSX.utils.book_append_sheet(wb, wsDeductions, "Imposed Fee Deductions Ledger");
 
-            // Trigger standard automated desktop workbook file extraction process
             const datestamp = new Date().toISOString().slice(0, 10);
             XLSX.writeFile(wb, `RIBRO_Inc_Master_Audit_Report_${datestamp}.xlsx`);
         }
