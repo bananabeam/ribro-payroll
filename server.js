@@ -47,6 +47,52 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
+// ====================================================
+// 🚀 NEW: MEMBER SELF-SERVICE SETTINGS PATHWAY (SUPABASE)
+// ====================================================
+app.post('/api/users/change-password-self', async (req, res) => {
+    try {
+        const { username, password } = req.body;
+
+        if (!username || !password) {
+            return res.status(400).json({ error: "Missing required payload property criteria." });
+        }
+
+        // 1. First extract data to evaluate security constraints
+        const fetchResponse = await axios.get(`${SUPABASE_URL}/rest/v1/users?username=eq.${encodeURIComponent(username.trim())}`, {
+            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+        });
+
+        const targetedUser = fetchResponse.data[0];
+
+        if (!targetedUser) {
+            return res.status(404).json({ error: "Target profile directory row not found." });
+        }
+        if (targetedUser.status === 'locked') {
+            return res.status(403).json({ error: "Account structure locked. Modifications restricted." });
+        }
+
+        // 2. Perform safe relational write-override matching on password row
+        await axios.patch(
+            `${SUPABASE_URL}/rest/v1/users?username=eq.${encodeURIComponent(username.trim())}`,
+            { password: password.trim() },
+            {
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=representation'
+                }
+            }
+        );
+
+        console.log(`[SECURITY] Self-service passcode rewrite applied for account profile: ${username}`);
+        res.json({ message: "Password credential vault updated successfully." });
+    } catch (err) {
+        res.status(500).json({ error: "Failed to securely update self-service password vault profile." });
+    }
+});
+
 // API: Admin creates new member accounts
 app.post('/api/users', async (req, res) => {
     try {
@@ -321,10 +367,6 @@ app.patch('/api/withdrawals/:id/status', async (req, res) => {
         res.status(500).json({ error: "Failed to modify withdrawal action status." });
     }
 });
-
-// ==========================================
-// NEW FEATURES: DEDUCTIONS ROUTING SYSTEM
-// ==========================================
 
 // Get deduction metrics filtering cleanly by role context parameters
 app.get('/api/deductions', async (req, res) => {
