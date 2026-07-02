@@ -47,9 +47,7 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// ====================================================
-// 🚀 NEW: MEMBER SELF-SERVICE SETTINGS PATHWAY (SUPABASE)
-// ====================================================
+// API: MEMBER SELF-SERVICE SETTINGS PATHWAY (SUPABASE)
 app.post('/api/users/change-password-self', async (req, res) => {
     try {
         const { username, password } = req.body;
@@ -58,7 +56,6 @@ app.post('/api/users/change-password-self', async (req, res) => {
             return res.status(400).json({ error: "Missing required payload property criteria." });
         }
 
-        // 1. First extract data to evaluate security constraints
         const fetchResponse = await axios.get(`${SUPABASE_URL}/rest/v1/users?username=eq.${encodeURIComponent(username.trim())}`, {
             headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
         });
@@ -72,7 +69,6 @@ app.post('/api/users/change-password-self', async (req, res) => {
             return res.status(403).json({ error: "Account structure locked. Modifications restricted." });
         }
 
-        // 2. Perform safe relational write-override matching on password row
         await axios.patch(
             `${SUPABASE_URL}/rest/v1/users?username=eq.${encodeURIComponent(username.trim())}`,
             { password: password.trim() },
@@ -387,28 +383,38 @@ app.get('/api/deductions', async (req, res) => {
     }
 });
 
-// Admin creates a deduction penalty entry
+// 🛠️ UPDATED: Admin creates batch deduction entries for multiple target users simultaneously
 app.post('/api/deductions', async (req, res) => {
     try {
-        const { name, reason, amount, date } = req.body;
-        const newDeduction = {
-            name: name.trim(),
-            reason: reason.trim(),
-            amount: parseFloat(amount) || 0,
-            date
-        };
+        const { names, reason, amount, date } = req.body;
 
-        const response = await axios.post(`${SUPABASE_URL}/rest/v1/deductions`, newDeduction, {
-            headers: {
-                'apikey': SUPABASE_KEY,
-                'Authorization': `Bearer ${SUPABASE_KEY}`,
-                'Content-Type': 'application/json',
-                'Prefer': 'return=representation'
-            }
+        if (!names || !Array.isArray(names) || names.length === 0) {
+            return res.status(400).json({ error: "Missing array matrix of target referee profile targets." });
+        }
+
+        const insertPromises = names.map(refereeName => {
+            const newDeduction = {
+                name: refereeName.trim(),
+                reason: reason.trim(),
+                amount: parseFloat(amount) || 0,
+                date
+            };
+
+            return axios.post(`${SUPABASE_URL}/rest/v1/deductions`, newDeduction, {
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=representation'
+                }
+            });
         });
-        res.status(201).json(response.data);
+
+        await Promise.all(insertPromises);
+        console.log(`[MANAGEMENT] Batch mass deduction executed for: (${names.join(', ')})`);
+        res.status(201).json({ message: `Successfully logged entries for ${names.length} users.` });
     } catch (err) {
-        res.status(500).json({ error: "Failed to store deduction record parameter." });
+        res.status(500).json({ error: "Failed to store batch deduction record parameters." });
     }
 });
 
