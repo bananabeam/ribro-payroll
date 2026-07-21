@@ -13,20 +13,15 @@
         .custom-scrollbar::-webkit-scrollbar-track { background: #111827; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #374151; border-radius: 3px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #4B5563; }
-        .hidden { display: none !important; }
     </style>
 </head>
 <body class="bg-gray-950 text-gray-100 min-h-screen font-sans antialiased custom-scrollbar">
 
-    <!-- Login Screen -->
     <div id="loginScreen" class="flex items-center justify-center min-h-screen p-4 bg-gradient-to-br from-gray-950 via-gray-900 to-orange-950/20">
         <div class="bg-gray-900 p-8 rounded-2xl border border-gray-800 shadow-2xl max-w-md w-full space-y-6 relative overflow-hidden">
             <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500"></div>
             <div class="flex flex-col items-center text-center">
-                <!-- Using a placeholder for logo -->
-                <div class="w-28 h-28 bg-gray-800 rounded-full flex items-center justify-center mb-4 border-2 border-orange-500/40 drop-shadow-[0_0_15px_rgba(249,115,22,0.4)]">
-                    <i data-lucide="shield" class="w-12 h-12 text-orange-500"></i>
-                </div>
+                <img src="ribro-logo.jpg" alt="RIBRO Inc. Logo" class="w-28 h-28 object-contain mb-4 drop-shadow-[0_0_15px_rgba(249,115,22,0.4)]">
                 <h1 class="text-2xl font-black tracking-wider text-white uppercase">RIBRO INC.</h1>
                 <p class="text-xs font-bold text-gray-400 uppercase tracking-wide mt-1">Roxas Isabela Basketball Referees Organization</p>
                 <span class="text-[10px] text-gray-500 font-mono mt-1 bg-gray-950 px-2.5 py-1 rounded border border-gray-800">SEC Reg. No. 2025048197717-63</span>
@@ -34,7 +29,9 @@
             <form id="loginForm" class="space-y-4" onsubmit="handleLogin(event)">
                 <div>
                     <label class="block text-xs font-bold uppercase text-gray-400 mb-1.5 tracking-wider">Account Username</label>
-                    <input type="text" id="usernameInput" required placeholder="Enter username (try 'admin')" class="w-full bg-gray-950 border border-gray-700 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition duration-200">
+                    <div class="relative">
+                        <input type="text" id="usernameInput" required placeholder="Enter username" class="w-full bg-gray-950 border border-gray-700 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition duration-200">
+                    </div>
                 </div>
                 <div>
                     <label class="block text-xs font-bold uppercase text-gray-400 mb-1.5 tracking-wider">Security Password</label>
@@ -45,14 +42,11 @@
         </div>
     </div>
 
-    <!-- Main Dashboard Application -->
     <div id="appDashboard" class="hidden min-h-screen flex flex-col lg:flex-row">
-        <!-- Sidebar Navigation -->
+        
         <aside class="hidden lg:flex flex-col w-64 bg-gray-900 border-r border-gray-800 h-screen sticky top-0 shrink-0 z-30">
             <div class="p-5 border-b border-gray-800 flex items-center gap-3 bg-gray-950/40">
-                <div class="w-9 h-9 bg-orange-600 rounded-lg flex items-center justify-center text-white">
-                    <i data-lucide="shield" class="w-5 h-5"></i>
-                </div>
+                <img src="ribro-logo.jpg" alt="RIBRO Logo" class="w-9 h-9 object-contain rounded-lg">
                 <div>
                     <h2 class="text-sm font-black text-white uppercase tracking-wider">RIBRO INC.</h2>
                     <p class="text-[9px] text-gray-500 font-mono">SEC Management Core</p>
@@ -64,25 +58,25 @@
                 <button onclick="switchViewChannel('dashboardView')" id="navLink-dashboardView" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition group bg-orange-600 text-white">
                     <i data-lucide="layout-dashboard" class="w-4 h-4 shrink-0"></i> Dashboard
                 </button>
-                <button onclick="switchViewChannel('assignmentsView')" id="navLink-assignmentsView" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition group text-gray-400 hover:bg-gray-800 hover:text-white">
+                <button onclick="switchViewChannel('assignmentsView')" id="navLink-assignmentsView" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition group text-gray-400 hover:bg-gray-800 hover:text-white">
                     <i data-lucide="award" class="w-4 h-4 shrink-0"></i> Match Logs
                 </button>
-                <button onclick="switchViewChannel('withdrawalsView')" id="navLink-withdrawalsView" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition group text-gray-400 hover:bg-gray-800 hover:text-white">
+                <button onclick="switchViewChannel('withdrawalsView')" id="navLink-withdrawalsView" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition group text-gray-400 hover:bg-gray-800 hover:text-white">
                     <i data-lucide="wallet" class="w-4 h-4 shrink-0"></i> Withdrawals
                 </button>
-                <button onclick="switchViewChannel('deductionsView')" id="navLink-deductionsView" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition group text-gray-400 hover:bg-gray-800 hover:text-white">
+                <button onclick="switchViewChannel('deductionsView')" id="navLink-deductionsView" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition group text-gray-400 hover:bg-gray-800 hover:text-white">
                     <i data-lucide="shield-alert" class="w-4 h-4 shrink-0"></i> Deductions
                 </button>
-                <button onclick="switchViewChannel('reportsView')" id="navLink-reportsView" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition group text-gray-400 hover:bg-gray-800 hover:text-white">
+                <button onclick="switchViewChannel('reportsView')" id="navLink-reportsView" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition group text-gray-400 hover:bg-gray-800 hover:text-white">
                     <i data-lucide="bar-chart-3" class="w-4 h-4 shrink-0"></i> Audit Reports
                 </button>
-                <button onclick="switchViewChannel('settingsView')" id="navLink-settingsView" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition group text-gray-400 hover:bg-gray-800 hover:text-white">
+                <button onclick="switchViewChannel('settingsView')" id="navLink-settingsView" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition group text-gray-400 hover:bg-gray-800 hover:text-white">
                     <i data-lucide="settings" class="w-4 h-4 shrink-0"></i> Account Settings
                 </button>
 
                 <div id="adminNavGroup" class="hidden pt-4 space-y-1.5 border-t border-gray-800/60 mt-4">
                     <div class="text-[10px] uppercase tracking-widest font-bold text-red-400 px-3 mb-2">Administration</div>
-                    <button onclick="switchViewChannel('usersView')" id="navLink-usersView" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition group text-gray-400 hover:bg-gray-800 hover:text-white">
+                    <button onclick="switchViewChannel('usersView')" id="navLink-usersView" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition group text-gray-400 hover:bg-gray-800 hover:text-white">
                         <i data-lucide="users" class="w-4 h-4 shrink-0"></i> User Directory
                     </button>
                 </div>
@@ -90,10 +84,10 @@
 
             <div class="p-4 border-t border-gray-800 bg-gray-950/60 flex items-center justify-between">
                 <div class="flex items-center gap-2.5 truncate">
-                    <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-orange-600 to-amber-500 flex items-center justify-center text-white font-black text-xs uppercase shadow" id="avatarLetter">A</div>
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-orange-600 to-amber-500 flex items-center justify-center text-white font-black text-xs uppercase shadow" id="avatarLetter">U</div>
                     <div class="truncate">
-                        <p class="text-xs font-bold text-white truncate" id="sidebarUserDisplay">Admin</p>
-                        <p class="text-[9px] text-gray-500 uppercase tracking-wider font-mono font-bold" id="sidebarRoleDisplay">Administrator</p>
+                        <p class="text-xs font-bold text-white truncate" id="sidebarUserDisplay">User</p>
+                        <p class="text-[9px] text-gray-500 uppercase tracking-wider font-mono font-bold" id="sidebarRoleDisplay">Member</p>
                     </div>
                 </div>
                 <button onclick="handleLogout()" class="text-gray-500 hover:text-red-400 p-1.5 rounded-lg hover:bg-gray-800/50 transition" title="Logout System">
@@ -102,12 +96,11 @@
             </div>
         </aside>
 
-        <!-- Main Content Area -->
         <div class="flex-1 flex flex-col min-w-0 pb-20 lg:pb-0">
-            <!-- Header -->
             <header class="bg-gray-900/80 backdrop-blur-md border-b border-gray-800 px-4 lg:px-6 py-4 sticky top-0 z-20 flex items-center justify-between gap-4">
                 <div class="flex items-center gap-3">
                     <div class="lg:hidden flex items-center gap-2">
+                        <img src="ribro-logo.jpg" alt="Logo" class="w-7 h-7 object-contain">
                         <span class="text-sm font-black text-orange-500 tracking-wider">RIBRO</span>
                     </div>
                     <div class="hidden sm:flex items-center gap-2 text-xs font-medium text-gray-400">
@@ -134,15 +127,14 @@
 
             <main class="p-4 lg:p-6 space-y-6 flex-1">
                 
-                <!-- KPI Widgets (Visible across primary tabs) -->
-                <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="kpiSection">
+                <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div class="bg-gradient-to-br from-gray-900 to-gray-900/40 p-5 rounded-2xl border border-gray-800 flex justify-between items-center shadow-md relative group overflow-hidden">
                         <div class="absolute right-0 bottom-0 translate-x-4 translate-y-4 opacity-5 group-hover:scale-110 transition duration-300 text-orange-500">
                             <i data-lucide="banknote" class="w-24 h-24"></i>
                         </div>
                         <div>
                             <h4 class="text-[10px] uppercase font-black tracking-widest text-orange-400">Gross System Incomes</h4>
-                            <p class="text-2xl font-black text-white font-mono mt-1" id="kpiGrossIncomes">₱124,500.00</p>
+                            <p class="text-2xl font-black text-white font-mono mt-1" id="kpiGrossIncomes">₱0.00</p>
                             <p class="text-[10px] text-gray-500 mt-1">Sum of all approved match logs</p>
                         </div>
                         <div class="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-400 shadow-inner">
@@ -155,7 +147,7 @@
                         </div>
                         <div>
                             <h4 class="text-[10px] uppercase font-black tracking-widest text-red-400">Total Capital Released</h4>
-                            <p class="text-2xl font-black text-white font-mono mt-1" id="kpiTotalWithdrawals">₱42,300.00</p>
+                            <p class="text-2xl font-black text-white font-mono mt-1" id="kpiTotalWithdrawals">₱0.00</p>
                             <p class="text-[10px] text-gray-500 mt-1">Processed payout extraction receipts</p>
                         </div>
                         <div class="w-10 h-10 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 shadow-inner">
@@ -168,7 +160,7 @@
                         </div>
                         <div>
                             <h4 class="text-[10px] uppercase font-black tracking-widest text-emerald-400">Remaining Balance Pool</h4>
-                            <p class="text-2xl font-black text-emerald-400 font-mono mt-1" id="kpiNetBalance">₱82,200.00</p>
+                            <p class="text-2xl font-black text-emerald-400 font-mono mt-1" id="kpiNetBalance">₱0.00</p>
                             <p class="text-[10px] text-gray-500 mt-1">Available operational liquid capital</p>
                         </div>
                         <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shadow-inner">
@@ -177,7 +169,6 @@
                     </div>
                 </section>
 
-                <!-- 1. Dashboard View -->
                 <div id="dashboardView" class="view-panel space-y-6">
                     <div class="bg-gray-900 p-4 rounded-2xl border border-gray-800">
                         <div class="text-[10px] uppercase font-black tracking-widest text-gray-400 mb-3 px-1">Quick Action Command Deck</div>
@@ -194,7 +185,7 @@
                                 <div class="p-2 rounded-lg bg-blue-500/10 text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition"><i data-lucide="file-spreadsheet" class="w-4 h-4"></i></div>
                                 <span class="text-[11px] font-bold uppercase tracking-wider text-gray-300">Master Report</span>
                             </button>
-                            <button onclick="exportDataToExcel()" class="bg-gradient-to-br from-gray-950 to-blue-950/20 hover:from-gray-900 hover:to-blue-900/30 border border-blue-900/40 p-3.5 rounded-xl flex flex-col items-center justify-center text-center gap-2 group transition">
+                            <button onclick="exportOverallSystemMasterReport()" class="bg-gradient-to-br from-gray-950 to-blue-950/20 hover:from-gray-900 hover:to-blue-900/30 border border-blue-900/40 p-3.5 rounded-xl flex flex-col items-center justify-center text-center gap-2 group transition">
                                 <div class="p-2 rounded-lg bg-blue-500 text-white shadow"><i data-lucide="download" class="w-4 h-4"></i></div>
                                 <span class="text-[11px] font-bold uppercase tracking-wider text-blue-400">Direct XLSX Export</span>
                             </button>
@@ -248,7 +239,6 @@
                     </div>
                 </div>
 
-                <!-- 2. Assignments View -->
                 <div id="assignmentsView" class="view-panel hidden space-y-6">
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
                         <div class="bg-gray-900 p-5 rounded-2xl border border-gray-800 shadow space-y-4">
@@ -271,16 +261,16 @@
                                 <div class="grid grid-cols-2 gap-3">
                                     <div>
                                         <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Games Count</label>
-                                        <input type="number" id="gamesCount" min="1" value="1" required oninput="calculateLiveTotal()" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white text-center focus:outline-none focus:border-orange-500">
+                                        <input type="number" id="gamesCount" min="1" value="1" required class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white text-center focus:outline-none focus:border-orange-500">
                                     </div>
                                     <div>
                                         <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Rate per Game (₱)</label>
-                                        <input type="number" id="gameRate" step="0.01" value="350.00" required oninput="calculateLiveTotal()" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white text-center focus:outline-none focus:border-orange-500">
+                                        <input type="number" id="gameRate" step="0.01" value="0.00" required class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white text-center focus:outline-none focus:border-orange-500">
                                     </div>
                                 </div>
                                 <div class="p-3 rounded-xl bg-gray-950 flex items-center justify-between border border-gray-800">
                                     <span class="text-[10px] uppercase font-bold text-gray-500 tracking-wider">Calculated Total:</span>
-                                    <span id="liveCalculationTotal" class="text-base font-black text-green-400 font-mono">₱350.00</span>
+                                    <span id="liveCalculationTotal" class="text-base font-black text-green-400 font-mono">₱0.00</span>
                                 </div>
                                 <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider transition">Save Record</button>
                             </form>
@@ -289,14 +279,14 @@
                         <div class="lg:col-span-2 space-y-3">
                             <div class="flex flex-wrap items-center justify-between gap-3 bg-gray-900 p-3 rounded-xl border border-gray-800">
                                 <div class="flex items-center gap-2">
-                                    <input type="month" id="filterMonthSelect" class="bg-gray-950 border border-gray-800 rounded-lg text-[11px] px-2.5 py-1 text-white">
-                                    <select id="filterStatusQuery" class="bg-gray-950 border border-gray-800 rounded-lg text-[11px] px-2.5 py-1 text-white">
+                                    <input type="month" id="filterMonthSelect" onchange="renderPayrollTableData()" class="bg-gray-950 border border-gray-800 rounded-lg text-[11px] px-2.5 py-1 text-white">
+                                    <select id="filterStatusQuery" onchange="renderPayrollTableData()" class="bg-gray-950 border border-gray-800 rounded-lg text-[11px] px-2.5 py-1 text-white">
                                         <option value="all">All States</option>
                                         <option value="approved">Approved</option>
                                         <option value="pending">Pending</option>
                                     </select>
                                 </div>
-                                <input type="text" id="filterSearchQuery" placeholder="Search referee..." class="bg-gray-950 border border-gray-800 rounded-lg text-[11px] px-3 py-1 text-white max-w-xs w-full">
+                                <input type="text" id="filterSearchQuery" oninput="renderPayrollTableData()" placeholder="Search referee..." class="bg-gray-950 border border-gray-800 rounded-lg text-[11px] px-3 py-1 text-white max-w-xs w-full">
                             </div>
 
                             <div class="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden shadow">
@@ -310,12 +300,10 @@
                                                 <th class="p-3 text-center">Games</th>
                                                 <th class="p-3 text-right">Total Payout</th>
                                                 <th class="p-3 text-center">Status</th>
-                                                <th class="p-3 text-center">Actions</th>
+                                                <th class="p-3 text-center">Management Actions</th>
                                             </tr>
                                         </thead>
-                                        <tbody id="payrollTableRowsContainer" class="divide-y divide-gray-800/60">
-                                            <!-- Dynamically populated rows -->
-                                        </tbody>
+                                        <tbody id="payrollTableRowsContainer" class="divide-y divide-gray-800/60"></tbody>
                                     </table>
                                 </div>
                             </div>
@@ -324,7 +312,6 @@
                     </div>
                 </div>
 
-                <!-- 3. Withdrawals View -->
                 <div id="withdrawalsView" class="view-panel hidden space-y-6">
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
                         <div class="bg-gray-900 p-5 rounded-2xl border border-gray-800 shadow space-y-4">
@@ -357,23 +344,13 @@
                                             <th class="p-3 text-center">Administrative Authority</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="withdrawalsTableRowsContainer" class="divide-y divide-gray-800/60">
-                                        <!-- Dummy data row -->
-                                        <tr>
-                                            <td class="p-3 font-semibold">John Doe</td>
-                                            <td class="p-3 text-gray-400 font-mono">2026-07-21</td>
-                                            <td class="p-3 text-right text-emerald-400 font-mono font-bold">₱1,500.00</td>
-                                            <td class="p-3 text-center"><span class="bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded text-[9px] uppercase font-bold">Pending</span></td>
-                                            <td class="p-3 text-center"><button class="text-xs bg-gray-800 hover:bg-gray-700 px-3 py-1 rounded text-white transition">Approve</button></td>
-                                        </tr>
-                                    </tbody>
+                                    <tbody id="withdrawalsTableRowsContainer" class="divide-y divide-gray-800/60"></tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 4. Deductions View (Completed from User Snippet) -->
                 <div id="deductionsView" class="view-panel hidden space-y-6">
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
                         <div id="adminDeductionFormWrapper" class="bg-gray-900 p-5 rounded-2xl border border-gray-800 shadow space-y-4">
@@ -384,257 +361,565 @@
                                 <div>
                                     <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Select Target Referee Member</label>
                                     <select id="deductionUserSelect" required class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-500">
-                                        <option value="">Select Referee</option>
-                                        <option value="user1">John Doe</option>
-                                        <option value="user2">Jane Smith</option>
-                                        <option value="user3">Mike Johnson</option>
+                                        <option value="">-- Choose Account Row --</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Deduction Reason</label>
-                                    <input type="text" id="deductionReason" required placeholder="e.g., Late Penalty, Uniform Fee" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-500">
+                                    <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Deduction Justification Reason</label>
+                                    <input type="text" id="deductionReason" required placeholder="e.g., Uniform replacement cost" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-500">
                                 </div>
-                                <div>
-                                    <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Amount (₱)</label>
-                                    <input type="number" id="deductionAmount" step="0.01" min="1" required placeholder="0.00" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-500">
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Penalty Fee (₱)</label>
+                                        <input type="number" id="deductionAmount" step="0.01" min="1" required placeholder="0.00" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Imposed Date</label>
+                                        <input type="date" id="deductionDate" required class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-500">
+                                    </div>
                                 </div>
-                                <div>
-                                    <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Date</label>
-                                    <input type="date" id="deductionDate" required class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-500">
-                                </div>
-                                <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider transition">Impose Deduction</button>
+                                <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider transition">Impose Penalty Charge</button>
                             </form>
                         </div>
-                        
+
                         <div class="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden shadow lg:col-span-2">
-                            <div class="p-3.5 bg-gray-950 text-xs font-black uppercase tracking-widest border-b border-gray-800 text-gray-400">Deduction Penalty History</div>
+                            <div class="p-3.5 bg-gray-950 text-xs font-black uppercase tracking-widest border-b border-gray-800 text-gray-400">Internal Adjustments & Imposed Fines Log</div>
                             <div class="overflow-x-auto custom-scrollbar">
                                 <table class="w-full text-left text-xs border-collapse">
                                     <thead>
                                         <tr class="bg-gray-950/60 text-gray-400 uppercase text-[10px] tracking-wider font-bold border-b border-gray-800">
-                                            <th class="p-3">Member Referee</th>
-                                            <th class="p-3">Reason</th>
-                                            <th class="p-3">Date</th>
-                                            <th class="p-3 text-right">Amount Deducted</th>
+                                            <th class="p-3">Referee</th>
+                                            <th class="p-3">Reason / Context</th>
+                                            <th class="p-3">Date Applied</th>
+                                            <th class="p-3 text-right">Charged Fee</th>
+                                            <th class="p-3 text-center">Audit Authority</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="deductionsTableRowsContainer" class="divide-y divide-gray-800/60">
-                                        <!-- Empty State -->
-                                        <tr><td colspan="4" class="p-6 text-center text-gray-500 italic">No deductions found in the ledger.</td></tr>
-                                    </tbody>
+                                    <tbody id="deductionsTableRowsContainer" class="divide-y divide-gray-800/60"></tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 5. Reports View -->
                 <div id="reportsView" class="view-panel hidden space-y-6">
-                    <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 shadow text-center space-y-4">
-                        <i data-lucide="file-spreadsheet" class="w-16 h-16 text-blue-500 mx-auto opacity-80"></i>
-                        <h2 class="text-xl font-black text-white uppercase tracking-wider">Enterprise Master Report</h2>
-                        <p class="text-sm text-gray-400 max-w-lg mx-auto">Generate comprehensive Excel (.xlsx) financial ledgers containing all match assignments, pending/approved withdrawals, and system deductions.</p>
-                        <div class="pt-4">
-                            <button onclick="exportDataToExcel()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl text-xs uppercase tracking-wider transition inline-flex items-center gap-2">
-                                <i data-lucide="download" class="w-4 h-4"></i> Generate Full Excel Backup
+                    <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 space-y-6 shadow-xl relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-gray-800 pb-4">
+                            <div>
+                                <h3 class="text-base font-black uppercase tracking-wider text-white">📑 Central Financial Reporting Engine</h3>
+                                <p class="text-xs text-gray-400 mt-1">Generate unified balance analytics and extract spreadsheet reports.</p>
+                            </div>
+                            <button onclick="exportOverallSystemMasterReport()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl uppercase tracking-wider transition shadow flex items-center gap-2 self-start sm:self-auto">
+                                <i data-lucide="download" class="w-4 h-4"></i> Download Master Report (XLSX)
                             </button>
                         </div>
-                    </div>
-                </div>
 
-                <!-- 6. Settings View -->
-                <div id="settingsView" class="view-panel hidden space-y-6">
-                    <div class="bg-gray-900 p-5 rounded-2xl border border-gray-800 shadow max-w-2xl mx-auto space-y-6">
-                        <h3 class="text-xs font-black uppercase tracking-widest text-white border-b border-gray-800 pb-3">Profile Preferences</h3>
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Update Password</label>
-                                <input type="password" placeholder="New Password" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-orange-500 mb-2">
-                                <input type="password" placeholder="Confirm New Password" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-orange-500">
+                        <div class="bg-gray-950 p-1.5 rounded-xl border border-gray-800 grid grid-cols-3 max-w-md gap-1">
+                            <button onclick="toggleReportSubTab('reportTabIncomes')" id="btnReportSubTab-reportTabIncomes" class="py-1.5 text-center font-bold uppercase tracking-wider text-[10px] rounded-lg bg-gray-800 text-white transition">Incomes</button>
+                            <button onclick="toggleReportSubTab('reportTabWithdrawals')" id="btnReportSubTab-reportTabWithdrawals" class="py-1.5 text-center font-bold uppercase tracking-wider text-[10px] rounded-lg text-gray-400 hover:text-white transition">Extractions</button>
+                            <button onclick="toggleReportSubTab('reportTabFines')" id="btnReportSubTab-reportTabFines" class="py-1.5 text-center font-bold uppercase tracking-wider text-[10px] rounded-lg text-gray-400 hover:text-white transition">Deductions</button>
+                        </div>
+
+                        <div id="reportTabIncomes" class="report-sub-panel space-y-3">
+                            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">Historical Verified Payout Stream:</div>
+                            <div class="border border-gray-800 rounded-xl overflow-hidden max-h-60 overflow-y-auto custom-scrollbar">
+                                <table class="w-full text-left text-xs border-collapse">
+                                    <tr class="bg-gray-950 text-gray-400 text-[10px] uppercase border-b border-gray-800 font-bold"><th class="p-2.5">Referee</th><th class="p-2.5">League</th><th class="p-2.5 text-right">Value (PHP)</th></tr>
+                                    <tbody id="reportIncomesTableBody" class="divide-y divide-gray-800/40"></tbody>
+                                </table>
                             </div>
-                            <button class="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2.5 px-4 rounded-xl text-xs uppercase tracking-wider transition">Save Changes</button>
+                        </div>
+
+                        <div id="reportTabWithdrawals" class="report-sub-panel hidden space-y-3">
+                            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">Disbursed Cash Extract Log:</div>
+                            <div class="border border-gray-800 rounded-xl overflow-hidden max-h-60 overflow-y-auto custom-scrollbar">
+                                <table class="w-full text-left text-xs border-collapse">
+                                    <tr class="bg-gray-950 text-gray-400 text-[10px] uppercase border-b border-gray-800 font-bold"><th class="p-2.5">Referee</th><th class="p-2.5">Date</th><th class="p-2.5 text-right">Disbursed Amount</th></tr>
+                                    <tbody id="reportWithdrawalsTableBody" class="divide-y divide-gray-800/40"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div id="reportTabFines" class="report-sub-panel hidden space-y-3">
+                            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">Account Adjustments Statement Summary:</div>
+                            <div class="border border-gray-800 rounded-xl overflow-hidden max-h-60 overflow-y-auto custom-scrollbar">
+                                <table class="w-full text-left text-xs border-collapse">
+                                    <tr class="bg-gray-950 text-gray-400 text-[10px] uppercase border-b border-gray-800 font-bold"><th class="p-2.5">Referee</th><th class="p-2.5">Reason</th><th class="p-2.5 text-right">Amount Deducted</th></tr>
+                                    <tbody id="reportDeductionsTableBody" class="divide-y divide-gray-800/40"></tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 7. Users Directory View -->
-                <div id="usersView" class="view-panel hidden space-y-6">
-                    <div class="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden shadow">
-                        <div class="flex items-center justify-between p-4 bg-gray-950 border-b border-gray-800">
-                            <h3 class="text-xs font-black uppercase tracking-widest text-gray-300">Registered System Members</h3>
-                            <button class="bg-gray-800 hover:bg-gray-700 text-white text-[10px] px-3 py-1.5 rounded uppercase font-bold tracking-wider">Add New Member</button>
+                <div id="settingsView" class="view-panel hidden space-y-6">
+                    <div class="max-w-md bg-gray-900 p-6 rounded-2xl border border-gray-800 shadow-xl space-y-4">
+                        <div class="border-b border-gray-800 pb-3">
+                            <h3 class="text-sm font-black uppercase tracking-wider text-orange-400 flex items-center gap-2">
+                                <i data-lucide="key-round" class="w-4 h-4"></i> Security Credential Vault
+                            </h3>
+                            <p class="text-xs text-gray-400 mt-1">Update your authentication key passcode below.</p>
                         </div>
-                        <div class="overflow-x-auto custom-scrollbar">
-                            <table class="w-full text-left text-xs border-collapse">
-                                <thead>
-                                    <tr class="bg-gray-950/60 text-gray-400 uppercase text-[10px] tracking-wider font-bold border-b border-gray-800">
-                                        <th class="p-3">ID / Username</th>
-                                        <th class="p-3">System Role</th>
-                                        <th class="p-3">Registration Date</th>
-                                        <th class="p-3 text-center">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-gray-800/60">
-                                    <tr>
-                                        <td class="p-3 font-semibold">admin<br><span class="text-[10px] text-gray-500 font-normal">Super Administrator</span></td>
-                                        <td class="p-3"><span class="bg-red-900/50 text-red-400 px-2 py-0.5 rounded text-[9px] uppercase">Admin</span></td>
-                                        <td class="p-3 text-gray-400 font-mono">System Core</td>
-                                        <td class="p-3 text-center"><span class="text-emerald-500">Active</span></td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        <form id="memberSelfPasswordForm" onsubmit="handleSelfPasswordChange(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">New System Passcode String</label>
+                                <input type="password" id="selfNewPasswordInput" required placeholder="••••••••" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2.5 text-xs text-white placeholder-gray-700 focus:outline-none focus:border-orange-500">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Confirm Security String Match</label>
+                                <input type="password" id="selfConfirmPasswordInput" required placeholder="••••••••" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2.5 text-xs text-white placeholder-gray-700 focus:outline-none focus:border-orange-500">
+                            </div>
+                            <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider transition shadow">
+                                Rewrite Account Passcode
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div id="usersView" class="view-panel hidden space-y-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+                        <div class="bg-gray-900 p-5 rounded-2xl border border-gray-800 shadow space-y-5">
+                            <div>
+                                <h3 class="text-xs font-black uppercase tracking-widest text-teal-400 flex items-center gap-2"><i data-lucide="user-plus" class="w-4 h-4"></i> Provision Referee Account</h3>
+                                <form id="createAccountForm" onsubmit="handleCreateAccount(event)" class="space-y-3 mt-3">
+                                    <input type="text" id="newUsername" required placeholder="Assign unique username" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-teal-500">
+                                    <input type="text" id="newPassword" required placeholder="Assign entry password" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-teal-500">
+                                    <button type="submit" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 rounded-xl text-xs uppercase tracking-wider transition">Register Credentials</button>
+                                </form>
+                            </div>
+                            
+                            <div class="pt-4 border-t border-gray-800/80">
+                                <h3 class="text-xs font-black uppercase tracking-widest text-orange-400 flex items-center gap-2"><i data-lucide="key-round" class="w-4 h-4"></i> Safety Credential Override</h3>
+                                <div class="space-y-3 mt-3">
+                                    <select id="resetUserSelect" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-orange-500">
+                                        <option value="">-- Choose Member Profile --</option>
+                                    </select>
+                                    <input type="text" id="resetNewPassword" placeholder="Input overwrite password string" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-orange-500">
+                                    <button onclick="handlePasswordReset()" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 rounded-xl text-xs uppercase tracking-wider transition">Execute Security Reset</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden shadow lg:col-span-2">
+                            <div class="p-3.5 bg-gray-950 text-xs font-black uppercase tracking-widest border-b border-gray-800 text-gray-400 flex justify-between items-center">
+                                <span>Operational User Authorization Map</span>
+                                <span id="directoryCountBadge" class="bg-gray-900 text-gray-400 text-[10px] px-2 py-0.5 rounded border border-gray-800 font-mono">0 Registered Profiles</span>
+                            </div>
+                            <div class="overflow-x-auto custom-scrollbar">
+                                <table class="w-full text-left text-xs border-collapse">
+                                    <thead>
+                                        <tr class="bg-gray-950/40 text-gray-400 uppercase text-[10px] tracking-wider font-bold border-b border-gray-800">
+                                            <th class="p-3">System Profile Key</th>
+                                            <th class="p-3 text-center">Interactive Directory Administrative Controls</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="memberDirectoryContainer" class="divide-y divide-gray-800/60"></tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
 
             </main>
         </div>
+
+        <nav class="lg:hidden fixed bottom-0 left-0 w-full bg-gray-900 border-t border-gray-800 px-4 py-2 grid grid-cols-5 text-center gap-1 z-40 shadow-2xl backdrop-blur-md bg-gray-900/90">
+            <button onclick="switchViewChannel('dashboardView')" id="mobileNavLink-dashboardView" class="flex flex-col items-center justify-center text-orange-500 py-1 transition gap-0.5">
+                <i data-lucide="layout-dashboard" class="w-4 h-4"></i><span class="text-[9px] font-bold uppercase tracking-tight">Home</span>
+            </button>
+            <button onclick="switchViewChannel('assignmentsView')" id="mobileNavLink-assignmentsView" class="flex flex-col items-center justify-center text-gray-400 py-1 transition gap-0.5">
+                <i data-lucide="award" class="w-4 h-4"></i><span class="text-[9px] font-bold uppercase tracking-tight">Logs</span>
+            </button>
+            <button onclick="switchViewChannel('withdrawalsView')" id="mobileNavLink-withdrawalsView" class="flex flex-col items-center justify-center text-gray-400 py-1 transition gap-0.5">
+                <i data-lucide="wallet" class="w-4 h-4"></i><span class="text-[9px] font-bold uppercase tracking-tight">Cash Out</span>
+            </button>
+            <button onclick="switchViewChannel('settingsView')" id="mobileNavLink-settingsView" class="flex flex-col items-center justify-center text-gray-400 py-1 transition gap-0.5">
+                <i data-lucide="settings" class="w-4 h-4"></i><span class="text-[9px] font-bold uppercase tracking-tight">Settings</span>
+            </button>
+            <button onclick="handleLogout()" class="flex flex-col items-center justify-center text-gray-500 py-1 transition gap-0.5">
+                <i data-lucide="log-out" class="w-4 h-4"></i><span class="text-[9px] font-bold uppercase tracking-tight">Exit</span>
+            </button>
+        </nav>
+
     </div>
 
-    <!-- Scripts -->
     <script>
-        // Initialize Lucide Icons
-        lucide.createIcons();
-
-        // Basic State Management
         let currentUser = null;
-        let isAdmin = false;
+        let userRole = 'member';
+        let payrollCachedRecords = [];
+        let withdrawalsCachedRecords = [];
+        let deductionsCachedRecords = [];
+        let globalCurrentWalletBalance = 0;
+        let dashboardRenderedChartInstance = null;
 
-        // Login Handler
-        function handleLogin(e) {
+        const refNameInput = document.getElementById('refereeName');
+        const gamesInput = document.getElementById('gamesCount');
+        const rateInput = document.getElementById('gameRate');
+        const liveTotalText = document.getElementById('liveCalculationTotal');
+
+        function updateLiveTotalMathOutput() {
+            const g = parseInt(gamesInput.value) || 0;
+            const r = parseFloat(rateInput.value) || 0;
+            liveTotalText.textContent = `₱${(g * r).toFixed(2)}`;
+        }
+        gamesInput.addEventListener('input', updateLiveTotalMathOutput);
+        rateInput.addEventListener('input', updateLiveTotalMathOutput);
+
+        function switchViewChannel(viewTargetId) {
+            document.querySelectorAll('.view-panel').forEach(p => p.classList.add('hidden'));
+            document.getElementById(viewTargetId).classList.remove('hidden');
+
+            const viewLabelMapping = {
+                'dashboardView': 'Dashboard Overview',
+                'assignmentsView': 'Match Assignments Ledger',
+                'withdrawalsView': 'Withdrawal Processing Terminal',
+                'deductionsView': 'Imposed Penalty Ledger',
+                'reportsView': 'Financial Audit Reports Engine',
+                'settingsView': 'Security & Account Profile Settings',
+                'usersView': 'System Account Profiles Directory'
+            };
+            document.getElementById('breadcrumbActiveView').textContent = viewLabelMapping[viewTargetId] || 'Portal Core';
+
+            // Desktop view active highlighting
+            document.querySelectorAll('aside nav button').forEach(b => {
+                b.classList.remove('bg-orange-600', 'text-white');
+                b.classList.add('text-gray-400', 'hover:bg-gray-800', 'hover:text-white');
+            });
+            const targetedDesktopBtn = document.getElementById(`navLink-${viewTargetId}`);
+            if (targetedDesktopBtn) {
+                targetedDesktopBtn.classList.remove('text-gray-400', 'hover:bg-gray-800', 'hover:text-white');
+                targetedDesktopBtn.classList.add('bg-orange-600', 'text-white');
+            }
+
+            // Mobile view active highlighting
+            document.querySelectorAll('nav[class*="fixed"] button').forEach(mb => {
+                if(!mb.getAttribute('onclick').includes('handleLogout')) {
+                    mb.classList.remove('text-orange-500');
+                    mb.classList.add('text-gray-400');
+                }
+            });
+            const targetedMobileBtn = document.getElementById(`mobileNavLink-${viewTargetId}`);
+            if (targetedMobileBtn) {
+                targetedMobileBtn.classList.remove('text-gray-400');
+                targetedMobileBtn.classList.add('text-orange-500');
+            }
+        }
+
+        function toggleReportSubTab(subTabElementId) {
+            document.querySelectorAll('.report-sub-panel').forEach(el => el.classList.add('hidden'));
+            document.getElementById(subTabElementId).classList.remove('hidden');
+
+            document.querySelectorAll('button[id^="btnReportSubTab-"]').forEach(btn => {
+                btn.classList.remove('bg-gray-800', 'text-white');
+                btn.classList.add('text-gray-400', 'hover:text-white');
+            });
+            const targetedSubBtn = document.getElementById(`btnReportSubTab-${subTabElementId}`);
+            if(targetedSubBtn) {
+                targetedSubBtn.classList.remove('text-gray-400', 'hover:text-white');
+                targetedSubBtn.classList.add('bg-gray-800', 'text-white');
+            }
+        }
+
+        async function handleLogin(e) {
             e.preventDefault();
-            const user = document.getElementById('usernameInput').value.trim();
-            const pass = document.getElementById('passwordInput').value.trim();
-            
-            if (user) {
-                currentUser = user;
-                isAdmin = (user.toLowerCase() === 'admin');
-                
-                // Update UI based on user role
-                document.getElementById('sidebarUserDisplay').innerText = user;
-                document.getElementById('avatarLetter').innerText = user.charAt(0).toUpperCase();
-                document.getElementById('sidebarRoleDisplay').innerText = isAdmin ? 'Administrator' : 'Member';
-                
-                if (isAdmin) {
-                    document.getElementById('adminNavGroup').classList.remove('hidden');
-                    document.getElementById('adminTopBadge').classList.remove('hidden');
-                } else {
-                    document.getElementById('adminNavGroup').classList.add('hidden');
-                    document.getElementById('adminTopBadge').classList.add('hidden');
+            const username = document.getElementById('usernameInput').value;
+            const password = document.getElementById('passwordInput').value;
+
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await response.json();
+
+                if (!response.ok) {
+                    alert(data.error || "Authentication system failure.");
+                    return;
                 }
 
-                // Default date settings
-                document.getElementById('matchDate').valueAsDate = new Date();
-                document.getElementById('withdrawDate').valueAsDate = new Date();
-                document.getElementById('deductionDate').valueAsDate = new Date();
+                currentUser = data.username;
+                userRole = data.role;
 
-                // Switch Screens
                 document.getElementById('loginScreen').classList.add('hidden');
                 document.getElementById('appDashboard').classList.remove('hidden');
-                document.getElementById('appDashboard').classList.add('flex');
-                
-                initDashboardChart();
+                document.getElementById('sidebarUserDisplay').textContent = currentUser;
+                document.getElementById('sidebarRoleDisplay').textContent = userRole;
+                document.getElementById('avatarLetter').textContent = currentUser.charAt(0).toUpperCase();
+
+                document.getElementById('withdrawDate').value = new Date().toISOString().slice(0, 10);
+                document.getElementById('deductionDate').value = new Date().toISOString().slice(0, 10);
+
+                if (userRole === 'admin') {
+                    document.getElementById('adminTopBadge').classList.remove('hidden');
+                    document.getElementById('adminNavGroup').classList.remove('hidden');
+                    document.getElementById('adminDeductionFormWrapper').classList.remove('hidden');
+                    refNameInput.value = '';
+                    refNameInput.readOnly = false;
+                    refNameInput.placeholder = "Enter referee name";
+                    loadMembersDropdownAndDirectory();
+                } else {
+                    document.getElementById('adminTopBadge').classList.add('hidden');
+                    document.getElementById('adminNavGroup').classList.add('hidden');
+                    document.getElementById('adminDeductionFormWrapper').classList.add('hidden');
+                    refNameInput.value = currentUser;
+                    refNameInput.readOnly = true;
+                }
+
+                updateLiveTotalMathOutput();
                 switchViewChannel('dashboardView');
+                fetchAllFinancialSystemRecords();
+                setTimeout(() => { lucide.createIcons(); }, 100);
+            } catch (err) {
+                alert("Cannot establish communications with backend API engine.");
             }
         }
 
-        function handleLogout() {
-            document.getElementById('appDashboard').classList.add('hidden');
-            document.getElementById('appDashboard').classList.remove('flex');
-            document.getElementById('loginScreen').classList.remove('hidden');
-            document.getElementById('loginForm').reset();
-            currentUser = null;
-            isAdmin = false;
+        // ==========================================
+        // NEW MEMBER SELF-SERVICE PASSWORD CHANGE ACTION
+        // ==========================================
+        async function handleSelfPasswordChange(e) {
+            e.preventDefault();
+            const newPassword = document.getElementById('selfNewPasswordInput').value;
+            const confirmPassword = document.getElementById('selfConfirmPasswordInput').value;
+
+            if (newPassword !== confirmPassword) {
+                alert("Passcode confirmation match failed. Please enter the same text string.");
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/users/change-password-self', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: currentUser, password: newPassword })
+                });
+
+                if (response.ok) {
+                    alert("Your security password credentials have been successfully updated!");
+                    document.getElementById('selfNewPasswordInput').value = '';
+                    document.getElementById('selfConfirmPasswordInput').value = '';
+                    switchViewChannel('dashboardView');
+                } else {
+                    const data = await response.json();
+                    alert(data.error || "Failed to update account passcode key.");
+                }
+            } catch (err) {
+                alert("Connection parameters processing error with backend API service.");
+            }
         }
 
-        // View Navigation Logic
-        function switchViewChannel(viewId) {
-            // Hide all views
-            document.querySelectorAll('.view-panel').forEach(panel => {
-                panel.classList.add('hidden');
+        async function fetchAllFinancialSystemRecords() {
+            await fetchPayrollDataRecords();
+            await fetchWithdrawalRecords();
+            await fetchDeductionsRecords();
+            calculateAndRenderUnifiedFinancials();
+            renderInteractiveAnalyticsCharts();
+        }
+
+        async function fetchPayrollDataRecords() {
+            try {
+                const response = await fetch(`/api/payroll?username=${encodeURIComponent(currentUser)}&role=${userRole}`);
+                payrollCachedRecords = await response.json();
+            } catch (err) { console.error(err); }
+        }
+
+        async function fetchWithdrawalRecords() {
+            try {
+                const response = await fetch(`/api/withdrawals?username=${encodeURIComponent(currentUser)}&role=${userRole}`);
+                withdrawalsCachedRecords = await response.json();
+            } catch (err) { console.error(err); }
+        }
+
+        async function fetchDeductionsRecords() {
+            try {
+                const response = await fetch(`/api/deductions?username=${encodeURIComponent(currentUser)}&role=${userRole}`);
+                deductionsCachedRecords = await response.json();
+            } catch (err) { console.error(err); }
+        }
+
+        function calculateAndRenderUnifiedFinancials() {
+            let grossEarnings = 0;
+            payrollCachedRecords.forEach(row => { if (row.status === 'approved') grossEarnings += (row.total || 0); });
+
+            let grossWithdrawals = 0;
+            withdrawalsCachedRecords.forEach(w => { if (w.status === 'approved') grossWithdrawals += (w.amount || 0); });
+
+            let grossDeductions = 0;
+            deductionsCachedRecords.forEach(d => { grossDeductions += (d.amount || 0); });
+
+            globalCurrentWalletBalance = grossEarnings - grossWithdrawals - grossDeductions;
+
+            document.getElementById('kpiGrossIncomes').textContent = `₱${grossEarnings.toFixed(2)}`;
+            document.getElementById('kpiTotalWithdrawals').textContent = `₱${grossWithdrawals.toFixed(2)}`;
+            document.getElementById('kpiNetBalance').textContent = `₱${globalCurrentWalletBalance.toFixed(2)}`;
+
+            renderPayrollTableData();
+            renderWithdrawalsTableData();
+            renderDeductionsTableData();
+            populateReportsSubTabsDisplays();
+        }
+
+        function renderPayrollTableData() {
+            const container = document.getElementById('payrollTableRowsContainer');
+            const counterText = document.getElementById('recordsCounterDisplay');
+            const monthFilter = document.getElementById('filterMonthSelect').value;
+            const searchQuery = document.getElementById('filterSearchQuery').value.toLowerCase().trim();
+            const statusFilter = document.getElementById('filterStatusQuery').value;
+
+            container.innerHTML = '';
+            let logs = [...payrollCachedRecords].filter(row => {
+                if (monthFilter && (!row.date || !row.date.startsWith(monthFilter))) return false;
+                if (statusFilter !== 'all' && row.status !== statusFilter) return false;
+                if (searchQuery && !row.name.toLowerCase().includes(searchQuery) && !row.league.toLowerCase().includes(searchQuery)) return false;
+                return true;
             });
-            
-            // Show target view
-            const targetView = document.getElementById(viewId);
-            if (targetView) {
-                targetView.classList.remove('hidden');
+
+            logs.sort((a,b) => new Date(b.date) - new Date(a.date));
+            counterText.textContent = `Showing ${logs.length} matching data assignment logs`;
+
+            if (logs.length === 0) {
+                container.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-gray-500 font-medium">No match log fields detected.</td></tr>`;
+                return;
             }
 
-            // Update Active Nav Styles
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('bg-orange-600', 'text-white');
-                btn.classList.add('text-gray-400');
+            logs.forEach(row => {
+                const isPending = row.status === 'pending';
+                const isRejected = row.status === 'rejected';
+                let statusBadge = `<span class="bg-emerald-950 text-emerald-400 border border-emerald-900 text-[10px] font-bold px-2 py-0.5 rounded-md uppercase">Approved</span>`;
+                if (isPending) statusBadge = `<span class="bg-amber-950 text-amber-400 border border-amber-900 text-[10px] font-bold px-2 py-0.5 rounded-md uppercase">Pending</span>`;
+                if (isRejected) statusBadge = `<span class="bg-red-950 text-red-400 border border-red-900 text-[10px] font-bold px-2 py-0.5 rounded-md uppercase line-through">Rejected</span>`;
+
+                let controls = `<button onclick="handleDeleteAssignment('${row.id}')" class="text-red-400 hover:text-red-300 font-bold uppercase text-[10px] tracking-wide transition">Delete</button>`;
+                if (userRole === 'admin' && isPending) {
+                    controls = `
+                        <div class="flex items-center gap-2 justify-center">
+                            <button onclick="approvePayrollLog('${row.id}', 'approved')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase transition">Approve</button>
+                            <button onclick="approvePayrollLog('${row.id}', 'rejected')" class="bg-gray-800 hover:bg-gray-700 text-gray-300 px-2 py-0.5 rounded text-[10px] font-bold uppercase transition">Deny</button>
+                        </div>
+                    `;
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-gray-800/30 text-gray-300 font-medium border-b border-gray-800/40";
+                tr.innerHTML = `
+                    <td class="p-3 font-semibold text-white">${row.name}</td>
+                    <td class="p-3 text-gray-400">${row.league}</td>
+                    <td class="p-3 font-mono text-gray-500">${row.date}</td>
+                    <td class="p-3 text-center font-bold">${row.games}</td>
+                    <td class="p-3 text-right font-bold text-gray-200 font-mono">₱${parseFloat(row.total).toFixed(2)}</td>
+                    <td class="p-3 text-center">${statusBadge}</td>
+                    <td class="p-3 text-center">${controls}</td>
+                `;
+                container.appendChild(tr);
             });
-            
-            const activeBtn = document.getElementById('navLink-' + viewId);
-            if (activeBtn) {
-                activeBtn.classList.remove('text-gray-400');
-                activeBtn.classList.add('bg-orange-600', 'text-white');
+        }
+
+        function renderWithdrawalsTableData() {
+            const container = document.getElementById('withdrawalsTableRowsContainer');
+            container.innerHTML = '';
+            let items = [...withdrawalsCachedRecords].sort((a,b) => new Date(b.date) - new Date(a.date));
+
+            if (items.length === 0) {
+                container.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-500 font-medium">No withdrawal parameters located.</td></tr>`;
+                return;
             }
 
-            // Update breadcrumb
-            const titles = {
-                'dashboardView': 'Dashboard Overview',
-                'assignmentsView': 'Match Logs & Entry',
-                'withdrawalsView': 'Withdrawal Requests',
-                'deductionsView': 'Fee Deductions',
-                'reportsView': 'Audit Reports',
-                'settingsView': 'Account Settings',
-                'usersView': 'User Directory'
-            };
-            document.getElementById('breadcrumbActiveView').innerText = titles[viewId] || 'Portal';
+            items.forEach(w => {
+                const isPending = w.status === 'pending';
+                let badge = `<span class="bg-emerald-950 text-emerald-400 border border-emerald-900 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Released</span>`;
+                if (isPending) badge = `<span class="bg-amber-950 text-amber-400 border border-amber-900 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Pending</span>`;
+                if (w.status === 'rejected') badge = `<span class="bg-gray-950 text-gray-600 border border-gray-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase line-through">Rejected</span>`;
+
+                let actions = `<span class="text-gray-600 font-mono text-[10px]">Settled</span>`;
+                if (userRole === 'admin' && isPending) {
+                    actions = `
+                        <div class="flex items-center gap-2 justify-center">
+                            <button onclick="processWithdrawalStatusToggles('${w.id}', 'approved')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase transition">Disburse</button>
+                            <button onclick="processWithdrawalStatusToggles('${w.id}', 'rejected')" class="text-red-400 hover:text-red-300 text-[10px] font-bold uppercase transition">Reject</button>
+                        </div>
+                    `;
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-gray-800/30 text-gray-300 font-medium border-b border-gray-800/40";
+                tr.innerHTML = `
+                    <td class="p-3 text-white font-bold">${w.name}</td>
+                    <td class="p-3 font-mono text-gray-500">${w.date}</td>
+                    <td class="p-3 text-right font-bold text-red-400 font-mono">₱${parseFloat(w.amount).toFixed(2)}</td>
+                    <td class="p-3 text-center">${badge}</td>
+                    <td class="p-3 text-center">${actions}</td>
+                `;
+                container.appendChild(tr);
+            });
         }
 
-        // Live calculation for assignment form
-        function calculateLiveTotal() {
-            const games = parseFloat(document.getElementById('gamesCount').value) || 0;
-            const rate = parseFloat(document.getElementById('gameRate').value) || 0;
-            const total = games * rate;
-            document.getElementById('liveCalculationTotal').innerText = `₱${total.toFixed(2)}`;
+        function renderDeductionsTableData() {
+            const container = document.getElementById('deductionsTableRowsContainer');
+            container.innerHTML = '';
+            let list = [...deductionsCachedRecords].sort((a,b) => new Date(b.date) - new Date(a.date));
+
+            if (list.length === 0) {
+                container.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-500 font-medium">No applied system account adjustments recorded.</td></tr>`;
+                return;
+            }
+
+            list.forEach(d => {
+                let actionCell = `<span class="text-gray-600 font-mono text-[10px]">Immutable</span>`;
+                if (userRole === 'admin') {
+                    actionCell = `<button onclick="handleDeleteDeduction('${d.id}')" class="text-red-400 hover:text-red-300 text-[10px] uppercase font-bold transition">Reverse</button>`;
+                }
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-gray-800/30 text-gray-300 font-medium border-b border-gray-800/40";
+                tr.innerHTML = `
+                    <td class="p-3 text-white font-bold">${d.name}</td>
+                    <td class="p-3 text-gray-400 font-medium">${d.reason}</td>
+                    <td class="p-3 font-mono text-gray-500">${d.date}</td>
+                    <td class="p-3 text-right font-bold text-amber-500 font-mono">-₱${parseFloat(d.amount).toFixed(2)}</td>
+                    <td class="p-3 text-center">${actionCell}</td>
+                `;
+                container.appendChild(tr);
+            });
         }
 
-        // Dummy handlers for forms to prevent page refresh
-        function handleSaveAssignment(e) {
-            e.preventDefault();
-            alert("Match log assignment recorded successfully.");
-            e.target.reset();
-            document.getElementById('matchDate').valueAsDate = new Date();
-            calculateLiveTotal();
+        function populateReportsSubTabsDisplays() {
+            document.getElementById('reportIncomesTableBody').innerHTML = payrollCachedRecords.filter(r => r.status==='approved').map(r=>`
+                <tr class="border-b border-gray-800/40"><td class="p-2 text-white font-bold">${r.name}</td><td class="p-2 text-gray-400">${r.league}</td><td class="p-2 text-right text-emerald-400 font-mono font-bold">₱${parseFloat(r.total).toFixed(2)}</td></tr>
+            `).join('') || '<tr><td colspan="3" class="p-2 text-center text-gray-600">No incomes data available.</td></tr>';
+
+            document.getElementById('reportWithdrawalsTableBody').innerHTML = withdrawalsCachedRecords.filter(w => w.status==='approved').map(w=>`
+                <tr class="border-b border-gray-800/40"><td class="p-2 text-white font-bold">${w.name}</td><td class="p-2 text-gray-400 font-mono">${w.date}</td><td class="p-2 text-right text-red-400 font-mono font-bold">₱${parseFloat(w.amount).toFixed(2)}</td></tr>
+            `).join('') || '<tr><td colspan="3" class="p-2 text-center text-gray-600">No withdrawals data available.</td></tr>';
+
+            document.getElementById('reportDeductionsTableBody').innerHTML = deductionsCachedRecords.map(d=>`
+                <tr class="border-b border-gray-800/40"><td class="p-2 text-white font-bold">${d.name}</td><td class="p-2 text-gray-400">${d.reason}</td><td class="p-2 text-right text-amber-500 font-mono font-bold">₱${parseFloat(d.amount).toFixed(2)}</td></tr>
+            `).join('') || '<tr><td colspan="3" class="p-2 text-center text-gray-600">No penalties data available.</td></tr>';
         }
 
-        function handleRequestWithdrawal(e) {
-            e.preventDefault();
-            alert("Withdrawal requested successfully. Awaiting admin approval.");
-            e.target.reset();
-            document.getElementById('withdrawDate').valueAsDate = new Date();
-        }
-
-        function handleImposeDeduction(e) {
-            e.preventDefault();
-            alert("Deduction penalty imposed on member.");
-            e.target.reset();
-            document.getElementById('deductionDate').valueAsDate = new Date();
-        }
-
-        // Chart.js initialization for the Dashboard
-        let trendChart;
-        function initDashboardChart() {
+        function renderInteractiveAnalyticsCharts() {
             const ctx = document.getElementById('dashboardTrendChart').getContext('2d');
-            
-            if (trendChart) trendChart.destroy();
-            
-            trendChart = new Chart(ctx, {
+            if (dashboardRenderedChartInstance) { dashboardRenderedChartInstance.destroy(); }
+
+            let dateMap = {};
+            payrollCachedRecords.forEach(r => { if(r.status==='approved') dateMap[r.date] = (dateMap[r.date] || 0) + r.total; });
+            let sortedDates = Object.keys(dateMap).sort((a,b)=> new Date(a) - new Date(b)).slice(-7);
+            let revenueValues = sortedDates.map(d => dateMap[d]);
+
+            if(sortedDates.length === 0) { sortedDates = ['No Data Available']; revenueValues = [0]; }
+
+            dashboardRenderedChartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+                    labels: sortedDates,
                     datasets: [{
-                        label: 'Gross Income (₱)',
-                        data: [15000, 22000, 18500, 29000, 31000, 27500, 35000],
+                        label: 'Gross Approved Match Valuation',
+                        data: revenueValues,
                         borderColor: '#f97316',
-                        backgroundColor: 'rgba(249, 115, 22, 0.1)',
+                        backgroundColor: 'rgba(249, 115, 22, 0.05)',
                         borderWidth: 2,
-                        fill: true,
-                        tension: 0.4
+                        tension: 0.3,
+                        fill: true
                     }]
                 },
                 options: {
@@ -642,34 +927,292 @@
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: {
-                        y: { 
-                            beginAtZero: true,
-                            grid: { color: 'rgba(255,255,255,0.05)' },
-                            ticks: { color: '#9ca3af', font: {size: 10} }
-                        },
-                        x: { 
-                            grid: { display: false },
-                            ticks: { color: '#9ca3af', font: {size: 10} }
-                        }
+                        x: { grid: { color: '#1f2937' }, ticks: { color: '#9ca3af', font: { size: 10 } } },
+                        y: { grid: { color: '#1f2937' }, ticks: { color: '#9ca3af', font: { size: 10 } } }
                     }
                 }
             });
         }
 
-        // Example stub for SheetJS Excel Export
-        function exportDataToExcel() {
+        async function handleImposeDeduction(e) {
+            e.preventDefault();
+            const name = document.getElementById('deductionUserSelect').value;
+            const reason = document.getElementById('deductionReason').value;
+            const amount = document.getElementById('deductionAmount').value;
+            const date = document.getElementById('deductionDate').value;
+
+            try {
+                const response = await fetch('/api/deductions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, reason, amount, date })
+                });
+                if (response.ok) {
+                    alert(`Account modification penalty charge appended to ${name}`);
+                    document.getElementById('deductionReason').value = '';
+                    document.getElementById('deductionAmount').value = '';
+                    fetchAllFinancialSystemRecords();
+                } else { alert("Failed to append structural balance alteration."); }
+            } catch (err) { alert("Communication link error."); }
+        }
+
+        async function handleDeleteDeduction(id) {
+            if (!confirm("Reverse this penalty charge allocation from ledger?")) return;
+            try {
+                const response = await fetch(`/api/deductions/${id}`, { method: 'DELETE' });
+                if (response.ok) fetchAllFinancialSystemRecords();
+            } catch (err) { alert("Execution connection failed."); }
+        }
+
+        async function handleRequestWithdrawal(e) {
+            e.preventDefault();
+            const amt = parseFloat(document.getElementById('withdrawAmount').value) || 0;
+            const date = document.getElementById('withdrawDate').value;
+
+            if (userRole !== 'admin' && amt > globalCurrentWalletBalance) {
+                alert(`Insufficient liquid balance values. Limit: ₱${globalCurrentWalletBalance.toFixed(2)}`);
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/withdrawals', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: currentUser, amount: amt, date })
+                });
+                if (response.ok) {
+                    alert("Extraction record catalogued. Awaiting administrator release pipeline authorization.");
+                    document.getElementById('withdrawAmount').value = '';
+                    fetchAllFinancialSystemRecords();
+                }
+            } catch (err) { alert("Network payload delivery timeout."); }
+        }
+
+        async function processWithdrawalStatusToggles(id, decision) {
+            try {
+                const response = await fetch(`/api/withdrawals/${id}/status`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: decision })
+                });
+                if (response.ok) fetchAllFinancialSystemRecords();
+            } catch (err) { alert("Server tracking breakdown."); }
+        }
+
+        async function loadMembersDropdownAndDirectory() {
+            try {
+                const response = await fetch('/api/users');
+                const users = await response.json();
+                
+                const selectElement = document.getElementById('resetUserSelect');
+                const deductionSelect = document.getElementById('deductionUserSelect');
+                const directoryBody = document.getElementById('memberDirectoryContainer');
+                const countBadge = document.getElementById('directoryCountBadge');
+
+                selectElement.innerHTML = '<option value="">-- Choose Profile --</option>';
+                deductionSelect.innerHTML = '<option value="">-- Choose Account Row --</option>';
+                directoryBody.innerHTML = '';
+                countBadge.textContent = `${users.length} Active System Credentials`;
+
+                users.forEach(user => {
+                    if(user.username !== 'admin') {
+                        const option = document.createElement('option'); option.value = user.username; option.textContent = user.username;
+                        selectElement.appendChild(option);
+                        const optDed = option.cloneNode(true); deductionSelect.appendChild(optDed);
+                    }
+                    const isLocked = user.status === 'locked';
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-gray-800/20 text-gray-300 font-medium border-b border-gray-800/40";
+                    tr.innerHTML = `
+                        <td class="p-3">
+                            <div class="font-bold text-white flex items-center gap-2">
+                                <span class="w-1.5 h-1.5 rounded-full ${isLocked ? 'bg-red-500':'bg-green-500'}"></span>
+                                <span>${user.username}</span>
+                            </div>
+                            <div class="text-[9px] text-gray-500 font-mono uppercase mt-0.5">${user.role} • ${user.status || 'Active'}</div>
+                        </td>
+                        <td class="p-3 text-center">
+                            <div class="flex items-center justify-center gap-2">
+                                <button onclick="toggleMemberLock('${user.id}', ${isLocked})" class="text-xs ${isLocked?'text-green-400':'text-amber-500'} font-bold uppercase tracking-wide">${isLocked?'Unlock':'Lock'}</button>
+                                ${user.username !== 'admin' ? `<button onclick="deleteMemberAccount('${user.id}', '${user.username}')" class="text-xs text-red-400 hover:text-red-300 font-bold uppercase tracking-wide">Delete</button>`:''}
+                            </div>
+                        </td>
+                    `;
+                    directoryBody.appendChild(tr);
+                });
+            } catch (err) { console.error(err); }
+        }
+
+        async function toggleMemberLock(id, currentlyLocked) {
+            const nextStatus = currentlyLocked ? 'active' : 'locked';
+            try {
+                const response = await fetch(`/api/users/${id}/toggle-lock`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: nextStatus })
+                });
+                if (response.ok) loadMembersDropdownAndDirectory();
+            } catch (err) { alert("Lock adjustment script exception."); }
+        }
+
+        async function deleteMemberAccount(id, name) {
+            if (!confirm(`Purge account registry row key: "${name}"?`)) return;
+            try {
+                const response = await fetch(`/api/users/${id}`, { method: 'DELETE' });
+                if (response.ok) loadMembersDropdownAndDirectory();
+            } catch (err) { alert("Deletion pathway block exception."); }
+        }
+
+        async function handlePasswordReset() {
+            const username = document.getElementById('resetUserSelect').value;
+            const newPassword = document.getElementById('resetNewPassword').value;
+            if (!username || !newPassword) return;
+
+            try {
+                const response = await fetch('/api/users/reset-password', {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, newPassword })
+                });
+                if (response.ok) { alert("Security parameters updated successfully."); document.getElementById('resetNewPassword').value = ''; }
+            } catch (err) { alert("Patch update tracking processing failure."); }
+        }
+
+        async function approvePayrollLog(id, decision) {
+            try {
+                const response = await fetch(`/api/payroll/${id}/approve`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: decision })
+                });
+                if (response.ok) fetchAllFinancialSystemRecords();
+            } catch (err) { alert("Approval pipeline handshake failed."); }
+        }
+
+        async function handleSaveAssignment(e) {
+            e.preventDefault();
+            const payload = {
+                name: document.getElementById('refereeName').value,
+                league: document.getElementById('leagueTitle').value,
+                date: document.getElementById('matchDate').value,
+                games: document.getElementById('gamesCount').value,
+                rate: document.getElementById('gameRate').value,
+                role: userRole
+            };
+
+            try {
+                const response = await fetch('/api/payroll', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (response.ok) {
+                    alert("Match record logged.");
+                    document.getElementById('leagueTitle').value = '';
+                    document.getElementById('matchDate').value = '';
+                    updateLiveTotalMathOutput();
+                    fetchAllFinancialSystemRecords();
+                }
+            } catch (err) { alert("Payload routing pipeline timeout exception."); }
+        }
+
+        async function handleDeleteAssignment(id) {
+            if (!confirm("Permanently clear this database entry string?")) return;
+            try {
+                const response = await fetch(`/api/payroll/${id}`, { method: 'DELETE' });
+                if (response.ok) fetchAllFinancialSystemRecords();
+            } catch (err) { alert("Data storage block mismatch error."); }
+        }
+
+        async function handleCreateAccount(e) {
+            e.preventDefault();
+            const username = document.getElementById('newUsername').value;
+            const password = document.getElementById('newPassword').value;
+
+            try {
+                const response = await fetch('/api/users', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password, role: 'member' })
+                });
+                if (response.ok) {
+                    alert(`Account created: ${username}`);
+                    document.getElementById('newUsername').value = '';
+                    document.getElementById('newPassword').value = '';
+                    loadMembersDropdownAndDirectory();
+                } else { alert("Username conflict detected inside local database mapping rows."); }
+            } catch (err) { alert("Connection parameters processing error."); }
+        }
+
+        function handleLogout() {
+            currentUser = null; userRole = 'member';
+            payrollCachedRecords = []; withdrawalsCachedRecords = []; deductionsCachedRecords = [];
+            document.getElementById('usernameInput').value = '';
+            document.getElementById('passwordInput').value = '';
+            document.getElementById('appDashboard').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+        }
+
+        function exportOverallSystemMasterReport() {
+            if (payrollCachedRecords.length === 0 && withdrawalsCachedRecords.length === 0 && deductionsCachedRecords.length === 0) {
+                alert("No cached data vectors detected.");
+                return;
+            }
+
             const wb = XLSX.utils.book_new();
-            
-            // Dummy Data for demonstration
-            const ws_data = [
-                ["Date", "Member", "Type", "Amount", "Status"],
-                ["2026-07-21", "John Doe", "Withdrawal", 1500.00, "Pending"],
-                ["2026-07-20", "Admin", "Match Log", 350.00, "Approved"]
+
+            let totalIncomes = 0; payrollCachedRecords.forEach(r => { if (r.status === 'approved') totalIncomes += (r.total || 0); });
+            let totalWithdrawals = 0; withdrawalsCachedRecords.forEach(w => { if (w.status === 'approved') totalWithdrawals += (w.amount || 0); });
+            let totalDeductions = 0; deductionsCachedRecords.forEach(d => { totalDeductions += (d.amount || 0); });
+            let netRemainingBalance = totalIncomes - totalWithdrawals - totalDeductions;
+
+            const summaryRows = [
+                ["ROXAS ISABELA BASKETBALL REFEREES ORGANIZATION INC. (RIBRO INC.)"],
+                ["SEC Reg. No. 2025048197717-63 | CONSOLIDATED FINANCIAL MANAGEMENT LEDGER"],
+                [],
+                ["FINANCIAL METRIC MATRIX STATEMENT", "BALANCE ALLOCATION VALUE (PHP)"],
+                ["Gross Approved Game Earnings (Total Corporate Incomes)", totalIncomes],
+                ["Total Approved Released Withdrawals (Capital Payout Outflow)", totalWithdrawals],
+                ["Total Imposed Account Fee Deductions (Internal Adjustments)", totalDeductions],
+                ["RIBRO Net Remaining Wallet Balance Pool", netRemainingBalance]
             ];
-            const ws = XLSX.utils.aoa_to_sheet(ws_data);
-            XLSX.utils.book_append_sheet(wb, ws, "Financial_Ledger");
-            
-            XLSX.writeFile(wb, "RIBRO_Master_Report.xlsx");
+            const wsSummary = XLSX.utils.aoa_to_sheet(summaryRows);
+            XLSX.utils.book_append_sheet(wb, wsSummary, "Executive Ledger Summary");
+
+            const cleanPayrollRows = payrollCachedRecords.map((item, index) => ({
+                "Log Sequence ID": index + 1,
+                "Referee Identification Name": item.name,
+                "League/Tournament Description": item.league,
+                "Match Date": item.date,
+                "Officiated Games Count": item.games,
+                "Compensation Payout (PHP)": item.total,
+                "Verification State Status": item.status
+            }));
+            const wsPayroll = XLSX.utils.json_to_sheet(cleanPayrollRows);
+            XLSX.utils.book_append_sheet(wb, wsPayroll, "Game Assignments Ledger");
+
+            const cleanWithdrawalRows = withdrawalsCachedRecords.map((item, index) => ({
+                "Disbursement Row Index": index + 1,
+                "Referee Account Name": item.name,
+                "Filing Processing Date": item.date,
+                "Extracted Payout Sum (PHP)": item.amount,
+                "Transaction Status Checked Flag": item.status
+            }));
+            const wsWithdrawals = XLSX.utils.json_to_sheet(cleanWithdrawalRows);
+            XLSX.utils.book_append_sheet(wb, wsWithdrawals, "Withdrawal Processing Requests");
+
+            const cleanDeductionRows = deductionsCachedRecords.map((item, index) => ({
+                "Adjustment Modification Line Key": index + 1,
+                "Target Referee Name": item.name,
+                "Reason Allocation Justification": item.reason,
+                "Subtracted Fine Sum (PHP)": item.amount,
+                "Imposed Action Date Stamp": item.date
+            }));
+            const wsDeductions = XLSX.utils.json_to_sheet(cleanDeductionRows);
+            XLSX.utils.book_append_sheet(wb, wsDeductions, "Imposed Fee Deductions Ledger");
+
+            const datestamp = new Date().toISOString().slice(0, 10);
+            XLSX.writeFile(wb, `RIBRO_Inc_Master_Audit_Report_${datestamp}.xlsx`);
         }
     </script>
 </body>
