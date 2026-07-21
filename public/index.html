@@ -362,7 +362,35 @@
                                     <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Select Target Referee Member</label>
                                     <select id="deductionUserSelect" required class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-500">
                                         <option value="">-- Choose Account Row --</option>
-                                    </select>
+                                    <div class="multi-select-container">
+    <!-- The clickable button that shows what's selected -->
+    <div class="select-btn" id="deductionSelectBtn" onclick="toggleDeductionDropdown()">
+        <span id="deductionSelectText">-- Select Member(s) --</span>
+        <i class="dropdown-icon">▼</i>
+    </div>
+
+    <!-- The hidden list of checkboxes -->
+    <div class="checkbox-list" id="deductionCheckboxList">
+        <label class="checkbox-item select-all-item">
+            <input type="checkbox" id="selectAllMembers" onchange="toggleAllMembers(this)">
+            <strong>Select All</strong>
+        </label>
+        
+        <!-- Generate these dynamically from your backend/database -->
+        <label class="checkbox-item">
+            <input type="checkbox" name="deduction_members[]" value="ref_001" class="member-cb" onchange="updateSelectedCount()">
+            Juan Dela Cruz
+        </label>
+        <label class="checkbox-item">
+            <input type="checkbox" name="deduction_members[]" value="ref_002" class="member-cb" onchange="updateSelectedCount()">
+            Pedro Penduko
+        </label>
+        <label class="checkbox-item">
+            <input type="checkbox" name="deduction_members[]" value="ref_003" class="member-cb" onchange="updateSelectedCount()">
+            Maria Clara
+        </label>
+    </div>
+</div>
                                 </div>
                                 <div>
                                     <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Deduction Justification Reason</label>
