@@ -359,10 +359,16 @@
                             </h3>
                             <form id="deductionForm" onsubmit="handleImposeDeduction(event)" class="space-y-3.5">
                                 <div>
-                                    <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Select Target Referee Member</label>
-                                    <select id="deductionUserSelect" required class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-500">
-                                        <option value="">-- Choose Account Row --</option>
-                                    </select>
+                                    <div class="flex items-center justify-between mb-1.5">
+                                        <label class="block text-[10px] font-bold uppercase text-gray-400">Select Target Referee Members</label>
+                                        <label class="inline-flex items-center gap-1.5 text-[10px] text-gray-400 hover:text-white cursor-pointer select-none">
+                                            <input type="checkbox" id="selectAllDeductionUsers" onchange="toggleSelectAllDeductionUsers(this)" class="rounded border-gray-700 bg-gray-950 text-red-600 focus:ring-0 focus:ring-offset-0">
+                                            <span>Select All</span>
+                                        </label>
+                                    </div>
+                                    <div id="deductionUserCheckboxes" class="max-h-36 overflow-y-auto p-2.5 bg-gray-950 border border-gray-800 rounded-xl space-y-2 custom-scrollbar">
+                                        <p class="text-[11px] text-gray-500">Loading members...</p>
+                                    </div>
                                 </div>
                                 <div>
                                     <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Deduction Justification Reason</label>
@@ -566,6 +572,11 @@
         gamesInput.addEventListener('input', updateLiveTotalMathOutput);
         rateInput.addEventListener('input', updateLiveTotalMathOutput);
 
+        function toggleSelectAllDeductionUsers(masterCheckbox) {
+            const checkboxes = document.querySelectorAll('.deduction-user-checkbox');
+            checkboxes.forEach(cb => cb.checked = masterCheckbox.checked);
+        }
+
         function switchViewChannel(viewTargetId) {
             document.querySelectorAll('.view-panel').forEach(p => p.classList.add('hidden'));
             document.getElementById(viewTargetId).classList.remove('hidden');
@@ -676,9 +687,6 @@
             }
         }
 
-        // ==========================================
-        // NEW MEMBER SELF-SERVICE PASSWORD CHANGE ACTION
-        // ==========================================
         async function handleSelfPasswordChange(e) {
             e.preventDefault();
             const newPassword = document.getElementById('selfNewPasswordInput').value;
@@ -936,24 +944,47 @@
 
         async function handleImposeDeduction(e) {
             e.preventDefault();
-            const name = document.getElementById('deductionUserSelect').value;
+            
+            const selectedCheckboxes = document.querySelectorAll('.deduction-user-checkbox:checked');
+            const selectedUsers = Array.from(selectedCheckboxes).map(cb => cb.value);
+
+            if (selectedUsers.length === 0) {
+                alert("Please select at least one referee member to impose the deduction.");
+                return;
+            }
+
             const reason = document.getElementById('deductionReason').value;
             const amount = document.getElementById('deductionAmount').value;
             const date = document.getElementById('deductionDate').value;
 
             try {
-                const response = await fetch('/api/deductions', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, reason, amount, date })
-                });
-                if (response.ok) {
-                    alert(`Account modification penalty charge appended to ${name}`);
+                const requests = selectedUsers.map(name => 
+                    fetch('/api/deductions', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name, reason, amount, date })
+                    })
+                );
+
+                const results = await Promise.all(requests);
+                const allSuccess = results.every(res => res.ok);
+
+                if (allSuccess) {
+                    alert(`Penalty charge successfully applied to ${selectedUsers.length} member(s).`);
                     document.getElementById('deductionReason').value = '';
                     document.getElementById('deductionAmount').value = '';
+                    
+                    selectedCheckboxes.forEach(cb => cb.checked = false);
+                    const selectAllCb = document.getElementById('selectAllDeductionUsers');
+                    if (selectAllCb) selectAllCb.checked = false;
+
                     fetchAllFinancialSystemRecords();
-                } else { alert("Failed to append structural balance alteration."); }
-            } catch (err) { alert("Communication link error."); }
+                } else {
+                    alert("Some deduction entries failed to save. Please check system logs.");
+                }
+            } catch (err) {
+                alert("Communication link error.");
+            }
         }
 
         async function handleDeleteDeduction(id) {
@@ -1005,20 +1036,35 @@
                 const users = await response.json();
                 
                 const selectElement = document.getElementById('resetUserSelect');
-                const deductionSelect = document.getElementById('deductionUserSelect');
+                const deductionContainer = document.getElementById('deductionUserCheckboxes');
                 const directoryBody = document.getElementById('memberDirectoryContainer');
                 const countBadge = document.getElementById('directoryCountBadge');
 
                 selectElement.innerHTML = '<option value="">-- Choose Profile --</option>';
-                deductionSelect.innerHTML = '<option value="">-- Choose Account Row --</option>';
+                if (deductionContainer) deductionContainer.innerHTML = '';
+                
+                const selectAllCb = document.getElementById('selectAllDeductionUsers');
+                if (selectAllCb) selectAllCb.checked = false;
+
                 directoryBody.innerHTML = '';
                 countBadge.textContent = `${users.length} Active System Credentials`;
 
                 users.forEach(user => {
                     if(user.username !== 'admin') {
-                        const option = document.createElement('option'); option.value = user.username; option.textContent = user.username;
+                        const option = document.createElement('option'); 
+                        option.value = user.username; 
+                        option.textContent = user.username;
                         selectElement.appendChild(option);
-                        const optDed = option.cloneNode(true); deductionSelect.appendChild(optDed);
+
+                        if (deductionContainer) {
+                            const label = document.createElement('label');
+                            label.className = "flex items-center gap-2 text-xs text-gray-300 hover:text-white cursor-pointer select-none";
+                            label.innerHTML = `
+                                <input type="checkbox" value="${user.username}" class="deduction-user-checkbox rounded border-gray-700 bg-gray-900 text-red-600 focus:ring-0 focus:ring-offset-0">
+                                <span>${user.username}</span>
+                            `;
+                            deductionContainer.appendChild(label);
+                        }
                     }
                     const isLocked = user.status === 'locked';
                     const tr = document.createElement('tr');
